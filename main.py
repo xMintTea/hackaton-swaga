@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Response, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from authx import AuthX, AuthXConfig
+from authx import AuthX, AuthXConfig, RequestToken, TokenPayload
 import hashlib
 from datetime import datetime
 
@@ -60,16 +60,14 @@ def get_hash(string: str) -> str:
 @app.post("/login")
 def login(creds: UserLoginSchema, response: Response, db: Session = Depends(get_db)):
     
-    #TODO: изменить на рабочую реализацию с хэшами и подключением к бд
     
-    hashed_password = get_hash(creds.password)
     query = db.query(User)\
         .filter(User.login==creds.login)\
             .filter(User.password == get_hash(creds.password))
 
     user = query.first()
     if user is not None:
-        token = security.create_access_token(uid=str(user.id))
+        token = security.create_access_token(uid=str(user.id), user_id=user.id)
         response.set_cookie(config.JWT_ACCESS_COOKIE_NAME, token)
         return {"access_token":token}
     
@@ -111,6 +109,6 @@ def createDistrict(district: CreateDistrict, db: Session = Depends(get_db)) -> D
 
 
 # TODO: Тестовая защищённая ручка, убрать после.
-@app.get("/protected", dependencies=[Depends(security.access_token_required)])
-def protected():
-    return {"data": "TOP SECRET"}
+@app.get("/protected", dependencies=[Depends(AuthX.get_token_from_request)])
+def protected(payload: TokenPayload = Depends(security.access_token_required)):
+    return {"data": getattr(payload,"user_id")}
