@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div style="text-align: center;">
+        <p>Логин
+            <input id="loginField">
+        </p>
+        <p>Пароль
+            <input id="passwordField">
+        </p>
+    <button style="width: 200px; height: 24px" id="query">Войти</button>
+    </div>
+
+    <script>
+        var btn = document.getElementById("query");
+        btn.onclick = async function() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "login": document.getElementById("loginField").value,
+                        "password": document.getElementById("passwordField").value
+                    })
+                });
+
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                alert(JSON.stringify(data, null, 2));
+            } catch (error) {
+                alert('Error: ' + error);
+            }
+        }
+    </script>
+</body>
+</html>
