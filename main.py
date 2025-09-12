@@ -30,7 +30,12 @@ def get_db():
         yield db
     finally:
         db.close()
-        
+
+
+def get_hash(string: str) -> str:
+    return hashlib.sha256(string.encode()).hexdigest()
+
+
 @app.post("/login")
 def login(creds: UserLoginSchema, response: Response):
     
