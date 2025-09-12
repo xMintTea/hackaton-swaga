@@ -9,3 +9,9 @@ class Student(UserBase):
     
     class Config:
         orm_mode = True
+
+
+
+class UserLoginSchema(BaseModel):
+    username: str
+    password: str
