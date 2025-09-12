@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Response, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from authx import AuthX, AuthXConfig
 import hashlib
@@ -12,6 +13,25 @@ from static import Roles
 
 
 app = FastAPI()
+
+
+origins = [
+    "http://localhost",
+    "http://localhost:8000",
+    "http://127.0.0.1",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:5500",
+    # и другие адреса, с которых может приходить запрос
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Замените на адрес вашего сайта
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 Base.metadata.create_all(bind=engine)
 
 
