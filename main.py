@@ -1,10 +1,14 @@
 from fastapi import FastAPI, HTTPException, Response, Depends
 from sqlalchemy.orm import Session
 from authx import AuthX, AuthXConfig
+import hashlib
+
+
 
 from database import engine, session_local
 from schemas import UserLoginSchema 
 from models import Base
+
 
 app = FastAPI()
 Base.metadata.create_all(bind=engine)
@@ -27,11 +31,13 @@ def get_db():
     finally:
         db.close()
         
-        
 @app.post("/login")
 def login(creds: UserLoginSchema, response: Response):
     
     #TODO: изменить на рабочую реализацию с хэшами и подключением к бд
+    
+    hashed_password = hashlib.sha256(creds.password.encode())
+    
     if creds.username == "test" and creds.password == "test":
         token = security.create_access_token(uid="12345")
         response.set_cookie(config.JWT_ACCESS_COOKIE_NAME, token)
