@@ -43,7 +43,10 @@ def login(creds: UserLoginSchema, response: Response, db: Session = Depends(get_
     #TODO: изменить на рабочую реализацию с хэшами и подключением к бд
     
     hashed_password = get_hash(creds.password)
-    query = db.query(User).filter(User.login==creds.login and User.password == get_hash(creds.password))
+    query = db.query(User)\
+        .filter(User.login==creds.login)\
+            .filter(User.password == get_hash(creds.password))
+
     user = query.first()
     if user is not None:
         token = security.create_access_token(uid=str(user.id))
