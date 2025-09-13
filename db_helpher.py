@@ -1,4 +1,4 @@
-from database import engine, session_local
+from database import session_local
 
 def get_db():
     db = session_local()
