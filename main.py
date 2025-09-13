@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException, Response, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from authx import AuthX, AuthXConfig, RequestToken, TokenPayload
 import hashlib
 from datetime import datetime
 
@@ -35,14 +34,6 @@ app.add_middleware(
 Base.metadata.create_all(bind=engine)
 
 
-config = AuthXConfig()
-
-#TODO: Опасно, лучше всё это перенести в venv.
-config.JWT_SECRET_KEY = "SECRET_KEY"
-config.JWT_ACCESS_COOKIE_NAME = "my_access_token"
-config.JWT_TOKEN_LOCATION = ["cookies"]
-
-security = AuthX(config=config)
 
 
 def get_db():
