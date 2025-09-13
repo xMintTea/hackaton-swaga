@@ -1,8 +1,48 @@
+const CLASSES = {
+    VISIBLE: 'visible',
+    ANIMATED: 'animate__animated',
+    SCROLLED: 'scrolled',
+    ACTIVE: 'active'
+};
+
+const SELECTORS = {
+    HEADER: '#header',
+    MATRIX_RAIN: '#matrixRain',
+    MOBILE_MENU_BTN: '#mobileMenuBtn',
+    LOGIN_BTN: '#loginBtn',
+    REGISTER_BTN: '#registerBtn',
+    LOGIN_MODAL: '#loginModal',
+    REGISTER_MODAL: '#registerModal',
+    CLOSE_LOGIN_MODAL: '#closeLoginModal',
+    CLOSE_REGISTER_MODAL: '#closeRegisterModal',
+    LOGIN_FORM: '#loginForm',
+    REGISTER_FORM: '#registerForm',
+    LEADERBOARD_LIST: '#leaderboardList',
+    JOHNNY_IMAGE: '#johnnyImage',
+    JOHNNY_TEXT: '#johnnyText'
+};
+
+// Основная функция инициализации
 document.addEventListener('DOMContentLoaded', function() {
-    // Эффект матричного дождя
+    console.log('Инициализация сайта Cyberskill...');
+    
+    // Инициализация всех модулей
+    initMatrixRain();
+    initAnimations();
+    initNavigation();
+    initModals();
+    initForms();
+    initLeaderboard();
+    initScrollEffects();
+});
+
+// Инициализация матричного дождя
+function initMatrixRain() {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    const container = document.getElementById('matrixRain');
+    const container = document.querySelector(SELECTORS.MATRIX_RAIN);
+    
+    if (!container) return;
     
     container.appendChild(canvas);
     
@@ -52,29 +92,62 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Глитч-эффект для заголовка
     const title = document.querySelector('.logo');
-    setInterval(() => {
-        if (Math.random() > 0.9) {
-            title.style.animation = 'glitch 0.3s linear';
-            setTimeout(() => {
-                title.style.animation = '';
-            }, 300);
-        }
-    }, 5000);
+    if (title) {
+        setInterval(() => {
+            if (Math.random() > 0.9) {
+                title.style.animation = 'glitch 0.3s linear';
+                setTimeout(() => {
+                    title.style.animation = '';
+                }, 300);
+            }
+        }, 5000);
+    }
+}
+
+// Инициализация анимаций
+function initAnimations() {
+    console.log('Инициализация анимаций...');
+    
+    // Анимация появления элементов при скролле
+    const animatedElements = document.querySelectorAll('.course-card, .test-container, .leaderboard-container');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate__fadeInUp');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    animatedElements.forEach(element => {
+        observer.observe(element);
+    });
+}
+
+// Инициализация навигации
+function initNavigation() {
+    console.log('Инициализация навигации...');
     
     // Переключение мобильного меню
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenuBtn = document.querySelector(SELECTORS.MOBILE_MENU_BTN);
     const nav = document.querySelector('nav');
     
-    if (mobileMenuBtn) {
+    if (mobileMenuBtn && nav) {
         mobileMenuBtn.addEventListener('click', function() {
-            this.classList.toggle('active');
-            nav.classList.toggle('active');
+            this.classList.toggle(CLASSES.ACTIVE);
+            nav.classList.toggle(CLASSES.ACTIVE);
         });
     }
     
     // Плавная прокрутка для навигационных ссылок
     document.querySelectorAll('nav a').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
+            // Для внешних ссылок не предотвращаем стандартное поведение
+            if (this.getAttribute('href').startsWith('http') || this.getAttribute('href').includes('.html')) {
+                return;
+            }
+            
             e.preventDefault();
             
             const targetId = this.getAttribute('href').substring(1);
@@ -88,50 +161,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Закрытие мобильного меню если открыто
                 if (mobileMenuBtn) {
-                    mobileMenuBtn.classList.remove('active');
-                    nav.classList.remove('active');
+                    mobileMenuBtn.classList.remove(CLASSES.ACTIVE);
+                    nav.classList.remove(CLASSES.ACTIVE);
                 }
             }
         });
     });
+}
+
+// Инициализация модальных окон
+function initModals() {
+    console.log('Инициализация модальных окон...');
     
-    // Эффект скролла для хедера
-    window.addEventListener('scroll', function() {
-        const header = document.getElementById('header');
-        if (window.scrollY > 50) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
-        }
-        
-        // Анимация секции Johnny Silverhand
-        const johnnySection = document.getElementById('about');
-        const johnnyImage = document.getElementById('johnnyImage');
-        const johnnyText = document.getElementById('johnnyText');
-        
-        if (johnnySection && johnnyImage && johnnyText) {
-            const sectionTop = johnnySection.offsetTop;
-            const sectionHeight = johnnySection.offsetHeight;
-            
-            if (window.scrollY > sectionTop - window.innerHeight / 2 && 
-                window.scrollY < sectionTop + sectionHeight - window.innerHeight / 2) {
-                johnnyImage.classList.add('visible');
-                johnnyText.classList.add('visible');
-            } else {
-                johnnyImage.classList.remove('visible');
-                johnnyText.classList.remove('visible');
-            }
-        }
-    });
+    const loginBtn = document.querySelector(SELECTORS.LOGIN_BTN);
+    const registerBtn = document.querySelector(SELECTORS.REGISTER_BTN);
+    const loginModal = document.querySelector(SELECTORS.LOGIN_MODAL);
+    const registerModal = document.querySelector(SELECTORS.REGISTER_MODAL);
+    const closeLoginModal = document.querySelector(SELECTORS.CLOSE_LOGIN_MODAL);
+    const closeRegisterModal = document.querySelector(SELECTORS.CLOSE_REGISTER_MODAL);
     
-    // Функционал модальных окон
-    const loginBtn = document.getElementById('loginBtn');
-    const registerBtn = document.getElementById('registerBtn');
-    const loginModal = document.getElementById('loginModal');
-    const registerModal = document.getElementById('registerModal');
-    const closeLoginModal = document.getElementById('closeLoginModal');
-    const closeRegisterModal = document.getElementById('closeRegisterModal');
-    
+    // Открытие модальных окон
     if (loginBtn && loginModal) {
         loginBtn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -146,6 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Закрытие модальных окон
     if (closeLoginModal && loginModal) {
         closeLoginModal.addEventListener('click', function() {
             loginModal.style.display = 'none';
@@ -167,11 +217,18 @@ document.addEventListener('DOMContentLoaded', function() {
             registerModal.style.display = 'none';
         }
     });
+}
+
+// Инициализация форм
+function initForms() {
+    console.log('Инициализация форм...');
     
-    // Обработка отправки форм
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
+    const loginForm = document.querySelector(SELECTORS.LOGIN_FORM);
+    const registerForm = document.querySelector(SELECTORS.REGISTER_FORM);
+    const loginModal = document.querySelector(SELECTORS.LOGIN_MODAL);
+    const registerModal = document.querySelector(SELECTORS.REGISTER_MODAL);
     
+    // Обработка отправки формы входа
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -180,6 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Обработка отправки формы регистрации
     if (registerForm) {
         registerForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -187,39 +245,110 @@ document.addEventListener('DOMContentLoaded', function() {
             if (registerModal) registerModal.style.display = 'none';
         });
     }
+}
+
+// Инициализация лидерборда
+function initLeaderboard() {
+    console.log('Инициализация лидерборда...');
+    
+    const leaderboardList = document.querySelector(SELECTORS.LEADERBOARD_LIST);
+    if (!leaderboardList) return;
     
     // Загрузка данных лидерборда (заглушка)
-    function loadLeaderboard() {
-        const leaderboardData = [
-            { rank: 1, player: 'Neo_Matrix', points: 2450 },
-            { rank: 2, player: 'Cyber_Tr1x', points: 2280 },
-            { rank: 3, player: 'Data_Stream', points: 2150 },
-            { rank: 4, player: 'Byte_Runner', points: 1980 },
-            { rank: 5, player: 'Code_Hunter', points: 1840 }
-        ];
+    const leaderboardData = [
+        { rank: 1, player: 'Neo_Matrix', points: 2450 },
+        { rank: 2, player: 'Cyber_Tr1x', points: 2280 },
+        { rank: 3, player: 'Data_Stream', points: 2150 },
+        { rank: 4, player: 'Byte_Runner', points: 1980 },
+        { rank: 5, player: 'Code_Hunter', points: 1840 }
+    ];
+    
+    leaderboardList.innerHTML = '';
+    
+    leaderboardData.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.className = `leaderboard-item ${item.rank <= 3 ? 'top-' + item.rank : ''}`;
         
-        const leaderboardList = document.getElementById('leaderboardList');
-        if (leaderboardList) {
-            leaderboardList.innerHTML = '';
+        itemElement.innerHTML = `
+            <span class="rank">${item.rank}</span>
+            <span class="player">${item.player}</span>
+            <span class="points">${item.points}</span>
+        `;
+        
+        leaderboardList.appendChild(itemElement);
+    });
+}
+
+// Инициализация эффектов скролла
+function initScrollEffects() {
+    console.log('Инициализация эффектов скролла...');
+    
+    const header = document.querySelector(SELECTORS.HEADER);
+    const johnnySection = document.getElementById('about');
+    const johnnyImage = document.querySelector(SELECTORS.JOHNNY_IMAGE);
+    const johnnyText = document.querySelector(SELECTORS.JOHNNY_TEXT);
+    
+    // Эффект скролла для хедера
+    window.addEventListener('scroll', function() {
+        if (header) {
+            if (window.scrollY > 50) {
+                header.classList.add(CLASSES.SCROLLED);
+            } else {
+                header.classList.remove(CLASSES.SCROLLED);
+            }
+        }
+        
+        // Анимация секции Johnny Silverhand
+        if (johnnySection && johnnyImage && johnnyText) {
+            const sectionTop = johnnySection.offsetTop;
+            const sectionHeight = johnnySection.offsetHeight;
             
-            leaderboardData.forEach(item => {
-                const itemElement = document.createElement('div');
-                itemElement.className = `leaderboard-item ${item.rank <= 3 ? 'top-' + item.rank : ''}`;
-                
-                itemElement.innerHTML = `
-                    <span class="rank">${item.rank}</span>
-                    <span class="player">${item.player}</span>
-                    <span class="points">${item.points}</span>
-                `;
-                
-                leaderboardList.appendChild(itemElement);
-            });
+            if (window.scrollY > sectionTop - window.innerHeight / 2 && 
+                window.scrollY < sectionTop + sectionHeight - window.innerHeight / 2) {
+                johnnyImage.classList.add(CLASSES.VISIBLE);
+                johnnyText.classList.add(CLASSES.VISIBLE);
+            } else {
+                johnnyImage.classList.remove(CLASSES.VISIBLE);
+                johnnyText.classList.remove(CLASSES.VISIBLE);
+            }
+        }
+    });
+}
+
+// Утилитарные функции
+const utils = {
+    // Форматирование чисел
+    formatNumber: function(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    },
+    
+    // Генерация случайного числа в диапазоне
+    randomInt: function(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    },
+    
+    // Проверка поддержки WebGL
+    supportsWebGL: function() {
+        try {
+            const canvas = document.createElement('canvas');
+            return !!window.WebGLRenderingContext && 
+                (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+        } catch (e) {
+            return false;
         }
     }
-    
-    // Инициализация лидерборда
-    loadLeaderboard();
-    
-    // УБРАНА ФУНКЦИЯ ПРИНУДИТЕЛЬНОЙ ПРОКРУТКИ СЕКЦИЙ ПРИ СКРОЛЛЕ
-    // Теперь пользователь может свободно скроллить контент
-});
+};
+
+// Экспорт для использования в других модулях (если нужно)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        initMatrixRain,
+        initAnimations,
+        initNavigation,
+        initModals,
+        initForms,
+        initLeaderboard,
+        initScrollEffects,
+        utils
+    };
+}
