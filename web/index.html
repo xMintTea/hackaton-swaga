@@ -42,7 +42,7 @@
         <div class="container">
             <div class="hero-content">
                 <h1 class="animate__animated animate__fadeInDown">Будущее <span>обучения</span> уже здесь</h1>
-                <p class="animate__animated animate__fadeIn animate__delay-1s">Освойте технологии будущего с нашими инновационными курсами по программированию, кибербезопасности, искусственному интеллекту и многому другому.</p>
+                <p class="animate__animated animate__fadeIn animate__delay-1s">Освойте технологии будущего с нашими инновационными курсы по программированию, кибербезопасности, искусственному интеллекту и многому другому.</p>
                 <div class="hero-buttons animate__animated animate__fadeInUp animate__delay-2s">
                     <a href="#courses" class="btn">Начать обучение</a>
                     <a href="test.html" class="btn btn-pink">Пройти тест</a>
@@ -267,7 +267,7 @@
                     <label for="registerConfirmPassword">Подтверждение пароля</label>
                     <input type="password" id="registerConfirmPassword" required>
                 </div>
-
+                
                 <!-- Секция для преподавателей/админов -->
                 <div id="adminSection" style="display: none;">
                     <div class="form-group">
@@ -290,6 +290,21 @@
             <div style="text-align: center; margin-top: 15px;">
                 <button id="toggleAdminBtn" class="btn-link">Вы не ученик?</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно восстановления пароля -->
+    <div class="modal" id="forgotPasswordModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeForgotPasswordModal">&times;</button>
+            <h2 class="modal-title">Восстановление пароля</h2>
+            <form id="forgotPasswordForm">
+                <div class="form-group">
+                    <label for="forgotPasswordEmail">Email</label>
+                    <input type="email" id="forgotPasswordEmail" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Восстановить пароль</button>
+            </form>
         </div>
     </div>
 
