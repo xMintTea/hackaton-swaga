@@ -1,1 +1,149 @@
-<!-- Окно заглушка для теста--> 
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тестирование | Cyberskill</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .test-page-container {
+            padding: 150px 0 100px;
+            min-height: 100vh;
+        }
+        
+        .back-button {
+            margin-bottom: 30px;
+            display: inline-block;
+        }
+        
+        .test-info {
+            background: var(--dark-secondary);
+            border: 1px solid var(--neon-pink);
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
+        }
+        
+        .dev-comment {
+            background: rgba(0, 238, 255, 0.1);
+            border-left: 3px solid var(--neon-blue);
+            padding: 15px;
+            margin: 20px 0;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-rain" id="matrixRain"></div>
+    
+    <header id="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Cyberskill</a>
+                <nav>
+                    <ul>
+                        <li><a href="index.html#courses">Курсы</a></li>
+                        <li><a href="test.html">Тестирование</a></li>
+                        <li><a href="index.html#leaderboard">Лидерборд</a></li>
+                        <li><a href="index.html#about">О нас</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <a href="#" class="btn" id="loginBtn">Вход</a>
+                    <a href="#" class="btn btn-pink" id="registerBtn">Регистрация</a>
+                </div>
+                <div class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container test-page-container">
+        <a href="index.html" class="btn back-button">← Назад на главную</a>
+        <h1 class="page-title">Тестирование навыков</h1>
+        
+        <div class="test-info">
+            <h2>Страница в разработке</h2>
+            <p>Здесь будет система тестирования для определения уровня знаний по различным направлениям программирования.</p>
+            
+            <div class="dev-comment">
+                <strong>Комментарий для бэкендера:</strong> необходимо реализовать систему вопросов с различными типами ответов,
+                алгоритм подсчета баллов, систему рекомендаций на основе результатов и интеграцию с лидербордом.
+            </div>
+            
+            <h3>Планируемый функционал:</h3>
+            <ul>
+                <li>Разделение тестов по категориям (Python, JavaScript, Java и др.)</li>
+                <li>Различные типы вопросов: одиночный выбор, множественный выбор, ввод кода</li>
+                <li>Система подсчета очков и определения уровня</li>
+                <li>Рекомендации по курсам на основе результатов</li>
+                <li>Добавление результатов в лидерборд</li>
+                <li>Система достижений и наград</li>
+            </ul>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="index.html" class="btn btn-pink">Вернуться на главную</a>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Cyberskill</h3>
+                    <ul>
+                        <li><a href="index.html#about">О нас</a></li>
+                        <li><a href="#">Команда</a></li>
+                        <li><a href="#">Вакансии</a></li>
+                        <li><a href="#">Партнеры</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Курсы</h3>
+                    <ul>
+                        <li><a href="courses.html">Все курсы</a></li>
+                        <li><a href="#">Новые программы</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Поддержка</h3>
+                    <ul>
+                        <li><a href="#">Помощь</a></li>
+                        <li><a href="#">Контакты</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Социальные сети</h3>
+                    <div class="social-links">
+                        <a href="https://youtube.com" target="_blank" title="YouTube">📺</a>
+                        <a href="https://t.me" target="_blank" title="Telegram">📨</a>
+                        <a href="https://github.com" target="_blank" title="GitHub">🐙</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>© 2025 Cyberskill. Все права защищены. | Сделано в киберпространстве</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
