@@ -1,4 +1,3 @@
-// Основной скрипт для сайта Cyberskill
 document.addEventListener('DOMContentLoaded', function() {
     // Эффект матричного дождя
     const canvas = document.createElement('canvas');
@@ -132,7 +131,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const registerModal = document.getElementById('registerModal');
     const closeLoginModal = document.getElementById('closeLoginModal');
     const closeRegisterModal = document.getElementById('closeRegisterModal');
-    const startTestBtn = document.getElementById('startTestBtn');
     
     if (loginBtn && loginModal) {
         loginBtn.addEventListener('click', function(e) {
@@ -157,13 +155,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (closeRegisterModal && registerModal) {
         closeRegisterModal.addEventListener('click', function() {
             registerModal.style.display = 'none';
-        });
-    }
-    
-    if (startTestBtn) {
-        startTestBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            alert('Тест будет доступен после реализации бэкенда!');
         });
     }
     
@@ -229,46 +220,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Инициализация лидерборда
     loadLeaderboard();
     
-    // Плавная прокрутка между секциями при скролле колесиком
-    let isScrolling = false;
-    
-    window.addEventListener('wheel', function(e) {
-        if (isScrolling) return;
-        
-        isScrolling = true;
-        
-        // Определение направления прокрутки
-        const delta = e.deltaY > 0 ? 1 : -1;
-        
-        // Получение всех секций
-        const sections = document.querySelectorAll('section');
-        let currentSectionIndex = 0;
-        
-        // Поиск текущей секции
-        for (let i = 0; i < sections.length; i++) {
-            const rect = sections[i].getBoundingClientRect();
-            if (rect.top >= 0 && rect.top < window.innerHeight / 2) {
-                currentSectionIndex = i;
-                break;
-            }
-        }
-        
-        // Расчет индекса следующей секции
-        let nextSectionIndex = currentSectionIndex + delta;
-        
-        // Проверка границ
-        if (nextSectionIndex < 0) nextSectionIndex = 0;
-        if (nextSectionIndex >= sections.length) nextSectionIndex = sections.length - 1;
-        
-        // Прокрутка к следующей секции
-        window.scrollTo({
-            top: sections[nextSectionIndex].offsetTop - 80,
-            behavior: 'smooth'
-        });
-        
-        // Сброс флага через некоторое время
-        setTimeout(() => {
-            isScrolling = false;
-        }, 1000);
-    }, { passive: true });
+    // УБРАНА ФУНКЦИЯ ПРИНУДИТЕЛЬНОЙ ПРОКРУТКИ СЕКЦИЙ ПРИ СКРОЛЛЕ
+    // Теперь пользователь может свободно скроллить контент
 });

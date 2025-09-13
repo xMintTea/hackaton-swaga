@@ -15,9 +15,14 @@
     box-sizing: border-box;
 }
 
+/* УБИРАЕМ ПРИНУДИТЕЛЬНУЮ ПРОКРУТКУ ДЛЯ СВОБОДНОГО СКРОЛЛА */
 html {
     scroll-behavior: smooth;
-    scroll-snap-type: y mandatory;
+}
+
+/* УБИРАЕМ SCROLL-SNAP ДЛЯ СЕКЦИЙ */
+section {
+    /* Убрано принудительное выравнивание */
 }
 
 body {
@@ -29,12 +34,6 @@ body {
     background-image: 
         radial-gradient(circle at 10% 20%, rgba(0, 238, 255, 0.05) 0%, transparent 20%),
         radial-gradient(circle at 90% 60%, rgba(255, 0, 255, 0.05) 0%, transparent 20%);
-}
-
-/* Стили для snap-прокрутки */
-section {
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -252,7 +251,7 @@ nav ul li a:hover::after {
 /* Секция Johnny Silverhand */
 .johnny-section {
     position: relative;
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     overflow: hidden;
@@ -323,6 +322,7 @@ nav ul li a:hover::after {
 /* Секция курсов */
 .courses {
     padding: 100px 0;
+    min-height: auto;
 }
 
 .section-title {
@@ -435,6 +435,9 @@ nav ul li a:hover::after {
     background-color: var(--dark-secondary);
     position: relative;
     text-align: center;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
 }
 
 .test-section::before {
@@ -471,6 +474,7 @@ nav ul li a:hover::after {
 /* Секция лидерборда */
 .leaderboard-section {
     padding: 100px 0;
+    min-height: 80vh;
 }
 
 .leaderboard-container {
@@ -540,6 +544,7 @@ footer {
     background-color: var(--dark-secondary);
     padding: 60px 0 30px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+    min-height: auto;
 }
 
 .footer-content {
