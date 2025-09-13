@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакты | Cyberskill</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .contacts-page-container {
+            padding: 150px 0 100px;
+            min-height: 100vh;
+        }
+        
+        .back-button {
+            margin-bottom: 30px;
+            display: inline-block;
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+            text-align: center;
+        }
+        
+        .contacts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .contact-card {
+            background: var(--dark-secondary);
+            border: 1px solid var(--neon-blue);
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 238, 255, 0.2);
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 25px rgba(0, 238, 255, 0.4);
+        }
+        
+        .contact-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .contact-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--neon-pink);
+        }
+        
+        .contact-link {
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-size: 1.2rem;
+            display: block;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-link:hover {
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+        
+        .contact-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-rain" id="matrixRain"></div>
+    
+    <header id="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Cyberskill</a>
+                <nav>
+                    <ul>
+                        <li><a href="index.html#courses">Курсы</a></li>
+                        <li><a href="test.html">Тестирование</a></li>
+                        <li><a href="index.html#leaderboard">Лидерборд</a></li>
+                        <li><a href="index.html#about">О нас</a></li>
+                        <li><a href="contacts.html">Контакты</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <a href="#" class="btn" id="loginBtn">Вход</a>
+                    <a href="#" class="btn btn-pink" id="registerBtn">Регистрация</a>
+                </div>
+                <div class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container contacts-page-container">
+        <a href="index.html" class="btn back-button">← Назад на главную</a>
+        <h1 class="page-title">Наши контакты</h1>
+        
+        <div class="contacts-grid">
+            <div class="contact-card">
+                <span class="contact-icon">📨</span>
+                <h3 class="contact-title">Telegram</h3>
+                <p class="contact-description">Подписывайтесь на наш Telegram-канал для получения актуальных новостей и анонсов курсов.</p>
+                <a href="https://t.me/cyberskill_channel" target="_blank" class="contact-link">@cyberskill_channel</a>
+            </div>
+            
+            <div class="contact-card">
+                <span class="contact-icon">📺</span>
+                <h3 class="contact-title">YouTube</h3>
+                <p class="contact-description">Смотрите бесплатные уроки и обучающие материалы на нашем YouTube-канале.</p>
+                <a href="https://youtube.com/c/cyberskill" target="_blank" class="contact-link">Cyberskill Channel</a>
+            </div>
+            
+            <div class="contact-card">
+                <span class="contact-icon">🐙</span>
+                <h3 class="contact-title">GitHub</h3>
+                <p class="contact-description">Исходный код проектов и примеры для наших курсов доступны на GitHub.</p>
+                <a href="https://github.com/cyberskill" target="_blank" class="contact-link">github.com/cyberskill</a>
+            </div>
+            
+            <div class="contact-card">
+                <span class="contact-icon">📧</span>
+                <h3 class="contact-title">Email</h3>
+                <p class="contact-description">Пишите нам по любым вопросам, связанным с курсами, сотрудничеством или технической поддержкой.</p>
+                <a href="mailto:info@cyberskill.com" class="contact-link">info@cyberskill.com</a>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Cyberskill</h3>
+                    <ul>
+                        <li><a href="index.html#about">О нас</a></li>
+                        <li><a href="team.html">Команда</a></li>
+                        <li><a href="vacancies.html">Вакансии</a></li>
+                        <li><a href="partners.html">Партнеры</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Курсы</h3>
+                    <ul>
+                        <li><a href="courses.html">Все курсы</a></li>
+                        <li><a href="#">Новые программы</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Поддержка</h3>
+                    <ul>
+                        <li><a href="help.html">Помощь</a></li>
+                        <li><a href="contacts.html">Контакты</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Социальные сети</h3>
+                    <div class="social-links">
+                        <a href="https://youtube.com" target="_blank" title="YouTube">📺</a>
+                        <a href="https://t.me" target="_blank" title="Telegram">📨</a>
+                        <a href="https://github.com" target="_blank" title="GitHub">🐙</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>© 2025 Cyberskill. Все права защищены. | Сделано в киберпространстве</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
