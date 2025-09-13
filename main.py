@@ -77,14 +77,12 @@ def login(creds: UserLoginSchema, response: Response, db: Session = Depends(get_
 
     user = query.first()
     if user is not None:
-
-        jwt_payload = {
-            "sub": str(user.id),
-            "username": user.login,
-        }
         
-        access_token = utils_jwt.encode_jwt(jwt_payload)
-        return Token(access_token=access_token, token_type="bearer")
+        access_token = create_access_token(user)
+        refresh_token = create_refresh_token(user)
+        return Token(access_token=access_token,
+                     refresh_token=refresh_token,
+                     token_type="bearer")
     
     raise HTTPException(status_code=401, detail="Incorrect username or password")
 
@@ -135,39 +133,28 @@ def validate_auth_user(username: str = Form(), password: str = Form(), db: Sessi
     return user
 
 
+
+
 @app.post("/login/", response_model=Token)
 def auth_user(user: UserSchema = Depends(validate_auth_user)):
-    jwt_payload = {
-        "sub": str(user.id),
-        "login": user.login
-    }
+
+    access_token = create_access_token(user)
+    refresh_token = create_refresh_token(user)
     
-    token = utils_jwt.encode_jwt(jwt_payload)
-    
-    return Token(access_token=token, token_type="Bearer")
+    return Token(access_token=access_token, refresh_token=refresh_token)
 
 
-def get_current_token_payload(
-    #creds: HTTPAuthorizationCredentials = Depends(http_bearer)
-    token: str = Depends(oath2_scheme)
-    ) -> dict:
-    #token = creds.credentials
-    try:
-        payload = utils_jwt.decode_jwt(token=token)
-    except InvalidTokenError as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail=f"Invalid Token Error: {e}")
+@app.post("/refresh/", response_model=Token, response_model_exclude_none=True)
+def auth_refresh_jwt(
+    user: UserSchema = Depends(get_current_auth_user_for_refresh)
+):
+    access_token = create_access_token(user)
+    return Token(
+        access_token=access_token
+    )
 
-    return payload
-    
 
-def get_current_auth_user(payload: dict = Depends(get_current_token_payload),  db: Session = Depends(get_db)) -> UserSchema:
-    user_id: str | None = payload.get("sub")
 
-    if user:=db.query(User).where(User.id == user_id).first():
-        return user
-    
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 @app.get("/users/me")
 def  auth_user_check_self_info(
