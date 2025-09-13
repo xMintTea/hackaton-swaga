@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Партнеры | Cyberskill</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .partners-page-container {
+            padding: 150px 0 100px;
+            min-height: 100vh;
+        }
+        
+        .back-button {
+            margin-bottom: 30px;
+            display: inline-block;
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+        
+        .partners-info {
+            background: var(--dark-secondary);
+            border: 1px solid var(--neon-purple);
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 0 20px rgba(153, 0, 255, 0.2);
+            text-align: center;
+        }
+        
+        .partners-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-rain" id="matrixRain"></div>
+    
+    <header id="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Cyberskill</a>
+                <nav>
+                    <ul>
+                        <li><a href="index.html#courses">Курсы</a></li>
+                        <li><a href="test.html">Тестирование</a></li>
+                        <li><a href="index.html#leaderboard">Лидерборд</a></li>
+                        <li><a href="index.html#about">О нас</a></li>
+                        <li><a href="contacts.html">Контакты</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <a href="#" class="btn" id="loginBtn">Вход</a>
+                    <a href="#" class="btn btn-pink" id="registerBtn">Регистрация</a>
+                </div>
+                <div class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container partners-page-container">
+        <a href="index.html" class="btn back-button">← Назад на главную</a>
+        <h1 class="page-title">Наши партнеры</h1>
+        
+        <div class="partners-info">
+            <span class="partners-icon">🤝</span>
+            <h2>Партнерская программа в разработке</h2>
+            <p>В настоящее время мы активно развиваем партнерскую программу. Если вы заинтересованы в сотрудничестве с нами, пожалуйста, свяжитесь с нами через страницу контактов.</p>
+            <p>Мы открыты к предложениям от образовательных платформ, IT-компаний и технологических стартапов.</p>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="contacts.html" class="btn">Связаться с нами</a>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Cyberskill</h3>
+                    <ul>
+                        <li><a href="index.html#about">О нас</a></li>
+                        <li><a href="team.html">Команда</a></li>
+                        <li><a href="vacancies.html">Вакансии</a></li>
+                        <li><a href="partners.html">Партнеры</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Курсы</h3>
+                    <ul>
+                        <li><a href="courses.html">Все курсы</a></li>
+                        <li><a href="#">Новые программы</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Поддержка</h3>
+                    <ul>
+                        <li><a href="help.html">Помощь</a></li>
+                        <li><a href="contacts.html">Контакты</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Социальные сети</h3>
+                    <div class="social-links">
+                        <a href="https://youtube.com" target="_blank" title="YouTube">📺</a>
+                        <a href="https://t.me" target="_blank" title="Telegram">📨</a>
+                        <a href="https://github.com" target="_blank" title="GitHub">🐙</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>© 2025 Cyberskill. Все права защищены. | Сделано в киберпространстве</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
