@@ -11,8 +11,9 @@ class DistrictBase(BaseModel):
 class District(DistrictBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 
 class CreateDistrict(DistrictBase):
@@ -38,8 +39,9 @@ class User(UserBase):
     id: int
 
     
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 
 
@@ -64,11 +66,18 @@ class StudentBase(BaseModel):
 class Student(StudentBase):
     id: int
     
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 
 
 class UserLoginSchema(BaseModel):
     login: str
     password: str
+    
+    
+class Token(BaseModel):
+    access_token: str
+    refresh_token: str | None = None
+    token_type: str = "Bearer"

@@ -1,15 +1,36 @@
-from fastapi import FastAPI, HTTPException, Response, Depends
+from fastapi import (
+    FastAPI,
+    HTTPException,
+    Response,
+    Depends,
+    status,
+    Form
+    )
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer
 from sqlalchemy.orm import Session
-from authx import AuthX, AuthXConfig, RequestToken, TokenPayload
 import hashlib
 from datetime import datetime
+from database import engine
+from schemas import (
+    UserLoginSchema,
+    UserRegisterSchema,
+    CreateDistrict,
+    District as DistrictSchema,
+    User as UserSchema,
+    Response as ResponseSchema,
+    Token
+)
 
 
-from database import engine, session_local
-from schemas import UserLoginSchema, UserRegisterSchema, CreateDistrict, District as DistrictSchema, User as UserSchema, Response as ResponseSchema
 from models import Base, User, District
-from static import Roles
+from helpers import create_access_token, create_refresh_token
+from validation import (
+    get_current_token_payload,
+    get_current_auth_user,
+    get_current_auth_user_for_refresh
+)
+from db_helpher import get_db
 
 
 app = FastAPI()
@@ -24,9 +45,11 @@ origins = [
     # и другие адреса, с которых может приходить запрос
 ]
 
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # Замените на адрес вашего сайта
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -35,22 +58,9 @@ app.add_middleware(
 Base.metadata.create_all(bind=engine)
 
 
-config = AuthXConfig()
-
-#TODO: Опасно, лучше всё это перенести в venv.
-config.JWT_SECRET_KEY = "SECRET_KEY"
-config.JWT_ACCESS_COOKIE_NAME = "my_access_token"
-config.JWT_TOKEN_LOCATION = ["cookies"]
-
-security = AuthX(config=config)
 
 
-def get_db():
-    db = session_local()
-    try:
-        yield db
-    finally:
-        db.close()
+
 
 
 def get_hash(string: str) -> str:
@@ -59,17 +69,19 @@ def get_hash(string: str) -> str:
 
 @app.post("/login")
 def login(creds: UserLoginSchema, response: Response, db: Session = Depends(get_db)):
-    
-    
-    query = db.query(User)\
-        .filter(User.login==creds.login)\
-            .filter(User.password == get_hash(creds.password))
+    query = db.query(User).filter(
+        User.login == creds.login,
+        User.password == get_hash(creds.password)
+    )
 
     user = query.first()
     if user is not None:
-        token = security.create_access_token(uid=str(user.id), user_id=user.id)
-        response.set_cookie(config.JWT_ACCESS_COOKIE_NAME, token)
-        return {"access_token":token}
+        
+        access_token = create_access_token(user)
+        refresh_token = create_refresh_token(user)
+        return Token(access_token=access_token,
+                     refresh_token=refresh_token,
+                     token_type="bearer")
     
     raise HTTPException(status_code=401, detail="Incorrect username or password")
 
@@ -108,7 +120,53 @@ def createDistrict(district: CreateDistrict, db: Session = Depends(get_db)) -> D
     return db_dist
 
 
-# TODO: Тестовая защищённая ручка, убрать после.
-@app.get("/protected", dependencies=[Depends(AuthX.get_token_from_request)])
-def protected(payload: TokenPayload = Depends(security.access_token_required)):
-    return {"data": getattr(payload,"user_id")}
+
+
+def validate_auth_user(username: str = Form(), password: str = Form(), db: Session = Depends(get_db)):
+    unauthed_exc = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,\
+                                 detail="invalid login or password")
+
+    if not (user:= db.query(User).where(User.login == username).filter(User.password == get_hash(password)).first()):
+        raise unauthed_exc
+    
+    return user
+
+
+
+
+@app.post("/login/", response_model=Token)
+def auth_user(user: UserSchema = Depends(validate_auth_user)):
+
+    access_token = create_access_token(user)
+    refresh_token = create_refresh_token(user)
+    
+    return Token(access_token=access_token, refresh_token=refresh_token)
+
+
+@app.post("/refresh/", response_model=Token, response_model_exclude_none=True)
+def auth_refresh_jwt(
+    user: UserSchema = Depends(get_current_auth_user_for_refresh)
+):
+    access_token = create_access_token(user)
+    return Token(
+        access_token=access_token
+    )
+
+
+
+
+@app.get("/users/me")
+def  auth_user_check_self_info(
+    payload: dict = Depends(get_current_token_payload),
+    user: UserSchema = Depends(get_current_auth_user)
+):
+    iat = payload.get("iat")
+    exp = payload.get("exp")
+    
+    return {
+        "id": user.id,
+        "login": user.login,
+        "password": user.password,
+        "ait": iat,
+        "exp": exp
+    }
