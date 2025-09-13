@@ -1,18 +1,41 @@
-from fastapi import FastAPI, HTTPException, Response, Depends
+from fastapi import (
+    FastAPI,
+    HTTPException,
+    Response,
+    Depends,
+    status,
+    Form
+    )
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 import hashlib
-from datetime import datetime
-
+from datetime import datetime, timedelta
+from typing import Annotated
+from fastapi.openapi.utils import get_openapi
+from jwt import InvalidTokenError
 
 from database import engine, session_local
-from schemas import UserLoginSchema, UserRegisterSchema, CreateDistrict, District as DistrictSchema, User as UserSchema, Response as ResponseSchema
+from schemas import (
+    UserLoginSchema,
+    UserRegisterSchema,
+    CreateDistrict,
+    District as DistrictSchema,
+    User as UserSchema,
+    Response as ResponseSchema,
+    Token
+)
+from auth import utils_jwt
+
+
 from models import Base, User, District
 from static import Roles
 
 
 app = FastAPI()
 
+#http_bearer = HTTPBearer()
+oath2_scheme = OAuth2PasswordBearer(tokenUrl="/login/",)
 
 origins = [
     "http://localhost",
@@ -23,9 +46,11 @@ origins = [
     # и другие адреса, с которых может приходить запрос
 ]
 
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # Замените на адрес вашего сайта
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -50,17 +75,21 @@ def get_hash(string: str) -> str:
 
 @app.post("/login")
 def login(creds: UserLoginSchema, response: Response, db: Session = Depends(get_db)):
-    
-    
-    query = db.query(User)\
-        .filter(User.login==creds.login)\
-            .filter(User.password == get_hash(creds.password))
+    query = db.query(User).filter(
+        User.login == creds.login,
+        User.password == get_hash(creds.password)
+    )
 
     user = query.first()
     if user is not None:
-        token = security.create_access_token(uid=str(user.id), user_id=user.id)
-        response.set_cookie(config.JWT_ACCESS_COOKIE_NAME, token)
-        return {"access_token":token}
+
+        jwt_payload = {
+            "sub": str(user.id),
+            "username": user.login,
+        }
+        
+        access_token = utils_jwt.encode_jwt(jwt_payload)
+        return Token(access_token=access_token, token_type="bearer")
     
     raise HTTPException(status_code=401, detail="Incorrect username or password")
 
@@ -99,7 +128,64 @@ def createDistrict(district: CreateDistrict, db: Session = Depends(get_db)) -> D
     return db_dist
 
 
-# TODO: Тестовая защищённая ручка, убрать после.
-@app.get("/protected", dependencies=[Depends(AuthX.get_token_from_request)])
-def protected(payload: TokenPayload = Depends(security.access_token_required)):
-    return {"data": getattr(payload,"user_id")}
+
+
+def validate_auth_user(username: str = Form(), password: str = Form(), db: Session = Depends(get_db)):
+    unauthed_exc = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,\
+                                 detail="invalid login or password")
+
+    if not (user:= db.query(User).where(User.login == username).filter(User.password == get_hash(password)).first()):
+        raise unauthed_exc
+    
+    return user
+
+
+@app.post("/login/", response_model=Token)
+def auth_user(user: UserSchema = Depends(validate_auth_user)):
+    jwt_payload = {
+        "sub": str(user.id),
+        "login": user.login
+    }
+    
+    token = utils_jwt.encode_jwt(jwt_payload)
+    
+    return Token(access_token=token, token_type="Bearer")
+
+
+def get_current_token_payload(
+    #creds: HTTPAuthorizationCredentials = Depends(http_bearer)
+    token: str = Depends(oath2_scheme)
+    ) -> dict:
+    #token = creds.credentials
+    try:
+        payload = utils_jwt.decode_jwt(token=token)
+    except InvalidTokenError as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail=f"Invalid Token Error: {e}")
+
+    return payload
+    
+
+def get_current_auth_user(payload: dict = Depends(get_current_token_payload),  db: Session = Depends(get_db)) -> UserSchema:
+    user_id: str | None = payload.get("sub")
+
+    if user:=db.query(User).where(User.id == user_id).first():
+        return user
+    
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+@app.get("/users/me")
+def  auth_user_check_self_info(
+    payload: dict = Depends(get_current_token_payload),
+    user: UserSchema = Depends(get_current_auth_user)
+):
+    iat = payload.get("iat")
+    exp = payload.get("exp")
+    
+    return {
+        "id": user.id,
+        "login": user.login,
+        "password": user.password,
+        "ait": iat,
+        "exp": exp
+    }
