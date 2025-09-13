@@ -24,7 +24,6 @@ class UserBase(BaseModel):
     nickname: str
     login: str
     password: str
-    district_id: int
     last_activity_date: datetime
     creation_date: datetime
     role: Roles
@@ -49,7 +48,6 @@ class UserRegisterSchema(BaseModel):
     nickname: str
     login: str
     password: str
-    district_id: int
     role: Roles
 
 

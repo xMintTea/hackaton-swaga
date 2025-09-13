@@ -98,7 +98,6 @@ def registerUser(user: UserRegisterSchema, db: Session = Depends(get_db)) -> dic
                    login=user.login,
                    nickname=user.nickname,
                    password=get_hash(user.password),
-                   district_id=user.district_id,
                    last_activity_date = datetime.now(),
                    creation_date=datetime.now(),
                    role=user.role)
