@@ -75,7 +75,7 @@
             
             <h3 class="course-category">Базовые курсы</h3>
             <div class="courses-grid">
-                <div class="course-card animate__animated">
+                <div class="course-card animate-on-scroll" data-animation="fadeInUp">
                     <div class="course-icon">🐍</div>
                     <h3>Python Basics</h3>
                     <p>Изучите основы самого популярного языка для анализа данных и искусственного интеллекта.</p>
@@ -85,7 +85,7 @@
                     </div>
                 </div>
                 
-                <div class="course-card animate__animated">
+                <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="100">
                     <div class="course-icon">⚡</div>
                     <h3>JavaScript Fundamentals</h3>
                     <p>Освойте язык, который powers современный веб и позволяет создавать интерактивные приложения.</p>
@@ -95,7 +95,7 @@
                     </div>
                 </div>
                 
-                <div class="course-card animate__animated">
+                <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="200">
                     <div class="course-icon">☕</div>
                     <h3>Java Essentials</h3>
                     <p>Начните путь в enterprise разработке с одного из самых стабильных и надежных языков.</p>
@@ -108,7 +108,7 @@
             
             <h3 class="course-category">Продвинутые курсы</h3>
             <div class="courses-grid">
-                <div class="course-card animate__animated">
+                <div class="course-card animate-on-scroll" data-animation="fadeInUp">
                     <div class="course-icon">🤖</div>
                     <h3>AI with Python</h3>
                     <p>Создавайте нейронные сети и алгоритмы машинного обучения для решения сложных задач.</p>
@@ -118,7 +118,7 @@
                     </div>
                 </div>
                 
-                <div class="course-card animate__animated">
+                <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="100">
                     <div class="course-icon">🌐</div>
                     <h3>Advanced JS Frameworks</h3>
                     <p>Изучите современные фреймворки для создания сложных веб-приложений.</p>
@@ -128,7 +128,7 @@
                     </div>
                 </div>
                 
-                <div class="course-card animate__animated">
+                <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="200">
                     <div class="course-icon">🔐</div>
                     <h3>Java Security</h3>
                     <p>Освойте методы защиты enterprise приложений от современных киберугроз.</p>
@@ -151,7 +151,7 @@
                 <h2>Проверь свои навыки</h2>
             </div>
             
-            <div class="test-container animate__animated">
+            <div class="test-container animate-on-scroll" data-animation="zoomIn">
                 <h2>"Хочешь проверить себя?"</h2>
                 <p>Прими вызов и пройди наш специальный тест, чтобы определить свой уровень и получить персональные рекомендации по обучению.</p>
                 <a href="test.html" class="btn btn-pink">Начать тест</a>
@@ -165,7 +165,7 @@
                 <h2>Лидерборд</h2>
             </div>
             
-            <div class="leaderboard-container animate__animated">
+            <div class="leaderboard-container animate-on-scroll" data-animation="fadeInLeft">
                 <div class="leaderboard-header">
                     <span>Ранг</span>
                     <span>Игрок</span>
@@ -263,8 +263,29 @@
                     <label for="registerConfirmPassword">Подтверждение пароля</label>
                     <input type="password" id="registerConfirmPassword" required>
                 </div>
+                
+                <!-- Секция для преподавателей/админов -->
+                <div id="adminSection" style="display: none;">
+                    <div class="form-group">
+                        <label for="secretCode">Секретный код</label>
+                        <input type="password" id="secretCode" placeholder="Введите секретный код">
+                    </div>
+                    <div class="form-group">
+                        <label for="userRole">Роль</label>
+                        <select id="userRole">
+                            <option value="student">Студент</option>
+                            <option value="teacher">Преподаватель</option>
+                            <option value="admin">Администратор</option>
+                        </select>
+                    </div>
+                </div>
+                
                 <button type="submit" class="btn" style="width: 100%;">Зарегистрироваться</button>
             </form>
+            
+            <div style="text-align: center; margin-top: 15px;">
+                <button id="toggleAdminBtn" class="btn-link">Вы не ученик?</button>
+            </div>
         </div>
     </div>
 
