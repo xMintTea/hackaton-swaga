@@ -373,6 +373,13 @@ nav ul li a:hover::after {
     position: relative;
     overflow: hidden;
     cursor: pointer;
+    opacity: 0;
+    transform: translateY(50px);
+}
+
+.course-card.animate__animated {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .course-card::before {
@@ -457,6 +464,13 @@ nav ul li a:hover::after {
     border: 1px solid var(--neon-pink);
     box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
     position: relative;
+    opacity: 0;
+    transform: translateY(50px);
+}
+
+.test-container.animate__animated {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .test-container h2 {
@@ -482,6 +496,13 @@ nav ul li a:hover::after {
     margin: 0 auto;
     border: 1px solid var(--neon-blue);
     box-shadow: 0 0 20px rgba(0, 238, 255, 0.2);
+    opacity: 0;
+    transform: translateY(50px);
+}
+
+.leaderboard-container.animate__animated {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .leaderboard-header {
