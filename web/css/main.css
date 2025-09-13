@@ -248,6 +248,21 @@ nav ul li a:hover::after {
     box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
 }
 
+.btn-link {
+    background: none;
+    border: none;
+    color: var(--neon-blue);
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 0.9rem;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.btn-link:hover {
+    opacity: 1;
+}
+
 /* Секция Johnny Silverhand */
 .johnny-section {
     position: relative;
@@ -374,12 +389,10 @@ nav ul li a:hover::after {
     overflow: hidden;
     cursor: pointer;
     opacity: 0;
-    transform: translateY(50px);
 }
 
 .course-card.animate__animated {
     opacity: 1;
-    transform: translateY(0);
 }
 
 .course-card::before {
@@ -465,12 +478,10 @@ nav ul li a:hover::after {
     box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
     position: relative;
     opacity: 0;
-    transform: translateY(50px);
 }
 
 .test-container.animate__animated {
     opacity: 1;
-    transform: translateY(0);
 }
 
 .test-container h2 {
@@ -497,12 +508,10 @@ nav ul li a:hover::after {
     border: 1px solid var(--neon-blue);
     box-shadow: 0 0 20px rgba(0, 238, 255, 0.2);
     opacity: 0;
-    transform: translateY(50px);
 }
 
 .leaderboard-container.animate__animated {
     opacity: 1;
-    transform: translateY(0);
 }
 
 .leaderboard-header {
@@ -707,13 +716,18 @@ footer {
     color: var(--text-secondary);
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
     width: 100%;
     padding: 10px;
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid var(--neon-blue);
     color: var(--text-primary);
     font-family: 'Rajdhani', sans-serif;
+}
+
+.form-group select {
+    cursor: pointer;
 }
 
 /* Анимации */
