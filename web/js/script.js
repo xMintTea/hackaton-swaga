@@ -1,8 +1,10 @@
+// Константы для классов и идентификаторов
 const CLASSES = {
     VISIBLE: 'visible',
     ANIMATED: 'animate__animated',
     SCROLLED: 'scrolled',
-    ACTIVE: 'active'
+    ACTIVE: 'active',
+    ANIMATE_ON_SCROLL: 'animate-on-scroll'
 };
 
 const SELECTORS = {
@@ -19,8 +21,13 @@ const SELECTORS = {
     REGISTER_FORM: '#registerForm',
     LEADERBOARD_LIST: '#leaderboardList',
     JOHNNY_IMAGE: '#johnnyImage',
-    JOHNNY_TEXT: '#johnnyText'
+    JOHNNY_TEXT: '#johnnyText',
+    TOGGLE_ADMIN_BTN: '#toggleAdminBtn',
+    ADMIN_SECTION: '#adminSection'
 };
+
+// Глобальные переменные для управления анимациями
+let animationObservers = [];
 
 // Основная функция инициализации
 document.addEventListener('DOMContentLoaded', function() {
@@ -34,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initForms();
     initLeaderboard();
     initScrollEffects();
+    initAdminToggle();
 });
 
 // Инициализация матричного дождя
@@ -109,13 +117,28 @@ function initAnimations() {
     console.log('Инициализация анимаций...');
     
     // Анимация появления элементов при скролле
-    const animatedElements = document.querySelectorAll('.course-card, .test-container, .leaderboard-container');
+    const animatedElements = document.querySelectorAll('.' + CLASSES.ANIMATE_ON_SCROLL);
     
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('animate__fadeInUp');
-                observer.unobserve(entry.target);
+                const animation = entry.target.getAttribute('data-animation') || 'animate__fadeInUp';
+                const delay = entry.target.getAttribute('data-delay') || 0;
+                
+                setTimeout(() => {
+                    entry.target.classList.add(CLASSES.ANIMATED, animation);
+                    
+                    // Удаляем класс анимации после завершения для возможности повторного запуска
+                    const animationDuration = parseInt(getComputedStyle(entry.target).animationDuration.replace('s', '')) * 1000 || 1000;
+                    setTimeout(() => {
+                        entry.target.classList.remove(CLASSES.ANIMATED, animation);
+                    }, animationDuration);
+                    
+                }, parseInt(delay));
+            } else {
+                // Сбрасываем анимацию при выходе из viewport
+                const animation = entry.target.getAttribute('data-animation') || 'animate__fadeInUp';
+                entry.target.classList.remove(CLASSES.ANIMATED, animation);
             }
         });
     }, { threshold: 0.1 });
@@ -123,6 +146,9 @@ function initAnimations() {
     animatedElements.forEach(element => {
         observer.observe(element);
     });
+    
+    // Сохраняем observer для последующей очистки
+    animationObservers.push(observer);
 }
 
 // Инициализация навигации
@@ -219,6 +245,28 @@ function initModals() {
     });
 }
 
+// Инициализация переключателя режима администратора
+function initAdminToggle() {
+    console.log('Инициализация переключателя администратора...');
+    
+    const toggleAdminBtn = document.querySelector(SELECTORS.TOGGLE_ADMIN_BTN);
+    const adminSection = document.querySelector(SELECTORS.ADMIN_SECTION);
+    
+    if (toggleAdminBtn && adminSection) {
+        toggleAdminBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (adminSection.style.display === 'none') {
+                adminSection.style.display = 'block';
+                this.textContent = 'Я ученик';
+            } else {
+                adminSection.style.display = 'none';
+                this.textContent = 'Вы не ученик?';
+            }
+        });
+    }
+}
+
 // Инициализация форм
 function initForms() {
     console.log('Инициализация форм...');
@@ -241,7 +289,36 @@ function initForms() {
     if (registerForm) {
         registerForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Функционал регистрации будет реализован с бэкендом!');
+            
+            const secretCode = document.getElementById('secretCode').value;
+            const userRole = document.getElementById('userRole').value;
+            const adminSection = document.querySelector(SELECTORS.ADMIN_SECTION);
+            
+            // Проверка секретного кода (на фронтенде, на бэкенде будет дополнительная проверка)
+            if (adminSection.style.display !== 'none') {
+                if (!secretCode) {
+                    alert('Пожалуйста, введите секретный код');
+                    return;
+                }
+                
+                // Проверка кодов (временно, должно быть на бэкенде)
+                const validCodes = {
+                    'teacher': 'TEACHER2025',
+                    'admin': 'ADMIN256'
+                };
+                
+                if (userRole === 'teacher' && secretCode !== validCodes.teacher) {
+                    alert('Неверный код для преподавателя');
+                    return;
+                }
+                
+                if (userRole === 'admin' && secretCode !== validCodes.admin) {
+                    alert('Неверный код для администратора');
+                    return;
+                }
+            }
+            
+            alert(`Регистрация успешна! Роль: ${adminSection.style.display !== 'none' ? userRole : 'student'}`);
             if (registerModal) registerModal.style.display = 'none';
         });
     }
@@ -336,8 +413,23 @@ const utils = {
         } catch (e) {
             return false;
         }
+    },
+    
+    // Очистка всех observers
+    cleanupObservers: function() {
+        animationObservers.forEach(observer => {
+            observer.disconnect();
+        });
+        animationObservers = [];
     }
 };
+
+// Обработка изменения размера окна
+window.addEventListener('resize', function() {
+    // Переинициализация анимаций при изменении размера окна
+    utils.cleanupObservers();
+    initAnimations();
+});
 
 // Экспорт для использования в других модулях (если нужно)
 if (typeof module !== 'undefined' && module.exports) {
@@ -349,6 +441,7 @@ if (typeof module !== 'undefined' && module.exports) {
         initForms,
         initLeaderboard,
         initScrollEffects,
+        initAdminToggle,
         utils
     };
 }
