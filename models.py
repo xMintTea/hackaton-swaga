@@ -15,8 +15,7 @@ class User(Base):
     last_activity_date = Column(DateTime)
     creation_date = Column(DateTime)
     role = Column(Enum(Roles))
-    
-    district = relationship("District")
+
 
 
 class District(Base):
