@@ -7,15 +7,11 @@ from fastapi import (
     Form
     )
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordBearer
+from fastapi.security import HTTPBearer
 from sqlalchemy.orm import Session
 import hashlib
-from datetime import datetime, timedelta
-from typing import Annotated
-from fastapi.openapi.utils import get_openapi
-from jwt import InvalidTokenError
-
-from database import engine, session_local
+from datetime import datetime
+from database import engine
 from schemas import (
     UserLoginSchema,
     UserRegisterSchema,
@@ -25,17 +21,20 @@ from schemas import (
     Response as ResponseSchema,
     Token
 )
-from auth import utils_jwt
 
 
 from models import Base, User, District
-from static import Roles
+from helpers import create_access_token, create_refresh_token
+from validation import (
+    get_current_token_payload,
+    get_current_auth_user,
+    get_current_auth_user_for_refresh
+)
+from db_helpher import get_db
 
 
 app = FastAPI()
 
-#http_bearer = HTTPBearer()
-oath2_scheme = OAuth2PasswordBearer(tokenUrl="/login/",)
 
 origins = [
     "http://localhost",
