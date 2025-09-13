@@ -12,7 +12,6 @@ class User(Base):
     nickname = Column(String)
     login = Column(String,index=True)
     password = Column(String)
-    district_id = Column(Integer, ForeignKey("districts.id"))
     last_activity_date = Column(DateTime)
     creation_date = Column(DateTime)
     role = Column(Enum(Roles))
