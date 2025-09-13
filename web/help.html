@@ -108,7 +108,27 @@
         </div>
     </header>
     
+    <div class="container help-page-container">
+        <a href="index.html" class="btn back-button">← Назад на главную</a>
+        <h1 class="page-title">Помощь и поддержка</h1>
+        
+        <div class="help-info">
+            <span class="help-icon">❓</span>
+            <h2>Часто задаваемые вопросы</h2>
+            <p>Здесь вы найдете ответы на наиболее распространенные вопросы. Если вы не нашли ответ на свой вопрос, пожалуйста, свяжитесь с нами через страницу контактов.</p>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    Вопрос
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    Ответ
+                </div>
+            </div>
 
+        </div>
+    </div>
     
     <footer>
         <div class="container">
@@ -156,7 +176,31 @@
         </div>
     </footer>
 
-
+    <script>
+        // Скрипт для аккордеона FAQ
+        document.addEventListener('DOMContentLoaded', function() {
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', function() {
+                    const answer = this.nextElementSibling;
+                    const toggle = this.querySelector('.faq-toggle');
+                    
+                    // Закрываем все открытые ответы
+                    document.querySelectorAll('.faq-answer').forEach(item => {
+                        if (item !== answer && item.classList.contains('active')) {
+                            item.classList.remove('active');
+                            item.previousElementSibling.querySelector('.faq-toggle').textContent = '+';
+                        }
+                    });
+                    
+                    // Переключаем текущий ответ
+                    answer.classList.toggle('active');
+                    toggle.textContent = answer.classList.contains('active') ? '−' : '+';
+                });
+            });
+        });
+    </script>
     <script src="js/script.js"></script>
 </body>
 </html>
