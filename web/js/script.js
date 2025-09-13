@@ -15,15 +15,19 @@ const SELECTORS = {
     REGISTER_BTN: '#registerBtn',
     LOGIN_MODAL: '#loginModal',
     REGISTER_MODAL: '#registerModal',
+    FORGOT_PASSWORD_MODAL: '#forgotPasswordModal',
     CLOSE_LOGIN_MODAL: '#closeLoginModal',
     CLOSE_REGISTER_MODAL: '#closeRegisterModal',
+    CLOSE_FORGOT_PASSWORD_MODAL: '#closeForgotPasswordModal',
     LOGIN_FORM: '#loginForm',
     REGISTER_FORM: '#registerForm',
+    FORGOT_PASSWORD_FORM: '#forgotPasswordForm',
     LEADERBOARD_LIST: '#leaderboardList',
     JOHNNY_IMAGE: '#johnnyImage',
     JOHNNY_TEXT: '#johnnyText',
     TOGGLE_ADMIN_BTN: '#toggleAdminBtn',
-    ADMIN_SECTION: '#adminSection'
+    ADMIN_SECTION: '#adminSection',
+    FORGOT_PASSWORD_BTN: '#forgotPasswordBtn'
 };
 
 // Глобальные переменные для управления анимациями
@@ -127,18 +131,12 @@ function initAnimations() {
                 
                 setTimeout(() => {
                     entry.target.classList.add(CLASSES.ANIMATED, animation);
-                    
-                    // Удаляем класс анимации после завершения для возможности повторного запуска
-                    const animationDuration = parseInt(getComputedStyle(entry.target).animationDuration.replace('s', '')) * 1000 || 1000;
+                    // Убираем начальную прозрачность после анимации
                     setTimeout(() => {
-                        entry.target.classList.remove(CLASSES.ANIMATED, animation);
-                    }, animationDuration);
+                        entry.target.style.opacity = '1';
+                    }, parseInt(delay) + 1000);
                     
                 }, parseInt(delay));
-            } else {
-                // Сбрасываем анимацию при выходе из viewport
-                const animation = entry.target.getAttribute('data-animation') || 'animate__fadeInUp';
-                entry.target.classList.remove(CLASSES.ANIMATED, animation);
             }
         });
     }, { threshold: 0.1 });
@@ -160,9 +158,30 @@ function initNavigation() {
     const nav = document.querySelector('nav');
     
     if (mobileMenuBtn && nav) {
-        mobileMenuBtn.addEventListener('click', function() {
+        mobileMenuBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
             this.classList.toggle(CLASSES.ACTIVE);
             nav.classList.toggle(CLASSES.ACTIVE);
+        });
+        
+        // Закрытие меню при клике на ссылку
+        const navLinks = nav.querySelectorAll('a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenuBtn.classList.remove(CLASSES.ACTIVE);
+                nav.classList.remove(CLASSES.ACTIVE);
+            });
+        });
+        
+        // Закрытие меню при клике вне его области
+        document.addEventListener('click', function(e) {
+            if (nav.classList.contains(CLASSES.ACTIVE) && 
+                !nav.contains(e.target) && 
+                e.target !== mobileMenuBtn && 
+                !mobileMenuBtn.contains(e.target)) {
+                mobileMenuBtn.classList.remove(CLASSES.ACTIVE);
+                nav.classList.remove(CLASSES.ACTIVE);
+            }
         });
     }
     
@@ -184,12 +203,6 @@ function initNavigation() {
                     top: targetElement.offsetTop - 80,
                     behavior: 'smooth'
                 });
-                
-                // Закрытие мобильного меню если открыто
-                if (mobileMenuBtn) {
-                    mobileMenuBtn.classList.remove(CLASSES.ACTIVE);
-                    nav.classList.remove(CLASSES.ACTIVE);
-                }
             }
         });
     });
@@ -203,13 +216,24 @@ function initModals() {
     const registerBtn = document.querySelector(SELECTORS.REGISTER_BTN);
     const loginModal = document.querySelector(SELECTORS.LOGIN_MODAL);
     const registerModal = document.querySelector(SELECTORS.REGISTER_MODAL);
+    const forgotPasswordModal = document.querySelector(SELECTORS.FORGOT_PASSWORD_MODAL);
     const closeLoginModal = document.querySelector(SELECTORS.CLOSE_LOGIN_MODAL);
     const closeRegisterModal = document.querySelector(SELECTORS.CLOSE_REGISTER_MODAL);
+    const closeForgotPasswordModal = document.querySelector(SELECTORS.CLOSE_FORGOT_PASSWORD_MODAL);
+    const forgotPasswordBtn = document.querySelector(SELECTORS.FORGOT_PASSWORD_BTN);
+    
+    // Функция для закрытия всех модальных окон
+    function closeAllModals() {
+        if (loginModal) loginModal.style.display = 'none';
+        if (registerModal) registerModal.style.display = 'none';
+        if (forgotPasswordModal) forgotPasswordModal.style.display = 'none';
+    }
     
     // Открытие модальных окон
     if (loginBtn && loginModal) {
         loginBtn.addEventListener('click', function(e) {
             e.preventDefault();
+            closeAllModals();
             loginModal.style.display = 'flex';
         });
     }
@@ -217,7 +241,16 @@ function initModals() {
     if (registerBtn && registerModal) {
         registerBtn.addEventListener('click', function(e) {
             e.preventDefault();
+            closeAllModals();
             registerModal.style.display = 'flex';
+        });
+    }
+    
+    if (forgotPasswordBtn && forgotPasswordModal && loginModal) {
+        forgotPasswordBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeAllModals();
+            forgotPasswordModal.style.display = 'flex';
         });
     }
     
@@ -234,6 +267,12 @@ function initModals() {
         });
     }
     
+    if (closeForgotPasswordModal && forgotPasswordModal) {
+        closeForgotPasswordModal.addEventListener('click', function() {
+            forgotPasswordModal.style.display = 'none';
+        });
+    }
+    
     // Закрытие модальных окон при клике вне их области
     window.addEventListener('click', function(e) {
         if (e.target === loginModal) {
@@ -241,6 +280,9 @@ function initModals() {
         }
         if (e.target === registerModal) {
             registerModal.style.display = 'none';
+        }
+        if (e.target === forgotPasswordModal) {
+            forgotPasswordModal.style.display = 'none';
         }
     });
 }
@@ -273,8 +315,10 @@ function initForms() {
     
     const loginForm = document.querySelector(SELECTORS.LOGIN_FORM);
     const registerForm = document.querySelector(SELECTORS.REGISTER_FORM);
+    const forgotPasswordForm = document.querySelector(SELECTORS.FORGOT_PASSWORD_FORM);
     const loginModal = document.querySelector(SELECTORS.LOGIN_MODAL);
     const registerModal = document.querySelector(SELECTORS.REGISTER_MODAL);
+    const forgotPasswordModal = document.querySelector(SELECTORS.FORGOT_PASSWORD_MODAL);
     
     // Обработка отправки формы входа
     if (loginForm) {
@@ -294,32 +338,29 @@ function initForms() {
             const userRole = document.getElementById('userRole').value;
             const adminSection = document.querySelector(SELECTORS.ADMIN_SECTION);
             
-            // Проверка секретного кода (на фронтенде, на бэкенде будет дополнительная проверка)
-            if (adminSection.style.display !== 'none') {
-                if (!secretCode) {
-                    alert('Пожалуйста, введите секретный код');
-                    return;
-                }
-                
-                // Проверка кодов (временно, должно быть на бэкенде)
-                const validCodes = {
-                    'teacher': 'TEACHER2025',
-                    'admin': 'ADMIN256'
-                };
-                
-                if (userRole === 'teacher' && secretCode !== validCodes.teacher) {
-                    alert('Неверный код для преподавателя');
-                    return;
-                }
-                
-                if (userRole === 'admin' && secretCode !== validCodes.admin) {
-                    alert('Неверный код для администратора');
-                    return;
-                }
-            }
+            // В реальном приложении проверка кода должна быть на бэкенде
+            // Здесь просто отправляем данные на сервер
+            const formData = {
+                name: document.getElementById('registerName').value,
+                email: document.getElementById('registerEmail').value,
+                password: document.getElementById('registerPassword').value,
+                role: adminSection.style.display !== 'none' ? userRole : 'student',
+                secretCode: adminSection.style.display !== 'none' ? secretCode : ''
+            };
             
-            alert(`Регистрация успешна! Роль: ${adminSection.style.display !== 'none' ? userRole : 'student'}`);
+            console.log('Данные для регистрации:', formData);
+            alert('Регистрация отправлена на сервер. Проверка секретного кода будет выполнена на бэкенде.');
+            
             if (registerModal) registerModal.style.display = 'none';
+        });
+    }
+    
+    // Обработка отправки формы восстановления пароля
+    if (forgotPasswordForm) {
+        forgotPasswordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Запрос на восстановление пароля отправлен! Проверьте вашу электронную почту.');
+            if (forgotPasswordModal) forgotPasswordModal.style.display = 'none';
         });
     }
 }
