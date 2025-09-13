@@ -1,5 +1,6 @@
+// Основной скрипт для сайта Cyberskill
 document.addEventListener('DOMContentLoaded', function() {
-    // Matrix rain effect
+    // Эффект матричного дождя
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     const container = document.getElementById('matrixRain');
@@ -14,21 +15,21 @@ document.addEventListener('DOMContentLoaded', function() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
     
-    // Matrix characters
-    const matrixChars = "01010101NeuroAcademy10101010コードコードコード";
+    // Символы для матричного эффекта
+    const matrixChars = "01010101Cyberskill10101010コードコードコード";
     const fontSize = 14;
     let columns = Math.floor(canvas.width / fontSize);
     
-    // Drops array
+    // Массив для хранения позиций капель
     let drops = [];
     for (let i = 0; i < columns; i++) {
         drops[i] = Math.floor(Math.random() * canvas.height / fontSize);
     }
     
-    // Drawing function
+    // Функция отрисовки матричного дождя
     function draw() {
-        // Semi-transparent black to create trail effect
-        ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+        // Полупрозрачный черный для создания эффекта шлейфа
+        ctx.fillStyle = 'rgba(10, 10, 10, 0.04)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         ctx.fillStyle = '#00ff00';
@@ -47,10 +48,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Animation loop
+    // Запуск анимации матричного дождя
     setInterval(draw, 33);
     
-    // Glitch effect on title
+    // Глитч-эффект для заголовка
     const title = document.querySelector('.logo');
     setInterval(() => {
         if (Math.random() > 0.9) {
@@ -61,21 +62,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 5000);
     
-    // Mobile menu toggle
+    // Переключение мобильного меню
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const nav = document.querySelector('nav');
     
-    mobileMenuBtn.addEventListener('click', function() {
-        this.classList.toggle('active');
-        nav.classList.toggle('active');
-    });
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            nav.classList.toggle('active');
+        });
+    }
     
-    // Smooth scrolling for navigation links
-    document.querySelectorAll('a[data-scroll]').forEach(anchor => {
+    // Плавная прокрутка для навигационных ссылок
+    document.querySelectorAll('nav a').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
             
-            const targetId = this.getAttribute('data-scroll');
+            const targetId = this.getAttribute('href').substring(1);
             const targetElement = document.getElementById(targetId);
             
             if (targetElement) {
@@ -84,75 +87,188 @@ document.addEventListener('DOMContentLoaded', function() {
                     behavior: 'smooth'
                 });
                 
-                // Close mobile menu if open
-                mobileMenuBtn.classList.remove('active');
-                nav.classList.remove('active');
+                // Закрытие мобильного меню если открыто
+                if (mobileMenuBtn) {
+                    mobileMenuBtn.classList.remove('active');
+                    nav.classList.remove('active');
+                }
             }
         });
     });
     
-    // Header scroll effect
+    // Эффект скролла для хедера
     window.addEventListener('scroll', function() {
-        const header = document.querySelector('header');
+        const header = document.getElementById('header');
         if (window.scrollY > 50) {
             header.classList.add('scrolled');
         } else {
             header.classList.remove('scrolled');
         }
+        
+        // Анимация секции Johnny Silverhand
+        const johnnySection = document.getElementById('about');
+        const johnnyImage = document.getElementById('johnnyImage');
+        const johnnyText = document.getElementById('johnnyText');
+        
+        if (johnnySection && johnnyImage && johnnyText) {
+            const sectionTop = johnnySection.offsetTop;
+            const sectionHeight = johnnySection.offsetHeight;
+            
+            if (window.scrollY > sectionTop - window.innerHeight / 2 && 
+                window.scrollY < sectionTop + sectionHeight - window.innerHeight / 2) {
+                johnnyImage.classList.add('visible');
+                johnnyText.classList.add('visible');
+            } else {
+                johnnyImage.classList.remove('visible');
+                johnnyText.classList.remove('visible');
+            }
+        }
     });
     
-    // Animate progress bars
-    function animateProgressBars() {
-        document.querySelectorAll('.progress').forEach(progressBar => {
-            const progress = progressBar.getAttribute('data-progress');
-            progressBar.style.width = progress + '%';
+    // Функционал модальных окон
+    const loginBtn = document.getElementById('loginBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    const loginModal = document.getElementById('loginModal');
+    const registerModal = document.getElementById('registerModal');
+    const closeLoginModal = document.getElementById('closeLoginModal');
+    const closeRegisterModal = document.getElementById('closeRegisterModal');
+    const startTestBtn = document.getElementById('startTestBtn');
+    
+    if (loginBtn && loginModal) {
+        loginBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            loginModal.style.display = 'flex';
         });
     }
     
-    // Animate stats counter
-    function animateStats() {
-        const statElements = document.querySelectorAll('.stat-number');
+    if (registerBtn && registerModal) {
+        registerBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            registerModal.style.display = 'flex';
+        });
+    }
+    
+    if (closeLoginModal && loginModal) {
+        closeLoginModal.addEventListener('click', function() {
+            loginModal.style.display = 'none';
+        });
+    }
+    
+    if (closeRegisterModal && registerModal) {
+        closeRegisterModal.addEventListener('click', function() {
+            registerModal.style.display = 'none';
+        });
+    }
+    
+    if (startTestBtn) {
+        startTestBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Тест будет доступен после реализации бэкенда!');
+        });
+    }
+    
+    // Закрытие модальных окон при клике вне их области
+    window.addEventListener('click', function(e) {
+        if (e.target === loginModal) {
+            loginModal.style.display = 'none';
+        }
+        if (e.target === registerModal) {
+            registerModal.style.display = 'none';
+        }
+    });
+    
+    // Обработка отправки форм
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Функционал входа будет реализован с бэкендом!');
+            if (loginModal) loginModal.style.display = 'none';
+        });
+    }
+    
+    if (registerForm) {
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Функционал регистрации будет реализован с бэкендом!');
+            if (registerModal) registerModal.style.display = 'none';
+        });
+    }
+    
+    // Загрузка данных лидерборда (заглушка)
+    function loadLeaderboard() {
+        const leaderboardData = [
+            { rank: 1, player: 'Neo_Matrix', points: 2450 },
+            { rank: 2, player: 'Cyber_Tr1x', points: 2280 },
+            { rank: 3, player: 'Data_Stream', points: 2150 },
+            { rank: 4, player: 'Byte_Runner', points: 1980 },
+            { rank: 5, player: 'Code_Hunter', points: 1840 }
+        ];
         
-        statElements.forEach(stat => {
-            const target = parseInt(stat.getAttribute('data-target'));
-            const duration = 2000; // 2 seconds
-            const steps = 60; // 60 frames per second
-            const stepValue = target / (duration / (1000 / steps));
-            let current = 0;
+        const leaderboardList = document.getElementById('leaderboardList');
+        if (leaderboardList) {
+            leaderboardList.innerHTML = '';
             
-            const timer = setInterval(() => {
-                current += stepValue;
-                if (current >= target) {
-                    current = target;
-                    clearInterval(timer);
-                }
-                stat.textContent = Math.floor(current);
-            }, 1000 / steps);
-        });
+            leaderboardData.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = `leaderboard-item ${item.rank <= 3 ? 'top-' + item.rank : ''}`;
+                
+                itemElement.innerHTML = `
+                    <span class="rank">${item.rank}</span>
+                    <span class="player">${item.player}</span>
+                    <span class="points">${item.points}</span>
+                `;
+                
+                leaderboardList.appendChild(itemElement);
+            });
+        }
     }
     
-    // Intersection Observer for animations
-    const observerOptions = {
-        threshold: 0.5,
-        rootMargin: '0px'
-    };
+    // Инициализация лидерборда
+    loadLeaderboard();
     
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                if (entry.target.classList.contains('courses')) {
-                    animateProgressBars();
-                } else if (entry.target.classList.contains('community')) {
-                    animateStats();
-                }
+    // Плавная прокрутка между секциями при скролле колесиком
+    let isScrolling = false;
+    
+    window.addEventListener('wheel', function(e) {
+        if (isScrolling) return;
+        
+        isScrolling = true;
+        
+        // Определение направления прокрутки
+        const delta = e.deltaY > 0 ? 1 : -1;
+        
+        // Получение всех секций
+        const sections = document.querySelectorAll('section');
+        let currentSectionIndex = 0;
+        
+        // Поиск текущей секции
+        for (let i = 0; i < sections.length; i++) {
+            const rect = sections[i].getBoundingClientRect();
+            if (rect.top >= 0 && rect.top < window.innerHeight / 2) {
+                currentSectionIndex = i;
+                break;
             }
+        }
+        
+        // Расчет индекса следующей секции
+        let nextSectionIndex = currentSectionIndex + delta;
+        
+        // Проверка границ
+        if (nextSectionIndex < 0) nextSectionIndex = 0;
+        if (nextSectionIndex >= sections.length) nextSectionIndex = sections.length - 1;
+        
+        // Прокрутка к следующей секции
+        window.scrollTo({
+            top: sections[nextSectionIndex].offsetTop - 80,
+            behavior: 'smooth'
         });
-    }, observerOptions);
-    
-    // Observe sections
-    const coursesSection = document.querySelector('.courses');
-    const communitySection = document.querySelector('.community');
-    
-    if (coursesSection) observer.observe(coursesSection);
-    if (communitySection) observer.observe(communitySection);
+        
+        // Сброс флага через некоторое время
+        setTimeout(() => {
+            isScrolling = false;
+        }, 1000);
+    }, { passive: true });
 });
