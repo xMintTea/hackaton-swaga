@@ -1,47 +1,104 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login</title>
 </head>
 <body>
-    <div style="text-align: center;">
-        <p>Логин
-            <input id="loginField">
-        </p>
-        <p>Пароль
-            <input id="passwordField">
-        </p>
-    <button style="width: 200px; height: 24px" id="query">Войти</button>
+    <h2>Login Form</h2>
+    <form id="loginForm">
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Login</button>
+    </form>
+
+    <div id="userInfo" style="display: none;">
+        <h3>User Info</h3>
+        <p id="userData"></p>
+        <button onclick="logout()">Logout</button>
     </div>
 
     <script>
-        var btn = document.getElementById("query");
-        btn.onclick = async function() {
+        const API_BASE_URL = 'http://localhost:8000';
+        
+        // Обработка формы входа
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('username', document.getElementById('username').value);
+            formData.append('password', document.getElementById('password').value);
+            
             try {
-                const response = await fetch('http://127.0.0.1:8000/login', {
+                const response = await fetch(`${API_BASE_URL}/login/`, {
                     method: 'POST',
+                    body: new URLSearchParams(formData),
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: JSON.stringify({
-                        "login": document.getElementById("loginField").value,
-                        "password": document.getElementById("passwordField").value
-                    })
                 });
-
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                if (response.ok) {
+                    const tokenData = await response.json();
+                    // Сохраняем токен
+                    localStorage.setItem('access_token', tokenData.access_token);
+                    alert('Login successful!');
+                    loadUserInfo();
+                } else {
+                    alert('Login failed!');
                 }
-                
-                const data = await response.json();
-                alert(JSON.stringify(data, null, 2));
             } catch (error) {
-                alert('Error: ' + error);
+                console.error('Error:', error);
+            }
+        });
+        
+        // Загрузка информации о пользователе
+        async function loadUserInfo() {
+            const token = localStorage.getItem('access_token');
+            
+            if (!token) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/me`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    document.getElementById('userData').textContent = JSON.stringify(userData, null, 2);
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('userInfo').style.display = 'block';
+                } else {
+                    console.error('Failed to fetch user info');
+                }
+            } catch (error) {
+                console.error('Error:', error);
             }
         }
+        
+        // Выход
+        function logout() {
+            localStorage.removeItem('access_token');
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'none';
+        }
+        
+        // Проверяем есть ли токен при загрузке страницы
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('access_token')) {
+                loadUserInfo();
+            }
+        });
     </script>
 </body>
 </html>
