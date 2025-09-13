@@ -4,7 +4,8 @@ from fastapi import (
     Response,
     Depends,
     status,
-    Form
+    Form,
+    Request
     )
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer
@@ -22,6 +23,7 @@ from schemas import (
     Token
 )
 
+from templates import templates, templates_folder
 
 from models import Base, User, District
 from helpers import create_access_token, create_refresh_token
@@ -65,6 +67,32 @@ Base.metadata.create_all(bind=engine)
 
 def get_hash(string: str) -> str:
     return hashlib.sha256(string.encode()).hexdigest()
+
+
+
+@app.get("/", name="index")
+def index_page(
+    request: Request
+):
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html")
+ 
+
+@app.get("/users/")
+def users_page(
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    users = db.query(User).all()
+    
+    return templates.TemplateResponse(
+        request=request,
+        name="users.html",
+        context={"request": request, "users": users})
+
+
+
 
 
 @app.post("/login")
