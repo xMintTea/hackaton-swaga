@@ -15,7 +15,7 @@
     box-sizing: border-box;
 }
 
-/* УБИРАЕМ ПРИНУДИТЕЛЬНУЮ ПРОКРУТКУ ДЛЯ СВОБОДНОГО СКРОЛЛА */
+/* УБИРАЕМ ПРИНУДИТЕЛЬНУЮ ПРОКРУТКУ ДЛА СВОБОДНОГО СКРОЛЛА */
 html {
     scroll-behavior: smooth;
 }
@@ -745,7 +745,13 @@ footer {
     100% { transform: translate(0); }
 }
 
-/* Адаптивный дизайн */
+/* Дополнительные стили для улучшения UX */
+.animate-on-scroll {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* Улучшения для мобильного меню */
 @media (max-width: 768px) {
     .header-content {
         flex-direction: column;
@@ -824,6 +830,26 @@ footer {
     
     nav.active {
         right: 0;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+    }
+    
+    nav::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
+    
+    nav.active::before {
+        opacity: 1;
+        pointer-events: auto;
     }
     
     nav ul {
@@ -859,37 +885,6 @@ footer {
     .leaderboard-header, .leaderboard-item {
         grid-template-columns: 0.5fr 2fr 1fr;
         padding: 10px 15px;
-    }
-}
-/* Дополнительные стили для улучшения UX */
-.animate-on-scroll {
-    opacity: 0;
-    transition: opacity 0.5s ease;
-}
-
-/* Улучшения для мобильного меню */
-@media (max-width: 768px) {
-    nav.active {
-        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
-    }
-    
-    nav::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: -1;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        pointer-events: none;
-    }
-    
-    nav.active::before {
-        opacity: 1;
-        pointer-events: auto;
     }
 }
 
