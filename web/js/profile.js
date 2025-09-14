@@ -1,10 +1,10 @@
 // Основные функции для работы с профилем
 document.addEventListener('DOMContentLoaded', function() {
     // Проверяем авторизацию
-    if (!auth.isLoggedIn()) {
-        window.location.href = 'index.html';
-        return;
-    }
+    // if (!auth.isLoggedIn()) {
+    //     window.location.href = 'index.html';
+    //     return;
+    // }
     
     // Загружаем данные профиля
     loadProfileData();
@@ -16,62 +16,75 @@ document.addEventListener('DOMContentLoaded', function() {
 // Загрузка данных профиля
 async function loadProfileData() {
     try {
-        // Здесь будет запрос к API для получения данных профиля
-        // const response = await fetch(`${API_BASE_URL}/profile`, {
-        //     headers: {
-        //         'Authorization': `Bearer ${auth.getToken()}`
-        //     }
-        // });
-        
-        // Временно используем заглушку
-        const profileData = {
-            username: 'Neo_Matrix',
-            title: 'Новичок в киберпространстве',
-            level: 5,
-            xp: 650,
-            nextLevelXp: 1000,
-            currency: 1250,
-            description: 'Изучаю Python и кибербезопасность. Мечтаю стать профессиональным разработчиком.',
-            socialLinks: [
-                { type: 'youtube', url: 'youtube.com/user/neo_matrix' },
-                { type: 'github', url: 'github.com/neo_matrix' }
-            ],
-            courses: {
-                current: [
-                    { name: 'Python Basics', progress: 65 }
-                ],
-                completed: []
-            },
-            achievements: [
-                { id: 1, name: 'Первые шаги', description: 'Зарегистрировался на платформе', icon: '⭐' },
-                { id: 2, name: 'Начало пути', description: 'Завершил первый модуль курса', icon: '📚' }
-            ],
-            inventory: {
-                avatars: [1],
-                frames: [1],
-                titles: [1]
-            },
-            shop: {
-                avatars: [
-                    { id: 1, name: 'Базовый аватар', price: 0, owned: true },
-                    { id: 2, name: 'Кибер-аватар', price: 500, owned: false },
-                    { id: 3, name: 'Хакерский аватар', price: 750, owned: false }
-                ],
-                frames: [
-                    { id: 1, name: 'Базовая рамка', price: 0, owned: true },
-                    { id: 2, name: 'Золотая рамка', price: 1200, owned: false }
-                ],
-                titles: [
-                    { id: 1, name: 'Новичок в киберпространстве', price: 0, owned: true },
-                    { id: 2, name: 'Кибер-пионер', price: 800, owned: false }
-                ]
+        const token = auth.getToken();
+        const response = await fetch(`${API_BASE_URL}/profile`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
             }
-        };
+        });
         
-        updateProfileUI(profileData);
+        if (response.ok) {
+            const profileData = await response.json();
+            updateProfileUI(profileData);
+        } else {
+            console.error('Ошибка загрузки данных профиля');
+            // Используем заглушку, если сервер не отвечает
+            const profileData = getStubProfileData();
+            updateProfileUI(profileData);
+        }
     } catch (error) {
         console.error('Ошибка загрузки данных профиля:', error);
+        // Используем заглушку при ошибке
+        const profileData = getStubProfileData();
+        updateProfileUI(profileData);
     }
+}
+
+// Заглушка данных профиля
+function getStubProfileData() {
+    return {
+        username: 'Neo_Matrix',
+        title: 'Новичок в киберпространстве',
+        level: 5,
+        xp: 650,
+        nextLevelXp: 1000,
+        currency: 1250,
+        description: 'Изучаю Python и кибербезопасность. Мечтаю стать профессиональным разработчиком.',
+        socialLinks: [
+            { type: 'youtube', url: 'youtube.com/user/neo_matrix' },
+            { type: 'github', url: 'github.com/neo_matrix' }
+        ],
+        courses: {
+            current: [
+                { name: 'Python Basics', progress: 65 }
+            ],
+            completed: []
+        },
+        achievements: [
+            { id: 1, name: 'Первые шаги', description: 'Зарегистрировался на платформе', icon: '⭐' },
+            { id: 2, name: 'Начало пути', description: 'Завершил первый модуль курса', icon: '📚' }
+        ],
+        inventory: {
+            avatars: [1],
+            frames: [1],
+            titles: [1]
+        },
+        shop: {
+            avatars: [
+                { id: 1, name: 'Базовый аватар', price: 0, owned: true },
+                { id: 2, name: 'Кибер-аватар', price: 500, owned: false },
+                { id: 3, name: 'Хакерский аватар', price: 750, owned: false }
+            ],
+            frames: [
+                { id: 1, name: 'Базовая рамка', price: 0, owned: true },
+                { id: 2, name: 'Золотая рамка', price: 1200, owned: false }
+            ],
+            titles: [
+                { id: 1, name: 'Новичок в киберпространстве', price: 0, owned: true },
+                { id: 2, name: 'Кибер-пионер', price: 800, owned: false }
+            ]
+        }
+    };
 }
 
 // Обновление интерфейса профиля
@@ -501,6 +514,75 @@ function initEventHandlers() {
             showNotification(`Профиль ${this.checked ? 'скрыт' : 'открыт'}`, 'success');
         });
     }
+    
+    // Открытие модального окна достижений
+    const viewAllAchievementsBtn = document.querySelector('[data-translate="view_all"]');
+    if (viewAllAchievementsBtn) {
+        viewAllAchievementsBtn.addEventListener('click', openAchievementsModal);
+    }
+}
+
+// Функция для открытия модального окна достижений
+function openAchievementsModal() {
+    const modal = document.getElementById('achievementsModal');
+    modal.style.display = 'flex';
+    loadAllAchievements();
+}
+
+// Функция для загрузки всех достижений
+async function loadAllAchievements() {
+    try {
+        const token = auth.getToken();
+        const response = await fetch(`${API_BASE_URL}/achievements`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        let achievements = [];
+        
+        if (response.ok) {
+            achievements = await response.json();
+        } else {
+            // Используем заглушку, если сервер не отвечает
+            achievements = [
+                { id: 1, name: "Первые шаги", description: "Зарегистрировался на платформе", icon: "⭐", earned: true, date: "15.04.2025" },
+                { id: 2, name: "Начало пути", description: "Завершил первый модуль курса", icon: "📚", earned: true, date: "18.04.2025" },
+                { id: 3, name: "Неделя активности", description: "Заходил на платформу 7 дней подряд", icon: "🔥", earned: false, progress: "5/7 дней" },
+                { id: 4, name: "Мастер Python", description: "Завершил курс Python Basics", icon: "🐍", earned: false, progress: "65%" },
+                { id: 5, name: "Социальная активность", description: "Добавил 3 социальные ссылки в профиль", icon: "👥", earned: false, progress: "2/3 ссылок" },
+                { id: 6, name: "Коллекционер", description: "Приобрел 5 предметов в магазине", icon: "🛍️", earned: false, progress: "1/5 предметов" },
+                { id: 7, name: "Эксперт JavaScript", description: "Завершил курс JavaScript Fundamentals", icon: "⚡", earned: false },
+                { id: 8, name: "Кибер-легенда", description: "Достиг 10 уровня", icon: "🏆", earned: false }
+            ];
+        }
+        
+        const container = document.getElementById('allAchievements');
+        container.innerHTML = '';
+        
+        achievements.forEach(achievement => {
+            const achievementElement = document.createElement('div');
+            achievementElement.className = `achievement-item ${achievement.earned ? '' : 'locked'}`;
+            
+            achievementElement.innerHTML = `
+                <div class="achievement-icon">${achievement.icon}</div>
+                <div class="achievement-info">
+                    <h4>${achievement.name}</h4>
+                    <p>${achievement.description}</p>
+                    ${achievement.earned ? 
+                        `<div class="achievement-date">Получено: ${achievement.date}</div>` : 
+                        achievement.progress ? 
+                            `<div class="achievement-progress">Прогресс: ${achievement.progress}</div>` :
+                            `<div class="achievement-progress">Еще не получено</div>`
+                    }
+                </div>
+            `;
+            
+            container.appendChild(achievementElement);
+        });
+    } catch (error) {
+        console.error('Ошибка загрузки достижений:', error);
+    }
 }
 
 // Вспомогательная функция для показа уведомлений
@@ -545,70 +627,3 @@ function showNotification(message, type) {
         }, 300);
     }, 3000);
 }
-
-// Функция для открытия модального окна достижений
-function openAchievementsModal() {
-    const modal = document.getElementById('achievementsModal');
-    modal.style.display = 'flex';
-    loadAllAchievements();
-}
-
-// Функция для загрузки всех достижений
-async function loadAllAchievements() {
-    try {
-        // Здесь будет запрос к API для получения всех достижений
-        const achievements = [
-            { id: 1, name: "Первые шаги", description: "Зарегистрировался на платформе", icon: "⭐", earned: true, date: "15.04.2025" },
-            { id: 2, name: "Начало пути", description: "Завершил первый модуль курса", icon: "📚", earned: true, date: "18.04.2025" },
-            { id: 3, name: "Неделя активности", description: "Заходил на платформу 7 дней подряд", icon: "🔥", earned: false, progress: "5/7 дней" },
-            { id: 4, name: "Мастер Python", description: "Завершил курс Python Basics", icon: "🐍", earned: false, progress: "65%" },
-            { id: 5, name: "Социальная активность", description: "Добавил 3 социальные ссылки в профиль", icon: "👥", earned: false, progress: "2/3 ссылок" },
-            { id: 6, name: "Коллекционер", description: "Приобрел 5 предметов в магазине", icon: "🛍️", earned: false, progress: "1/5 предметов" },
-            { id: 7, name: "Эксперт JavaScript", description: "Завершил курс JavaScript Fundamentals", icon: "⚡", earned: false },
-            { id: 8, name: "Кибер-легенда", description: "Достиг 10 уровня", icon: "🏆", earned: false }
-        ];
-        
-        const container = document.getElementById('allAchievements');
-        container.innerHTML = '';
-        
-        achievements.forEach(achievement => {
-            const achievementElement = document.createElement('div');
-            achievementElement.className = `achievement-item ${achievement.earned ? '' : 'locked'}`;
-            
-            achievementElement.innerHTML = `
-                <div class="achievement-icon">${achievement.icon}</div>
-                <div class="achievement-info">
-                    <h4>${achievement.name}</h4>
-                    <p>${achievement.description}</p>
-                    ${achievement.earned ? 
-                        `<div class="achievement-date">Получено: ${achievement.date}</div>` : 
-                        achievement.progress ? 
-                            `<div class="achievement-progress">Прогресс: ${achievement.progress}</div>` :
-                            `<div class="achievement-progress">Еще не получено</div>`
-                    }
-                </div>
-            `;
-            
-            container.appendChild(achievementElement);
-        });
-    } catch (error) {
-        console.error('Ошибка загрузки достижений:', error);
-    }
-}
-
-// Добавим обработчик для кнопки закрытия модального окна
-document.addEventListener('DOMContentLoaded', function() {
-    const closeModalBtn = document.getElementById('closeAchievementsModal');
-    if (closeModalBtn) {
-        closeModalBtn.addEventListener('click', function() {
-            document.getElementById('achievementsModal').style.display = 'none';
-        });
-    }
-    
-    // Обработчик для кнопки "Все достижения"
-    const viewAllAchievementsBtn = document.querySelector('[onclick="openAchievementsModal()"]');
-    if (viewAllAchievementsBtn) {
-        viewAllAchievementsBtn.removeAttribute('onclick');
-        viewAllAchievementsBtn.addEventListener('click', openAchievementsModal);
-    }
-});
