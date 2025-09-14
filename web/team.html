@@ -176,6 +176,10 @@
                 <div class="auth-buttons">
                     <a href="#" class="btn" id="loginBtn">Вход</a>
                     <a href="#" class="btn btn-pink" id="registerBtn">Регистрация</a>
+                    <div id="userMenu" style="display: none;">
+                        <a href="profile.html" class="btn btn-pink" id="profileBtn">Профиль</a>
+                        <a href="#" class="btn" id="logoutBtn">Выход</a>
+                    </div>
                 </div>
                 <div class="mobile-menu-btn" id="mobileMenuBtn">
                     <span></span>
@@ -191,95 +195,98 @@
         <h1 class="page-title">Наша команда</h1>
         
         <div class="team-grid">
-            <div class="team-member" data-member="makan">
-                <img src="img/makan.jpg" alt="Макан" class="member-photo">
-                <h3 class="member-name">Макан</h3>
-                <p class="member-role">Главный разработчик</p>
-                <p class="member-bio">Специалист по Python и искусственному интеллекту с более чем 8-летним опытом...</p>
+            <div class="team-member" data-member="flyaflayer">
+                <img src="img/FLYaFLYer_Avatar.jpg" alt="FLYaFLYer" class="member-photo">
+                <h3 class="member-name">FLYaFLYer</h3>
+                <p class="member-role">Frontend Developer</p>
+                <p class="member-bio">Специалист по современным веб-технологиям с глубокими знаниями JavaScript и фреймворков...</p>
             </div>
             
-            <div class="team-member" data-member="makan2">
-                <img src="img/makan2.jpg" alt="Макан 2" class="member-photo">
-                <h3 class="member-name">Макан 2</h3>
-                <p class="member-role">Lead Frontend Developer</p>
-                <p class="member-bio">Эксперт в современных JavaScript-фреймворках и создании пользовательских интерфейсов...</p>
+            <div class="team-member" data-member="minttea">
+                <img src="img/MintTea_Avatar.jpg" alt="Mint Tea" class="member-photo">
+                <h3 class="member-name">Mint Tea</h3>
+                <p class="member-role">Backend Developer</p>
+                <p class="member-bio">Эксперт в серверной разработке и архитектуре баз данных с многолетним опытом...</p>
             </div>
             
-            <div class="team-member" data-member="makan3">
-                <img src="img/makan3.jpg" alt="Макан 3" class="member-photo">
-                <h3 class="member-name">Макан 3</h3>
-                <p class="member-role">Специалист по кибербезопасности</p>
-                <p class="member-bio">Сертифицированный этичный хакер с глубокими знаниями в области защиты данных...</p>
+            <div class="team-member" data-member="alexander">
+                <img src="img/Anonymous_Avatar.jpeg" alt="Александр" class="member-photo">
+                <h3 class="member-name">Александр</h3>
+                <p class="member-role">Project Manager & Presenter</p>
+                <p class="member-bio">Специалист по презентации проектов и коммуникации с клиентами и инвесторами...</p>
             </div>
         </div>
     </div>
     
     <!-- Модальные окна для участников команды -->
-    <div class="team-modal" id="makanModal">
+    <div class="team-modal" id="flyaflayerModal">
         <div class="team-modal-content">
-            <button class="close-team-modal" data-modal="makanModal">&times;</button>
-            <img src="img/makan.jpg" alt="Макан" class="modal-member-photo">
-            <h2 class="modal-member-name">Макан</h2>
-            <p class="modal-member-role">Главный разработчик</p>
+            <button class="close-team-modal" data-modal="flyaflayerModal">&times;</button>
+            <img src="img/FLYaFLYer_Avatar2.jpg" alt="FLYaFLYer" class="modal-member-photo">
+            <h2 class="modal-member-name">FLYaFLYer</h2>
+            <p class="modal-member-role">Frontend Developer</p>
             <div class="modal-member-details">
-                <p>Специалист по Python и искусственному интеллекту с более чем 8-летним опытом. Макан начал свой путь в программировании с создания простых скриптов и вырос до ведущего разработчика в нескольких успешных стартапах.</p>
+                <p>FLYaFLYer - талантливый фронтенд-разработчик с глубокими знаниями современных веб-технологий. Начинал свой путь с верстки простых сайтов и вырос до уровня эксперта в создании сложных интерактивных интерфейсов.</p>
                 
                 <h4>Навыки:</h4>
                 <ul>
-                    <li>Python и основные фреймворки (Django, Flask, FastAPI)</li>
-                    <li>Машинное обучение и deep learning (TensorFlow, PyTorch)</li>
-                    <li>Разработка архитектуры сложных систем</li>
-                    <li>Оптимизация производительности приложений</li>
-                </ul>
-                
-                <h4>Достижения:</h4>
-                <p>Разработал систему рекомендаций для крупной e-commerce платформы, увеличив конверсию на 27%. Автор двух успешных курсов по машинному обучению с более чем 10,000 студентов.</p>
-            </div>
-        </div>
-    </div>
-    
-    <div class="team-modal" id="makan2Modal">
-        <div class="team-modal-content">
-            <button class="close-team-modal" data-modal="makan2Modal">&times;</button>
-            <img src="img/makan2.jpg" alt="Макан 2" class="modal-member-photo">
-            <h2 class="modal-member-name">Макан 2</h2>
-            <p class="modal-member-role">Lead Frontend Developer</p>
-            <div class="modal-member-details">
-                <p>Эксперт в современных JavaScript-фреймворках и создании пользовательских интерфейсов. Макан 2 обладает уникальным талантом превращать сложные технические concepts в интуитивно понятные интерфейсы.</p>
-                
-                <h4>Навыки:</h4>
-                <ul>
-                    <li>React, Vue.js, Angular</li>
-                    <li>TypeScript и современный JavaScript (ES6+)</li>
-                    <li>UI/UX дизайн и прототипирование</li>
+                    <li>JavaScript (ES6+) и TypeScript</li>
+                    <li>React, Vue.js и Angular</li>
+                    <li>Адаптивная и кроссбраузерная верстка</li>
                     <li>Оптимизация производительности веб-приложений</li>
+                    <li>UI/UX дизайн и прототипирование</li>
                 </ul>
                 
                 <h4>Достижения:</h4>
-                <p>Разработал интерфейсы для более чем 15 успешных веб-приложений. Создал библиотеку компонентов, которую используют более 500 разработчиков. Ведущий спикер на конференциях по фронтенд-разработке.</p>
+                <p>Разработал более 15 успешных веб-приложений для различных отраслей. Создал библиотеку компонентов, которую используют более 500 разработчиков. Активный участник сообщества open-source.</p>
             </div>
         </div>
     </div>
     
-    <div class="team-modal" id="makan3Modal">
+    <div class="team-modal" id="mintteaModal">
         <div class="team-modal-content">
-            <button class="close-team-modal" data-modal="makan3Modal">&times;</button>
-            <img src="img/makan3.jpg" alt="Макан 3" class="modal-member-photo">
-            <h2 class="modal-member-name">Макан 3</h2>
-            <p class="modal-member-role">Специалист по кибербезопасности</p>
+            <button class="close-team-modal" data-modal="mintteaModal">&times;</button>
+            <img src="img/MintTea_Avatar2.jpg" alt="Mint Tea" class="modal-member-photo">
+            <h2 class="modal-member-name">Mint Tea</h2>
+            <p class="modal-member-role">Backend Developer</p>
             <div class="modal-member-details">
-                <p>Сертифицированный этичный хакер с глубокими знаниями в области защиты данных. Макан 3 имеет многолетний опыт работы в сфере информационной безопасности как в корпоративном секторе, так и в государственных учреждениях.</p>
+                <p>Mint Tea - опытный бэкенд-разработчик, специализирующийся на создании масштабируемых и надежных серверных решений. Имеет глубокие знания в области архитектуры программного обеспечения и баз данных.</p>
                 
                 <h4>Навыки:</h4>
                 <ul>
-                    <li>Тестирование на проникновение и аудит безопасности</li>
-                    <li>Криптография и защита данных</li>
-                    <li>Сетевая безопасность и анализ уязвимостей</li>
-                    <li>Forensic-анализ и расследование инцидентов</li>
+                    <li>Python и фреймворки (Django, Flask, FastAPI)</li>
+                    <li>Node.js и Express</li>
+                    <li>Базы данных (SQL и NoSQL)</li>
+                    <li>Микросервисная архитектура</li>
+                    <li>Docker и Kubernetes</li>
                 </ul>
                 
                 <h4>Достижения:</h4>
-                <p>Обнаружил и помог устранить критические уязвимости в системах крупных финансовых учреждений. Разработал программу обучения по кибербезопасности, которую прошли более 2,000 специалистов. Получил награду за вклад в развитие кибербезопасности в регионе.</p>
+                <p>Разработал высоконагруженную систему обработки данных для финансового сектора, способную обрабатывать до 1 миллиона запросов в день. Оптимизировал производительность существующих систем, сократив время отклика на 40%.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="team-modal" id="alexanderModal">
+        <div class="team-modal-content">
+            <button class="close-team-modal" data-modal="alexanderModal">&times;</button>
+            <img src="img/Anonymous_Avatar.jpeg" alt="Александр" class="modal-member-photo">
+            <h2 class="modal-member-name">Александр</h2>
+            <p class="modal-member-role">Project Manager & Presenter</p>
+            <div class="modal-member-details">
+                <p>Александр - талантливый менеджер проектов и специалист по презентациям. Обладает уникальной способностью понятно доносить сложные технические концепции до разнообразной аудитории, включая клиентов и инвесторов.</p>
+                
+                <h4>Навыки:</h4>
+                <ul>
+                    <li>Управление проектами и командами</li>
+                    <li>Публичные выступления и презентации</li>
+                    <li>Бизнес-анализ и планирование</li>
+                    <li>Коммуникация с заинтересованными сторонами</li>
+                    <li>Разработка документации и методических материалов</li>
+                </ul>
+                
+                <h4>Достижения:</h4>
+                <p>Успешно представил более 20 проектов на международных конференциях и investor days. Разработал систему презентаций, которая увеличила конверсию потенциальных клиентов на 35%. Организовал и провел 5 хакатонов по кибербезопасности и веб-разработке.</p>
             </div>
         </div>
     </div>
@@ -365,6 +372,7 @@
             });
         });
     </script>
+    <script src="js/auth.js"></script>
     <script src="js/script.js"></script>
 </body>
 </html>
