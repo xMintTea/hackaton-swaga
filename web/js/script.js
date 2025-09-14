@@ -235,6 +235,8 @@ function initModals() {
             e.preventDefault();
             closeAllModals();
             loginModal.style.display = 'flex';
+            // Показываем тестовое уведомление
+            showNotification('Тест', 'Это тестовое уведомление при нажатии на кнопку входа', 'success');
         });
     }
     
@@ -324,7 +326,7 @@ function initForms() {
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Функционал входа будет реализован с бэкендом!');
+            showNotification('Вход', 'Функционал входа будет реализован с бэкендом!', 'info');
             if (loginModal) loginModal.style.display = 'none';
         });
     }
@@ -349,7 +351,7 @@ function initForms() {
             };
             
             console.log('Данные для регистрации:', formData);
-            alert('Регистрация отправлена на сервер. Проверка секретного кода будет выполнена на бэкенде.');
+            showNotification('Регистрация', 'Регистрация отправлена на сервер. Проверка секретного кода будет выполнена на бэкенде.', 'success');
             
             if (registerModal) registerModal.style.display = 'none';
         });
@@ -359,7 +361,7 @@ function initForms() {
     if (forgotPasswordForm) {
         forgotPasswordForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Запрос на восстановление пароля отправлен! Проверьте вашу электронную почту.');
+            showNotification('Восстановление пароля', 'Запрос на восстановление пароля отправлен! Проверьте вашу электронную почту.', 'success');
             if (forgotPasswordModal) forgotPasswordModal.style.display = 'none';
         });
     }
@@ -516,7 +518,7 @@ function requestNotificationPermission() {
         Notification.requestPermission().then(permission => {
             if (permission === "granted") {
                 console.log("Notification permission granted.");
-                showNotification("Cyberskill", "Уведомления включены!");
+                showNotification("Cyberskill", "Уведомления включены!", "success");
             }
             notificationModal.style.display = 'none';
         });
@@ -528,27 +530,78 @@ function requestNotificationPermission() {
 }
 
 // Функция для показа уведомлений
-function showNotification(title, message, tag = null) {
-    if (Notification.permission === "granted") {
-        const options = {
-            body: message,
-            icon: 'img/logo.png',
-            tag: tag
-        };
-        
-        const notification = new Notification(title, options);
-        
-        // Закрытие уведомления через 5 секунд
-        setTimeout(() => {
-            notification.close();
-        }, 5000);
-        
-        // Обработчик клика по уведомлению
-        notification.onclick = function() {
-            window.focus();
-            this.close();
-        };
+function showNotification(title, message, type = 'info') {
+    // Создаем элемент уведомления
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    
+    // Создаем содержимое уведомления
+    notification.innerHTML = `
+        <div class="notification-content">
+            <div class="notification-title">${title}</div>
+            <div class="notification-message">${message}</div>
+        </div>
+        <button class="notification-close">&times;</button>
+    `;
+    
+    // Стилизуем уведомление
+    notification.style.position = 'fixed';
+    notification.style.bottom = '20px';
+    notification.style.right = '20px';
+    notification.style.padding = '15px';
+    notification.style.borderRadius = '5px';
+    notification.style.color = '#fff';
+    notification.style.zIndex = '10000';
+    notification.style.opacity = '0';
+    notification.style.transition = 'all 0.3s ease';
+    notification.style.maxWidth = '350px';
+    notification.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+    notification.style.transform = 'translateX(100%)';
+    
+    if (type === 'success') {
+        notification.style.background = 'var(--neon-green)';
+        notification.style.border = '1px solid var(--neon-green)';
+    } else if (type === 'error') {
+        notification.style.background = 'var(--neon-pink)';
+        notification.style.border = '1px solid var(--neon-pink)';
+    } else {
+        notification.style.background = 'var(--neon-blue)';
+        notification.style.border = '1px solid var(--neon-blue)';
     }
+    
+    // Добавляем уведомление на страницу
+    document.body.appendChild(notification);
+    
+    // Показываем уведомление
+    setTimeout(() => {
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // Обработчик закрытия уведомления
+    const closeBtn = notification.querySelector('.notification-close');
+    closeBtn.addEventListener('click', function() {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    });
+    
+    // Убираем уведомление через 5 секунд
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }
+    }, 5000);
 }
 
 // Добавим вызов запроса разрешения при загрузке страницы
@@ -671,13 +724,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     
                     // Показываем уведомление
-                    showNotification('Вход выполнен успешно!', 'success');
+                    showNotification('Успех', 'Вход выполнен успешно!', 'success');
                 } else {
-                    showNotification('Ошибка входа. Проверьте данные.', 'error');
+                    showNotification('Ошибка', 'Ошибка входа. Проверьте данные.', 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showNotification('Ошибка соединения.', 'error');
+                showNotification('Ошибка', 'Ошибка соединения.', 'error');
             }
         });
     }
@@ -694,7 +747,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const confirmPassword = document.getElementById('registerConfirmPassword').value;
             
             if (password !== confirmPassword) {
-                showNotification('Пароли не совпадают.', 'error');
+                showNotification('Ошибка', 'Пароли не совпадают.', 'error');
                 return;
             }
             
@@ -711,7 +764,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // В реальном приложении здесь должна быть проверка секретного кода
                 if (!secretCode) {
-                    showNotification('Введите секретный код.', 'error');
+                    showNotification('Ошибка', 'Введите секретный код.', 'error');
                     return;
                 }
             }
@@ -740,7 +793,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     
                     // Показываем уведомление
-                    showNotification('Регистрация прошла успешно!', 'success');
+                    showNotification('Успех', 'Регистрация прошла успешно!', 'success');
                     
                     // Автоматически выполняем вход
                     const formData = new FormData();
@@ -760,89 +813,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         auth.setToken(tokenData.access_token);
                     }
                 } else {
-                    showNotification('Ошибка регистрации.', 'error');
+                    showNotification('Ошибка', 'Ошибка регистрации.', 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showNotification('Ошибка соединения.', 'error');
+                showNotification('Ошибка', 'Ошибка соединения.', 'error');
             }
         });
     }
-});
-
-// Функция для запроса разрешения на уведомления
-function requestNotificationPermission() {
-    if (!("Notification" in window)) {
-        console.log("This browser does not support notifications");
-        return;
-    }
-
-    if (Notification.permission === "default") {
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                showNotification("Cyberskill", "Уведомления включены!");
-            }
-        });
-    }
-}
-
-// Улучшенная функция показа уведомлений
-function showNotification(title, message, tag = null, icon = null) {
-    // Нативные уведомления
-    if (Notification.permission === "granted") {
-        const options = {
-            body: message,
-            icon: icon || 'img/logo.png',
-            tag: tag
-        };
-        
-        const notification = new Notification(title, options);
-        
-        setTimeout(() => {
-            notification.close();
-        }, 5000);
-        
-        notification.onclick = function() {
-            window.focus();
-            this.close();
-        };
-    }
-    
-    // Внутрисайтовые уведомления
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <div class="notification-title">${title}</div>
-            <div class="notification-message">${message}</div>
-        </div>
-        <button class="notification-close">&times;</button>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 100);
-    
-    setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
-    }, 5000);
-    
-    notification.querySelector('.notification-close').addEventListener('click', function() {
-        notification.classList.remove('show');
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
-    });
-}
-
-// Добавьте вызов при загрузке
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(() => {
-        requestNotificationPermission();
-    }, 3000);
 });
