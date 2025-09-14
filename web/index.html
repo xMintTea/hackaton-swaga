@@ -34,9 +34,11 @@
                     </div>
                 </div>
                 <div class="language-switcher">
-                    <button class="btn btn-small" onclick="changeLanguage('ru')">RU</button>
-                    <button class="btn btn-small" onclick="changeLanguage('en')">EN</button>
-                    <button class="btn btn-small" onclick="changeLanguage('kz')">KZ</button>
+                    <select id="languageSelect" class="language-select">
+                        <option value="ru" data-flag="🇷🇺">Русский</option>
+                        <option value="en" data-flag="🇺🇸">English</option>
+                        <option value="kz" data-flag="🇰🇿">Қазақша</option>
+                    </select>
                 </div>
                 <div class="mobile-menu-btn" id="mobileMenuBtn">
                     <span></span>
