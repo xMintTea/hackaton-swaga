@@ -1,37 +1,33 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 
 
 from static import Roles
-
-
-class DistrictBase(BaseModel):
-    name: str
-
-class District(DistrictBase):
-    id: int
-
-    model_config = {
-        "from_attributes": True
-    }
-
-
-class CreateDistrict(DistrictBase):
-    pass
-
 
 class UserBase(BaseModel):
     nickname: str
     login: str
     password: str
-    last_activity_date: datetime
-    creation_date: datetime
-    role: Roles
-    district: District
+    email: str
+    role: Roles = Roles.USER
     
 
 class Response(BaseModel):
     data: str
+
+
+class UserResponse(BaseModel):
+    id: int
+    nickname: str
+    login: str
+    email: str
+    role: Roles
+
+    model_config = {
+        "from_attributes": True
+    }
+
 
 
 class User(UserBase):
@@ -43,39 +39,60 @@ class User(UserBase):
     }
 
 
-
-class UserRegisterSchema(BaseModel):
-    nickname: str
-    login: str
-    password: str
-    role: Roles
-
-
-class StudentBase(BaseModel):
+class StudentResponse(BaseModel):
     id: int
-    user_id: int
-    total_xp: int
-    current_streak: int
-    longest_streak: int
-    
-    user: User
+    user: UserResponse
 
-
-class Student(StudentBase):
-    id: int
-    
     model_config = {
         "from_attributes": True
     }
+
+
+class UserRegisterSchema(UserBase):
+    pass
+
 
 
 
 class UserLoginSchema(BaseModel):
     login: str
     password: str
+
+
+class StudentRegisterSchema(BaseModel):
+    user_id: int
     
+
+    
+
     
 class Token(BaseModel):
     access_token: str
     refresh_token: str | None = None
     token_type: str = "Bearer"
+    
+    
+    
+    
+    
+class AchievementCreate(BaseModel):
+    name: str
+    description: str
+
+class AchievementResponse(BaseModel):
+    id: int
+    name: str
+    description: str
+    
+    class Config:
+        orm_mode = True
+
+class TitleCreate(BaseModel):
+    name: str
+
+class TitleResponse(BaseModel):
+    id: int
+    name: str
+    
+    class Config:
+        orm_mode = True
