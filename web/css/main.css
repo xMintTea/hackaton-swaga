@@ -972,3 +972,59 @@ footer {
 .language-select option {
     background: var(--dark-secondary);
 }
+
+.notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--dark-secondary);
+    border: 1px solid var(--neon-blue);
+    border-radius: 5px;
+    padding: 15px;
+    max-width: 350px;
+    box-shadow: 0 0 20px rgba(0, 238, 255, 0.3);
+    display: flex;
+    align-items: flex-start;
+    z-index: 10000;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.notification.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--neon-blue);
+}
+
+.notification-message {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+@media (max-width: 768px) {
+    .notification {
+        bottom: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
