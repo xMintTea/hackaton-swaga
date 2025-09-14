@@ -34,7 +34,7 @@ const SELECTORS = {
 let animationObservers = [];
 
 // Основная функция инициализации
-document.addEventListener('DOMContentLoaded', function() {
+function initScripts() {
     console.log('Инициализация сайта Cyberskill...');
     
     // Создаем контейнер для уведомлений
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Запрос разрешения на уведомления
     initNotifications();
-});
+}
 
 // Создание контейнера для уведомлений
 function createNotificationContainer() {
