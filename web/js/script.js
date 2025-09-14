@@ -770,3 +770,79 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Функция для запроса разрешения на уведомления
+function requestNotificationPermission() {
+    if (!("Notification" in window)) {
+        console.log("This browser does not support notifications");
+        return;
+    }
+
+    if (Notification.permission === "default") {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                showNotification("Cyberskill", "Уведомления включены!");
+            }
+        });
+    }
+}
+
+// Улучшенная функция показа уведомлений
+function showNotification(title, message, tag = null, icon = null) {
+    // Нативные уведомления
+    if (Notification.permission === "granted") {
+        const options = {
+            body: message,
+            icon: icon || 'img/logo.png',
+            tag: tag
+        };
+        
+        const notification = new Notification(title, options);
+        
+        setTimeout(() => {
+            notification.close();
+        }, 5000);
+        
+        notification.onclick = function() {
+            window.focus();
+            this.close();
+        };
+    }
+    
+    // Внутрисайтовые уведомления
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <div class="notification-title">${title}</div>
+            <div class="notification-message">${message}</div>
+        </div>
+        <button class="notification-close">&times;</button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 100);
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 5000);
+    
+    notification.querySelector('.notification-close').addEventListener('click', function() {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    });
+}
+
+// Добавьте вызов при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        requestNotificationPermission();
+    }, 3000);
+});
