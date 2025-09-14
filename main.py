@@ -144,8 +144,7 @@ def login(creds: UserLoginSchema, response: Response, db: Session = Depends(get_
         
         access_token = create_access_token(user)
         refresh_token = create_refresh_token(user)
-        
-        print(response.set_cookie("access_token", access_token))
+    
         
         return Token(access_token=access_token,
                      refresh_token=refresh_token,
@@ -173,7 +172,6 @@ def registerUser(user: UserRegisterSchema, db: Session = Depends(get_db)) -> dic
 
     except IntegrityError as e:
         db.rollback()
-        print(e)
         
         return {"data": "Пользователь с таким логином уже существует"}
 
@@ -223,7 +221,6 @@ def  auth_user_check_self_info(
 ):
     token = request.cookies.get("access_token")
     
-    print(token)
     
     iat = payload.get("iat")
     exp = payload.get("exp")
@@ -242,13 +239,29 @@ def  auth_user_check_self_info(
 def user_profile(login: str, request: Request, db: Session = Depends(get_db)):
     
     if token:= request.cookies.get("access_token"):
-        print(login)
         if user := db.query(User).filter(User.login == login).first():
-            return user
+            
+            titile = user.title if user.title else ""
+            
+            response = {
+                "nickname": user.nickname,
+                "title" : titile,
+                "role" : user.role,
+                "achievements" : user.achievements
+            }
+            
+            return templates.TemplateResponse(
+        request=request,
+        name="user_profile.html",
+        context={"request": request, "user": response})
         
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+
+
+
 
 
 @app.get("/users/me/alt")
@@ -310,11 +323,24 @@ def get_courses(db: Session = Depends(get_db)):
     return courses
 
 @app.get("/courses/{course_id}", response_model=CourseResponse)
-def get_course(course_id: int, db: Session = Depends(get_db)):
+def get_course(course_id: int,  request: Request, db: Session = Depends(get_db)):
     course = db.query(Course).options(joinedload(Course.topics)).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="Course not found")
-    return course
+    
+    
+    response = {
+        "title" : course.title,
+        "desc" : course.description,
+        "studs" : course.students
+    }
+    
+    return templates.TemplateResponse(
+        request=request,
+        name="courses.html",
+        context={"request": request, "course": response})
+    
+
 
 @app.put("/courses/{course_id}", response_model=CourseResponse)
 def update_course(course_id: int, course: CourseCreate, db: Session = Depends(get_db)):
@@ -429,3 +455,40 @@ def set_student_course(
     db.refresh(student)
     
     return {"message": "Course set successfully", "student": student}
+
+
+
+
+
+@app.get("/course/{course_id}", name="course")
+def cours(course_id: int,request: Request,db: Session = Depends(get_db)):
+    topics = get_course_topics(course_id, db)
+    
+    
+    
+    return templates.TemplateResponse(
+        request=request,
+        name="cours.html",
+        context={"request": request,
+                 "topics": topics,
+                 "cid" : course_id})
+    
+
+@app.get("/topic/{topic_id}", name="topic")
+def topic(topic_id: int, request: Request, db: Session = Depends(get_db)):
+    
+    if topic:=db.query(Topic).filter(Topic.id==topic_id).first():
+        
+        response = {
+            "title" : topic.title,
+            "content" : topic.content,
+            "course_id" : topic.course_id,
+            "topic_id" : topic.id
+        }
+        
+        return templates.TemplateResponse(
+            request=request,
+            name="topic.html",
+            context={"request": request, "topic": response})
+    
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ topic.title}}
+{% endblock %}
+
+{% block body %}
+<h1>{{ topic.title}}</h1>
+<p>{{ topic.content }}</p>
+
+
+<button>Завершить тему</button>
+
+<div>
+    <a href="/course/{{ topic.course_id }}">Назад к темам</a>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Users List
+{% endblock %}
+
+{% block body %}
+
+<ul>
+    {% for topic in topics %}
+    <li><h2><a href="/topic/{{ topic.id }}">{{ topic.title }}</a></h2></li>
+    {% endfor %}
+</ul>
+
+<div>
+    <a href="{{ url_for('index') }}">Back to homepage</a>
+</div>
+{% endblock %}
