@@ -146,6 +146,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (window.showNotification) {
                         window.showNotification('Вход выполнен успешно!');
                     }
+
+                    // Показываем тестовое пуш-уведомление
+                    if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+                        navigator.serviceWorker.ready.then(function(registration) {
+                            registration.showNotification('Вход выполнен', {
+                                body: 'Добро пожаловать в киберпространство!',
+                                icon: 'img/icon-192.png',
+                                vibrate: [200, 100, 200],
+                                tag: 'login-notification'
+                            });
+                        });
+                    }
                 } else {
                     if (window.showNotification) {
                         window.showNotification('Ошибка входа. Проверьте данные.', 'error');
