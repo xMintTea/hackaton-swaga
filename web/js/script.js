@@ -586,11 +586,18 @@ function applyTranslations() {
     });
 }
 
-// Смена языка
 function changeLanguage(lang) {
     currentLanguage = lang;
     localStorage.setItem('language', lang);
     loadTranslations(lang);
+    updateSelectedLanguage();
+}
+
+function updateSelectedLanguage() {
+    const select = document.getElementById('languageSelect');
+    if (select) {
+        select.value = currentLanguage;
+    }
 }
 
 // Инициализация языка при загрузке
@@ -598,6 +605,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const savedLanguage = localStorage.getItem('language') || 'ru';
     changeLanguage(savedLanguage);
     
+    const languageSelect = document.getElementById('languageSelect');
+    if (languageSelect) {
+        languageSelect.addEventListener('change', function() {
+            changeLanguage(this.value);
+        });
+    }
+
     // Добавляем переключатель языков в хедер
     const headerContent = document.querySelector('.header-content');
     if (headerContent) {
