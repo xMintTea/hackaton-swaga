@@ -902,26 +902,65 @@ footer {
 /* Дополнительные стили для уведомлений */
 .notification {
     position: fixed;
-    top: 20px;
+    bottom: 20px;
     right: 20px;
-    padding: 15px 25px;
+    padding: 15px;
     border-radius: 5px;
     color: #fff;
     z-index: 10000;
     opacity: 0;
-    transition: opacity 0.3s ease;
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 500;
+    transition: all 0.3s ease;
+    max-width: 350px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transform: translateX(100%);
 }
 
 .notification.success {
     background: var(--neon-green);
-    box-shadow: 0 0 15px var(--neon-green);
+    border: 1px solid var(--neon-green);
 }
 
 .notification.error {
     background: var(--neon-pink);
-    box-shadow: 0 0 15px var(--neon-pink);
+    border: 1px solid var(--neon-pink);
+}
+
+.notification.info {
+    background: var(--neon-blue);
+    border: 1px solid var(--neon-blue);
+}
+
+.notification-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.notification-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
+.notification-message {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.notification-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.notification-close:hover {
+    opacity: 1;
 }
 
 /* Стили для кнопок в хедере */
@@ -950,7 +989,7 @@ footer {
     .notification {
         left: 20px;
         right: 20px;
-        text-align: center;
+        max-width: none;
     }
 }
 
@@ -971,60 +1010,4 @@ footer {
 
 .language-select option {
     background: var(--dark-secondary);
-}
-
-.notification {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: var(--dark-secondary);
-    border: 1px solid var(--neon-blue);
-    border-radius: 5px;
-    padding: 15px;
-    max-width: 350px;
-    box-shadow: 0 0 20px rgba(0, 238, 255, 0.3);
-    display: flex;
-    align-items: flex-start;
-    z-index: 10000;
-    transform: translateX(100%);
-    opacity: 0;
-    transition: all 0.3s ease;
-}
-
-.notification.show {
-    transform: translateX(0);
-    opacity: 1;
-}
-
-.notification-content {
-    flex: 1;
-}
-
-.notification-title {
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: var(--neon-blue);
-}
-
-.notification-message {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-}
-
-.notification-close {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 1.2rem;
-    cursor: pointer;
-    margin-left: 10px;
-}
-
-@media (max-width: 768px) {
-    .notification {
-        bottom: 10px;
-        right: 10px;
-        left: 10px;
-        max-width: none;
-    }
 }
