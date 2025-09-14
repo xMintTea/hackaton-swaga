@@ -108,3 +108,49 @@ function updateUserProfile(userInfo) {
     // Заглушка - в реальном приложении здесь будет обновление данных на странице
     console.log('User info:', userInfo);
 }
+
+// Обработка формы входа
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const formData = new FormData();
+                formData.append('username', email);
+                formData.append('password', password);
+                
+                const response = await fetch(`${API_BASE_URL}/login/`, {
+                    method: 'POST',
+                    body: new URLSearchParams(formData),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                });
+                
+                if (response.ok) {
+                    const tokenData = await response.json();
+                    auth.setToken(tokenData.access_token);
+                    
+                    // Закрываем модальное окно
+                    const loginModal = document.getElementById('loginModal');
+                    if (loginModal) {
+                        loginModal.style.display = 'none';
+                    }
+                    
+                    // Показываем уведомление
+                    showNotification('Вход выполнен успешно!');
+                } else {
+                    showNotification('Ошибка входа. Проверьте данные.', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Ошибка соединения.', 'error');
+            }
+        });
+    }
+});
