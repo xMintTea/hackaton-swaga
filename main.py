@@ -51,19 +51,7 @@ from config.settings import settings
 
 app = FastAPI()
 
-
-
-
-origins = [
-    "http://localhost",
-    "http://localhost:8000",
-    "http://127.0.0.1",
-    "http://127.0.0.1:8000",
-    "http://127.0.0.1:5500",
-    # и другие адреса, с которых может приходить запрос
-]
-
-
+Base.metadata.create_all(bind=engine)
 
 app.add_middleware(
     CORSMiddleware,
