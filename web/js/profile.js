@@ -343,7 +343,9 @@ function initEventHandlers() {
             editDescriptionBtn.style.display = 'block';
             
             // Временное уведомление
-            showNotification('Описание успешно сохранено', 'success');
+            if (window.showNotification) {
+                window.showNotification('Описание успешно сохранено', 'success');
+            }
         });
     }
     
@@ -395,7 +397,9 @@ function initEventHandlers() {
                 socialsList.appendChild(newLink);
                 document.getElementById('socialUrlInput').value = '';
                 
-                showNotification('Ссылка добавлена', 'success');
+                if (window.showNotification) {
+                    window.showNotification('Ссылка добавлена', 'success');
+                }
             }
         });
     }
@@ -407,7 +411,9 @@ function initEventHandlers() {
             socialsList.style.display = 'block';
             editSocialsBtn.style.display = 'block';
             
-            showNotification('Социальные ссылки сохранены', 'success');
+            if (window.showNotification) {
+                window.showNotification('Социальные ссылки сохранены', 'success');
+            }
         });
     }
     
@@ -472,9 +478,13 @@ function initEventHandlers() {
                 document.getElementById('userAvatar').src = avatarImg;
                 avatarModal.style.display = 'none';
                 
-                showNotification('Аватар успешно изменен', 'success');
+                if (window.showNotification) {
+                    window.showNotification('Аватар успешно изменен', 'success');
+                }
             } else {
-                showNotification('Этот аватар заблокирован', 'error');
+                if (window.showNotification) {
+                    window.showNotification('Этот аватар заблокирован', 'error');
+                }
             }
         });
     }
@@ -497,7 +507,9 @@ function initEventHandlers() {
             const itemType = e.target.getAttribute('data-item-type');
             
             // Здесь будет запрос к API для покупки предмета
-            showNotification(`Предмет приобретен!`, 'success');
+            if (window.showNotification) {
+                window.showNotification(`Предмет приобретен!`, 'success');
+            }
             
             // Обновляем интерфейс
             e.target.textContent = 'Приобретено';
@@ -511,7 +523,9 @@ function initEventHandlers() {
     if (visibilityToggle) {
         visibilityToggle.addEventListener('change', function() {
             // Здесь будет запрос к API для изменения настроек приватности
-            showNotification(`Профиль ${this.checked ? 'скрыт' : 'открыт'}`, 'success');
+            if (window.showNotification) {
+                window.showNotification(`Профиль ${this.checked ? 'скрыт' : 'открыт'}`, 'success');
+            }
         });
     }
     
@@ -583,47 +597,4 @@ async function loadAllAchievements() {
     } catch (error) {
         console.error('Ошибка загрузки достижений:', error);
     }
-}
-
-// Вспомогательная функция для показа уведомлений
-function showNotification(message, type) {
-    // Создаем элемент уведомления
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.textContent = message;
-    
-    // Стилизуем уведомление
-    notification.style.position = 'fixed';
-    notification.style.top = '20px';
-    notification.style.right = '20px';
-    notification.style.padding = '10px 20px';
-    notification.style.borderRadius = '5px';
-    notification.style.color = '#fff';
-    notification.style.zIndex = '10000';
-    notification.style.opacity = '0';
-    notification.style.transition = 'opacity 0.3s ease';
-    
-    if (type === 'success') {
-        notification.style.background = 'var(--neon-green)';
-        notification.style.boxShadow = '0 0 10px var(--neon-green)';
-    } else {
-        notification.style.background = 'var(--neon-pink)';
-        notification.style.boxShadow = '0 0 10px var(--neon-pink)';
-    }
-    
-    // Добавляем уведомление на страницу
-    document.body.appendChild(notification);
-    
-    // Показываем уведомление
-    setTimeout(() => {
-        notification.style.opacity = '1';
-    }, 10);
-    
-    // Убираем уведомление через 3 секунды
-    setTimeout(() => {
-        notification.style.opacity = '0';
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
-    }, 3000);
 }
