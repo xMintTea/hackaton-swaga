@@ -37,6 +37,9 @@ let animationObservers = [];
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Инициализация сайта Cyberskill...');
     
+    // Создаем контейнер для уведомлений
+    createNotificationContainer();
+    
     // Инициализация всех модулей
     initMatrixRain();
     initAnimations();
@@ -50,6 +53,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Запрос разрешения на уведомления
     initNotifications();
 });
+
+// Создание контейнера для уведомлений
+function createNotificationContainer() {
+    const container = document.createElement('div');
+    container.className = 'notification-container';
+    container.id = 'notificationContainer';
+    document.body.appendChild(container);
+}
 
 // Инициализация матричного дождя
 function initMatrixRain() {
@@ -480,6 +491,9 @@ window.addEventListener('resize', function() {
 
 // Функция для показа уведомлений
 function showNotification(title, message, type = 'info') {
+    const container = document.getElementById('notificationContainer');
+    if (!container) return;
+    
     // Создаем элемент уведомления
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
@@ -493,23 +507,22 @@ function showNotification(title, message, type = 'info') {
         <button class="notification-close">&times;</button>
     `;
     
-    // Добавляем уведомление на страницу
-    document.body.appendChild(notification);
+    // Добавляем уведомление в контейнер
+    container.appendChild(notification);
     
     // Показываем уведомление
     setTimeout(() => {
-        notification.style.opacity = '1';
-        notification.style.transform = 'translateX(0)';
+        notification.classList.add('slide-in');
     }, 10);
     
     // Обработчик закрытия уведомления
     const closeBtn = notification.querySelector('.notification-close');
     closeBtn.addEventListener('click', function() {
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateX(100%)';
+        notification.classList.remove('slide-in');
+        notification.classList.add('slide-out');
         setTimeout(() => {
             if (notification.parentNode) {
-                document.body.removeChild(notification);
+                container.removeChild(notification);
             }
         }, 300);
     });
@@ -517,11 +530,11 @@ function showNotification(title, message, type = 'info') {
     // Убираем уведомление через 5 секунд
     setTimeout(() => {
         if (notification.parentNode) {
-            notification.style.opacity = '0';
-            notification.style.transform = 'translateX(100%)';
+            notification.classList.remove('slide-in');
+            notification.classList.add('slide-out');
             setTimeout(() => {
                 if (notification.parentNode) {
-                    document.body.removeChild(notification);
+                    container.removeChild(notification);
                 }
             }, 300);
         }
