@@ -7,7 +7,6 @@ from static import Roles
 
 
 
-
 class User(Base):
     __tablename__ = "users"
 
