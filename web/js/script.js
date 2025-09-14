@@ -486,3 +486,272 @@ if (typeof module !== 'undefined' && module.exports) {
         utils
     };
 }
+
+// Функция для запроса разрешения на уведомления
+function requestNotificationPermission() {
+    if (!("Notification" in window)) {
+        console.log("This browser does not support notifications");
+        return;
+    }
+
+    // Показываем модальное окно с запросом
+    const notificationModal = document.createElement('div');
+    notificationModal.className = 'modal';
+    notificationModal.innerHTML = `
+        <div class="modal-content">
+            <h2>${getTranslation('notifications_request')}</h2>
+            <p>Получайте уведомления о новых достижениях, курсах и событиях</p>
+            <div class="modal-buttons">
+                <button class="btn" id="allowNotifications">${getTranslation('notifications_allow')}</button>
+                <button class="btn btn-pink" id="denyNotifications">${getTranslation('notifications_deny')}</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(notificationModal);
+    notificationModal.style.display = 'flex';
+
+    // Обработчики для кнопок
+    document.getElementById('allowNotifications').addEventListener('click', function() {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                console.log("Notification permission granted.");
+                showNotification("Cyberskill", "Уведомления включены!");
+            }
+            notificationModal.style.display = 'none';
+        });
+    });
+
+    document.getElementById('denyNotifications').addEventListener('click', function() {
+        notificationModal.style.display = 'none';
+    });
+}
+
+// Функция для показа уведомлений
+function showNotification(title, message, tag = null) {
+    if (Notification.permission === "granted") {
+        const options = {
+            body: message,
+            icon: 'img/logo.png',
+            tag: tag
+        };
+        
+        const notification = new Notification(title, options);
+        
+        // Закрытие уведомления через 5 секунд
+        setTimeout(() => {
+            notification.close();
+        }, 5000);
+        
+        // Обработчик клика по уведомлению
+        notification.onclick = function() {
+            window.focus();
+            this.close();
+        };
+    }
+}
+
+// Добавим вызов запроса разрешения при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    // Запрос разрешения только если еще не запрашивали
+    if (Notification.permission === "default") {
+        setTimeout(() => {
+            requestNotificationPermission();
+        }, 3000);
+    }
+});
+
+// Система перевода
+let currentLanguage = 'ru';
+let translations = {};
+
+// Загрузка переводов
+async function loadTranslations(lang) {
+    try {
+        const response = await fetch(`languages/${lang}.json`);
+        translations = await response.json();
+        applyTranslations();
+    } catch (error) {
+        console.error('Error loading translations:', error);
+    }
+}
+
+// Применение переводов
+function applyTranslations() {
+    document.querySelectorAll('[data-translate]').forEach(element => {
+        const key = element.getAttribute('data-translate');
+        if (translations[key]) {
+            element.textContent = translations[key];
+        }
+    });
+}
+
+// Смена языка
+function changeLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('language', lang);
+    loadTranslations(lang);
+}
+
+// Инициализация языка при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    const savedLanguage = localStorage.getItem('language') || 'ru';
+    changeLanguage(savedLanguage);
+    
+    // Добавляем переключатель языков в хедер
+    const headerContent = document.querySelector('.header-content');
+    if (headerContent) {
+        const languageSwitcher = document.createElement('div');
+        languageSwitcher.className = 'language-switcher';
+        languageSwitcher.innerHTML = `
+            <button class="btn btn-small ${currentLanguage === 'ru' ? 'active' : ''}" onclick="changeLanguage('ru')">RU</button>
+            <button class="btn btn-small ${currentLanguage === 'en' ? 'active' : ''}" onclick="changeLanguage('en')">EN</button>
+            <button class="btn btn-small ${currentLanguage === 'kz' ? 'active' : ''}" onclick="changeLanguage('kz')">KZ</button>
+        `;
+        headerContent.appendChild(languageSwitcher);
+    }
+});
+
+// Вспомогательная функция для получения перевода
+function getTranslation(key) {
+    return translations[key] || key;
+}
+
+// Интеграция с системой аутентификации
+document.addEventListener('DOMContentLoaded', function() {
+    // Загрузка скрипта аутентификации
+    if (typeof auth !== 'undefined') {
+        auth.updateUI();
+    }
+    
+    // Обработка формы входа
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const formData = new FormData();
+                formData.append('username', email);
+                formData.append('password', password);
+                
+                const response = await fetch(`${API_BASE_URL}/login/`, {
+                    method: 'POST',
+                    body: new URLSearchParams(formData),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                });
+                
+                if (response.ok) {
+                    const tokenData = await response.json();
+                    auth.setToken(tokenData.access_token);
+                    
+                    // Закрываем модальное окно
+                    const loginModal = document.getElementById('loginModal');
+                    if (loginModal) {
+                        loginModal.style.display = 'none';
+                    }
+                    
+                    // Показываем уведомление
+                    showNotification('Вход выполнен успешно!', 'success');
+                } else {
+                    showNotification('Ошибка входа. Проверьте данные.', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Ошибка соединения.', 'error');
+            }
+        });
+    }
+    
+    // Обработка формы регистрации
+    const registerForm = document.getElementById('registerForm');
+    if (registerForm) {
+        registerForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                showNotification('Пароли не совпадают.', 'error');
+                return;
+            }
+            
+            // Проверяем, открыта ли секция администратора
+            const adminSection = document.getElementById('adminSection');
+            const isAdminSectionVisible = adminSection.style.display !== 'none';
+            
+            let role = 'student';
+            let secretCode = '';
+            
+            if (isAdminSectionVisible) {
+                role = document.getElementById('userRole').value;
+                secretCode = document.getElementById('secretCode').value;
+                
+                // В реальном приложении здесь должна быть проверка секретного кода
+                if (!secretCode) {
+                    showNotification('Введите секретный код.', 'error');
+                    return;
+                }
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/register/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        nickname: name,
+                        login: email,
+                        password: password,
+                        role: role
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    // Закрываем модальное окно
+                    const registerModal = document.getElementById('registerModal');
+                    if (registerModal) {
+                        registerModal.style.display = 'none';
+                    }
+                    
+                    // Показываем уведомление
+                    showNotification('Регистрация прошла успешно!', 'success');
+                    
+                    // Автоматически выполняем вход
+                    const formData = new FormData();
+                    formData.append('username', email);
+                    formData.append('password', password);
+                    
+                    const loginResponse = await fetch(`${API_BASE_URL}/login/`, {
+                        method: 'POST',
+                        body: new URLSearchParams(formData),
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                    });
+                    
+                    if (loginResponse.ok) {
+                        const tokenData = await loginResponse.json();
+                        auth.setToken(tokenData.access_token);
+                    }
+                } else {
+                    showNotification('Ошибка регистрации.', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('Ошибка соединения.', 'error');
+            }
+        });
+    }
+});
