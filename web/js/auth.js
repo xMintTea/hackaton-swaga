@@ -143,13 +143,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     
                     // Показываем уведомление
-                    showNotification('Вход выполнен успешно!');
+                    if (window.showNotification) {
+                        window.showNotification('Вход выполнен успешно!');
+                    }
                 } else {
-                    showNotification('Ошибка входа. Проверьте данные.', 'error');
+                    if (window.showNotification) {
+                        window.showNotification('Ошибка входа. Проверьте данные.', 'error');
+                    }
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showNotification('Ошибка соединения.', 'error');
+                if (window.showNotification) {
+                    window.showNotification('Ошибка соединения.', 'error');
+                }
             }
         });
     }
