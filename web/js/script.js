@@ -46,6 +46,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initLeaderboard();
     initScrollEffects();
     initAdminToggle();
+    
+    // Запрос разрешения на уведомления
+    initNotifications();
 });
 
 // Инициализация матричного дождя
@@ -111,7 +114,7 @@ function initMatrixRain() {
                 setTimeout(() => {
                     title.style.animation = '';
                 }, 300);
-            }
+        }
         }, 5000);
     }
 }
@@ -235,8 +238,6 @@ function initModals() {
             e.preventDefault();
             closeAllModals();
             loginModal.style.display = 'flex';
-            // Показываем тестовое уведомление
-            showNotification('Тест', 'Это тестовое уведомление при нажатии на кнопку входа', 'success');
         });
     }
     
@@ -326,7 +327,10 @@ function initForms() {
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            showNotification('Вход', 'Функционал входа будет реализован с бэкендом!', 'info');
+            
+            // Показываем тестовое уведомление при нажатии на кнопку входа
+            showNotification('Тест', 'Это тестовое уведомление при нажатии на кнопку входа', 'success');
+            
             if (loginModal) loginModal.style.display = 'none';
         });
     }
@@ -474,61 +478,6 @@ window.addEventListener('resize', function() {
     initAnimations();
 });
 
-// Экспорт для использования в других модулях (если нужно)
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        initMatrixRain,
-        initAnimations,
-        initNavigation,
-        initModals,
-        initForms,
-        initLeaderboard,
-        initScrollEffects,
-        initAdminToggle,
-        utils
-    };
-}
-
-// Функция для запроса разрешения на уведомления
-function requestNotificationPermission() {
-    if (!("Notification" in window)) {
-        console.log("This browser does not support notifications");
-        return;
-    }
-
-    // Показываем модальное окно с запросом
-    const notificationModal = document.createElement('div');
-    notificationModal.className = 'modal';
-    notificationModal.innerHTML = `
-        <div class="modal-content">
-            <h2>${getTranslation('notifications_request')}</h2>
-            <p>Получайте уведомления о новых достижениях, курсах и событиях</p>
-            <div class="modal-buttons">
-                <button class="btn" id="allowNotifications">${getTranslation('notifications_allow')}</button>
-                <button class="btn btn-pink" id="denyNotifications">${getTranslation('notifications_deny')}</button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(notificationModal);
-    notificationModal.style.display = 'flex';
-
-    // Обработчики для кнопок
-    document.getElementById('allowNotifications').addEventListener('click', function() {
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                console.log("Notification permission granted.");
-                showNotification("Cyberskill", "Уведомления включены!", "success");
-            }
-            notificationModal.style.display = 'none';
-        });
-    });
-
-    document.getElementById('denyNotifications').addEventListener('click', function() {
-        notificationModal.style.display = 'none';
-    });
-}
-
 // Функция для показа уведомлений
 function showNotification(title, message, type = 'info') {
     // Создаем элемент уведомления
@@ -543,31 +492,6 @@ function showNotification(title, message, type = 'info') {
         </div>
         <button class="notification-close">&times;</button>
     `;
-    
-    // Стилизуем уведомление
-    notification.style.position = 'fixed';
-    notification.style.bottom = '20px';
-    notification.style.right = '20px';
-    notification.style.padding = '15px';
-    notification.style.borderRadius = '5px';
-    notification.style.color = '#fff';
-    notification.style.zIndex = '10000';
-    notification.style.opacity = '0';
-    notification.style.transition = 'all 0.3s ease';
-    notification.style.maxWidth = '350px';
-    notification.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
-    notification.style.transform = 'translateX(100%)';
-    
-    if (type === 'success') {
-        notification.style.background = 'var(--neon-green)';
-        notification.style.border = '1px solid var(--neon-green)';
-    } else if (type === 'error') {
-        notification.style.background = 'var(--neon-pink)';
-        notification.style.border = '1px solid var(--neon-pink)';
-    } else {
-        notification.style.background = 'var(--neon-blue)';
-        notification.style.border = '1px solid var(--neon-blue)';
-    }
     
     // Добавляем уведомление на страницу
     document.body.appendChild(notification);
@@ -604,221 +528,81 @@ function showNotification(title, message, type = 'info') {
     }, 5000);
 }
 
-// Добавим вызов запроса разрешения при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
-    // Запрос разрешения только если еще не запрашивали
+// Инициализация системы уведомлений
+function initNotifications() {
+    // Запрос разрешения на уведомления
+    if (!("Notification" in window)) {
+        console.log("Этот браузер не поддерживает уведомления");
+        return;
+    }
+
+    // Показываем модальное окно с запросом разрешения
     if (Notification.permission === "default") {
         setTimeout(() => {
-            requestNotificationPermission();
+            showNotificationPermissionModal();
         }, 3000);
-    }
-});
-
-// Система перевода
-let currentLanguage = 'ru';
-let translations = {};
-
-// Загрузка переводов
-async function loadTranslations(lang) {
-    try {
-        const response = await fetch(`languages/${lang}.json`);
-        translations = await response.json();
-        applyTranslations();
-    } catch (error) {
-        console.error('Error loading translations:', error);
     }
 }
 
-// Применение переводов
-function applyTranslations() {
-    document.querySelectorAll('[data-translate]').forEach(element => {
-        const key = element.getAttribute('data-translate');
-        if (translations[key]) {
-            element.textContent = translations[key];
-        }
+// Функция для показа модального окна запроса разрешения на уведомления
+function showNotificationPermissionModal() {
+    const notificationModal = document.createElement('div');
+    notificationModal.className = 'modal';
+    notificationModal.id = 'notificationPermissionModal';
+    notificationModal.innerHTML = `
+        <div class="modal-content">
+            <h2 class="modal-title">Уведомления</h2>
+            <p>Разрешить Cyberskill отправлять вам уведомления о новых курсах, достижениях и событиях?</p>
+            <div class="modal-buttons">
+                <button class="btn" id="allowNotifications">Разрешить</button>
+                <button class="btn btn-pink" id="denyNotifications">Отклонить</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(notificationModal);
+    notificationModal.style.display = 'flex';
+
+    // Обработчики для кнопок
+    document.getElementById('allowNotifications').addEventListener('click', function() {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                console.log("Notification permission granted.");
+                showNotification("Cyberskill", "Добро пожаловать в киберпространство!", "success");
+                
+                // Создаем тестовое пуш-уведомление
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.ready.then(function(registration) {
+                        registration.showNotification('Добро пожаловать в киберпространство!', {
+                            body: 'Теперь вы будете получать уведомления о новых курсах и событиях',
+                            icon: 'img/icon-192.png',
+                            vibrate: [200, 100, 200],
+                            tag: 'welcome-notification'
+                        });
+                    });
+                }
+            }
+            notificationModal.style.display = 'none';
+        });
+    });
+
+    document.getElementById('denyNotifications').addEventListener('click', function() {
+        notificationModal.style.display = 'none';
     });
 }
 
-function changeLanguage(lang) {
-    currentLanguage = lang;
-    localStorage.setItem('language', lang);
-    loadTranslations(lang);
-    updateSelectedLanguage();
+// Экспорт для использования в других модулях (если нужно)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        initMatrixRain,
+        initAnimations,
+        initNavigation,
+        initModals,
+        initForms,
+        initLeaderboard,
+        initScrollEffects,
+        initAdminToggle,
+        utils,
+        showNotification
+    };
 }
-
-function updateSelectedLanguage() {
-    const select = document.getElementById('languageSelect');
-    if (select) {
-        select.value = currentLanguage;
-    }
-}
-
-// Инициализация языка при загрузке
-document.addEventListener('DOMContentLoaded', function() {
-    const savedLanguage = localStorage.getItem('language') || 'ru';
-    changeLanguage(savedLanguage);
-    
-    const languageSelect = document.getElementById('languageSelect');
-    if (languageSelect) {
-        languageSelect.addEventListener('change', function() {
-            changeLanguage(this.value);
-        });
-    }
-
-    // Добавляем переключатель языков в хедер
-    const headerContent = document.querySelector('.header-content');
-    if (headerContent) {
-        const languageSwitcher = document.createElement('div');
-        languageSwitcher.className = 'language-switcher';
-        languageSwitcher.innerHTML = `
-            <button class="btn btn-small ${currentLanguage === 'ru' ? 'active' : ''}" onclick="changeLanguage('ru')">RU</button>
-            <button class="btn btn-small ${currentLanguage === 'en' ? 'active' : ''}" onclick="changeLanguage('en')">EN</button>
-            <button class="btn btn-small ${currentLanguage === 'kz' ? 'active' : ''}" onclick="changeLanguage('kz')">KZ</button>
-        `;
-        headerContent.appendChild(languageSwitcher);
-    }
-});
-
-// Вспомогательная функция для получения перевода
-function getTranslation(key) {
-    return translations[key] || key;
-}
-
-// Интеграция с системой аутентификации
-document.addEventListener('DOMContentLoaded', function() {
-    // Загрузка скрипта аутентификации
-    if (typeof auth !== 'undefined') {
-        auth.updateUI();
-    }
-    
-    // Обработка формы входа
-    const loginForm = document.getElementById('loginForm');
-    if (loginForm) {
-        loginForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            try {
-                const formData = new FormData();
-                formData.append('username', email);
-                formData.append('password', password);
-                
-                const response = await fetch(`${API_BASE_URL}/login/`, {
-                    method: 'POST',
-                    body: new URLSearchParams(formData),
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                });
-                
-                if (response.ok) {
-                    const tokenData = await response.json();
-                    auth.setToken(tokenData.access_token);
-                    
-                    // Закрываем модальное окно
-                    const loginModal = document.getElementById('loginModal');
-                    if (loginModal) {
-                        loginModal.style.display = 'none';
-                    }
-                    
-                    // Показываем уведомление
-                    showNotification('Успех', 'Вход выполнен успешно!', 'success');
-                } else {
-                    showNotification('Ошибка', 'Ошибка входа. Проверьте данные.', 'error');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showNotification('Ошибка', 'Ошибка соединения.', 'error');
-            }
-        });
-    }
-    
-    // Обработка формы регистрации
-    const registerForm = document.getElementById('registerForm');
-    if (registerForm) {
-        registerForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('registerName').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            const confirmPassword = document.getElementById('registerConfirmPassword').value;
-            
-            if (password !== confirmPassword) {
-                showNotification('Ошибка', 'Пароли не совпадают.', 'error');
-                return;
-            }
-            
-            // Проверяем, открыта ли секция администратора
-            const adminSection = document.getElementById('adminSection');
-            const isAdminSectionVisible = adminSection.style.display !== 'none';
-            
-            let role = 'student';
-            let secretCode = '';
-            
-            if (isAdminSectionVisible) {
-                role = document.getElementById('userRole').value;
-                secretCode = document.getElementById('secretCode').value;
-                
-                // В реальном приложении здесь должна быть проверка секретного кода
-                if (!secretCode) {
-                    showNotification('Ошибка', 'Введите секретный код.', 'error');
-                    return;
-                }
-            }
-            
-            try {
-                const response = await fetch(`${API_BASE_URL}/register/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        nickname: name,
-                        login: email,
-                        password: password,
-                        role: role
-                    })
-                });
-                
-                if (response.ok) {
-                    const result = await response.json();
-                    
-                    // Закрываем модальное окно
-                    const registerModal = document.getElementById('registerModal');
-                    if (registerModal) {
-                        registerModal.style.display = 'none';
-                    }
-                    
-                    // Показываем уведомление
-                    showNotification('Успех', 'Регистрация прошла успешно!', 'success');
-                    
-                    // Автоматически выполняем вход
-                    const formData = new FormData();
-                    formData.append('username', email);
-                    formData.append('password', password);
-                    
-                    const loginResponse = await fetch(`${API_BASE_URL}/login/`, {
-                        method: 'POST',
-                        body: new URLSearchParams(formData),
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                    });
-                    
-                    if (loginResponse.ok) {
-                        const tokenData = await loginResponse.json();
-                        auth.setToken(tokenData.access_token);
-                    }
-                } else {
-                    showNotification('Ошибка', 'Ошибка регистрации.', 'error');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showNotification('Ошибка', 'Ошибка соединения.', 'error');
-            }
-        });
-    }
-});
