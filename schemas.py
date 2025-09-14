@@ -1,6 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 
 from static import Roles
@@ -71,8 +71,59 @@ class Token(BaseModel):
     refresh_token: str | None = None
     token_type: str = "Bearer"
     
-    
-    
+
+
+
+
+class CourseCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+
+class CourseResponse(BaseModel):
+    id: int
+    title: str
+    description: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    topics: List["TopicResponse"] = []
+
+    class Config:
+        orm_mode = True
+# Pydantic схемы для тем
+# Для топиков - сделайте поле order обязательным с значением по умолчанию
+
+class TopicBase(BaseModel):
+    title: str
+    content: Optional[str] = None
+    order: int = Field(default=0, ge=0)
+
+
+class TopicCreate(TopicBase):
+    course_id: int
+
+
+
+class TopicUpdate(BaseModel):
+    course_id: Optional[int] = None
+    title: Optional[str] = None
+    content: Optional[str] = None
+    order: Optional[int] = Field(None, ge=0)
+
+class TopicResponse(BaseModel):
+    id: int
+    course_id: int
+    title: str
+    content: Optional[str] = None
+    order: int 
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class SetCourseRequest(BaseModel):
+    course_id: int
     
     
 class AchievementCreate(BaseModel):
