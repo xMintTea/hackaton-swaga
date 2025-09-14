@@ -898,3 +898,58 @@ footer {
 .leaderboard-container {
     opacity: 1 !important;
 }
+
+/* Дополнительные стили для уведомлений */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 5px;
+    color: #fff;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+}
+
+.notification.success {
+    background: var(--neon-green);
+    box-shadow: 0 0 15px var(--neon-green);
+}
+
+.notification.error {
+    background: var(--neon-pink);
+    box-shadow: 0 0 15px var(--neon-pink);
+}
+
+/* Стили для кнопок в хедере */
+.auth-buttons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+#userMenu {
+    display: none;
+    gap: 10px;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    .auth-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    #userMenu {
+        flex-direction: column;
+    }
+    
+    .notification {
+        left: 20px;
+        right: 20px;
+        text-align: center;
+    }
+}
