@@ -22,7 +22,7 @@ const SELECTORS = {
     LOGIN_FORM: '#loginForm',
     REGISTER_FORM: '#registerForm',
     FORGOT_PASSWORD_FORM: '#forgotPasswordForm',
-    LEADERBOARD_LIST: '#leaderboardList',
+    // LEADERBOARD_LIST: '#leaderboardList',
     JOHNNY_IMAGE: '#johnnyImage',
     JOHNNY_TEXT: '#johnnyText',
     TOGGLE_ADMIN_BTN: '#toggleAdminBtn',
@@ -46,7 +46,7 @@ function initScripts() {
     initNavigation();
     initModals();
     initForms();
-    initLeaderboard();
+    // initLeaderboard();
     initScrollEffects();
     initAdminToggle();
     
@@ -655,7 +655,7 @@ if (typeof module !== 'undefined' && module.exports) {
         initNavigation,
         initModals,
         initForms,
-        initLeaderboard,
+        // initLeaderboard,
         initScrollEffects,
         initAdminToggle,
         utils,
