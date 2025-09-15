@@ -1,11 +1,5 @@
-// Основные функции для работы с профилем
 document.addEventListener('DOMContentLoaded', function() {
-    // Проверяем авторизацию
-    // if (!auth.isLoggedIn()) {
-    //     window.location.href = 'index.html';
-    //     return;
-    // }
-    
+
     // Загружаем данные профиля
     loadProfileData();
     
@@ -35,15 +29,15 @@ async function loadProfileData() {
     } catch (error) {
         console.error('Ошибка загрузки данных профиля:', error);
         // Используем заглушку при ошибке
-        const profileData = getStubProfileData();
-        updateProfileUI(profileData);
+        // const profileData = getStubProfileData();
+        // updateProfileUI(profileData);
     }
 }
 
 // Заглушка данных профиля
 function getStubProfileData() {
     return {
-        username: 'Neo_Matrix',
+        // username: 'Neo_Matrix',
         title: 'Новичок в киберпространстве',
         level: 5,
         xp: 650,
@@ -90,8 +84,8 @@ function getStubProfileData() {
 // Обновление интерфейса профиля
 function updateProfileUI(data) {
     // Основная информация
-    document.getElementById('username').textContent = data.username;
-    document.getElementById('userTitle').textContent = data.title;
+    // document.getElementById('username').textContent = data.username;
+    // document.getElementById('userTitle').textContent = data.title;
     document.getElementById('userLevel').textContent = data.level;
     document.getElementById('currentXP').textContent = data.xp;
     document.getElementById('nextLevelXP').textContent = data.nextLevelXp;

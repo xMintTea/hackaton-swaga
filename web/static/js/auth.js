@@ -103,6 +103,27 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+
+function updateUI() {
+    const token = localStorage.getItem('access_token');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userInfo = document.getElementById('userInfo');
+    
+    if (token) {
+        // Пользователь авторизован
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'block';
+        if (userInfo) userInfo.style.display = 'block';
+    } else {
+        // Пользователь не авторизован
+        if (loginBtn) loginBtn.style.display = 'block';
+        if (logoutBtn) logoutBtn.style.display = 'none';
+        if (userInfo) userInfo.style.display = 'none';
+    }
+}
+
+
 // Функция для обновления профиля пользователя
 function updateUserProfile(userInfo) {
     // Заглушка - в реальном приложении здесь будет обновление данных на странице
@@ -118,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
+
             
             try {
                 const formData = new FormData();
@@ -132,33 +154,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                 });
                 
-                if (response.ok) {
-                    const tokenData = await response.json();
-                    auth.setToken(tokenData.access_token);
-                    
-                    // Закрываем модальное окно
-                    const loginModal = document.getElementById('loginModal');
-                    if (loginModal) {
-                        loginModal.style.display = 'none';
-                    }
-                    
-                    // Показываем уведомление
-                    if (window.showNotification) {
-                        window.showNotification('Вход выполнен успешно!');
-                    }
-
-                    // Показываем тестовое пуш-уведомление
-                    if ('serviceWorker' in navigator && Notification.permission === 'granted') {
-                        navigator.serviceWorker.ready.then(function(registration) {
-                            registration.showNotification('Вход выполнен', {
-                                body: 'Добро пожаловать в киберпространство!',
-                                icon: 'img/icon-192.png',
-                                vibrate: [200, 100, 200],
-                                tag: 'login-notification'
-                            });
-                        });
-                    }
-                } else {
+if (response.ok) {
+    // Успешная авторизация
+    const data = await response.json();
+    
+    // Отладочная информация
+    console.log('Токен получен:', data.access_token);
+    
+    // Сохраняем токены
+    localStorage.setItem('access_token', data.access_token);
+    localStorage.setItem('refresh_token', data.refresh_token);
+    
+    // Проверяем сохранение
+    console.log('Токен сохранен в localStorage:', localStorage.getItem('access_token'));
+    
+    // Показываем уведомление об успехе
+    showNotification('Успех', 'Вы успешно вошли в систему', 'success');
+    
+    // Закрываем модальное окно
+    if (loginModal) loginModal.style.display = 'none';
+    
+    // Обновляем интерфейс
+    if (typeof auth !== 'undefined' && typeof auth.updateUI === 'function') {
+        auth.updateUI();
+    }
+} else {
                     if (window.showNotification) {
                         window.showNotification('Ошибка входа. Проверьте данные.', 'error');
                     }

@@ -14,6 +14,7 @@ from database import engine
 from typing import List
 from sqlalchemy.exc import IntegrityError
 from templates import templates
+from fastapi.staticfiles import StaticFiles
 
 
 from models import (
@@ -56,10 +57,10 @@ from validation import (
 from db_helpher import get_db
 from config.settings import settings
 from utils.functions import get_hash, get_origins
-
+from auth.utils_jwt import decode_jwt
 
 app = FastAPI()
-
+app.mount("/static", StaticFiles(directory="web/static"), name="static")
 Base.metadata.create_all(bind=engine)
 
 app.add_middleware(
@@ -150,6 +151,9 @@ def login(creds: UserLoginSchema, response: Response, db: Session = Depends(get_
         
         access_token = create_access_token(user)
         refresh_token = create_refresh_token(user)
+        
+        response.set_cookie("access_token", access_token)
+        response.set_cookie("refresh_token", refresh_token)
     
         
         return Token(access_token=access_token,
@@ -222,19 +226,24 @@ def auth_refresh_jwt(
 @app.get("/users/me")
 def  auth_user_check_self_info(
     request: Request,
-    payload: dict = Depends(get_current_token_payload),
-    user: UserSchema = Depends(get_current_auth_user)
+    db: Session = Depends(get_db)
 ):
     token = request.cookies.get("access_token")
     
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    
+    payload = decode_jwt(token=token) #type: ignore
+    
+    user = db.query(User).filter(User.id == payload.get("sub")).first()
     
     iat = payload.get("iat")
     exp = payload.get("exp")
     
     return {
-        "id": user.id,
-        "login": user.login,
-        "password": user.password,
+        "id": user.id, #type: ignore
+        "login": user.login, #type: ignore
+        "password": user.password, #type: ignore
         "ait": iat,
         "exp": exp
     }
@@ -272,18 +281,27 @@ def user_profile(login: str, request: Request, db: Session = Depends(get_db)):
     if token:= request.cookies.get("access_token"):
         if user := db.query(User).filter(User.login == login).first():
             
-            titile = user.title if user.title else ""
+            titile = user.title if user.title else "Нет титула"
+            
+            lvl = user.student.lvl if user.student else 0
+            xp = user.student.xp if user.student else 0
+            currency = user.student.currency if user.student else 0
+            course = user.student.current_course if user.student else None
             
             response = {
                 "nickname": user.nickname,
                 "title" : titile,
                 "role" : user.role,
-                "achievements" : user.achievements
+                "lvl": lvl,
+                "xp" : xp,
+                "currency": currency,
+                "achievements" : user.achievements,
+                "course": course
             }
             
             return templates.TemplateResponse(
         request=request,
-        name="user_profile.html",
+        name="profile.html",
         context={"request": request, "user": response})
         
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)

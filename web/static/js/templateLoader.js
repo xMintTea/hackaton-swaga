@@ -2,12 +2,12 @@
 async function loadTemplates() {
     try {
         // Загрузка header
-        const headerResponse = await fetch('templates/header.html');
+        const headerResponse = await fetch('/static/templates/header.html');
         const headerHTML = await headerResponse.text();
         document.getElementById('header-placeholder').outerHTML = headerHTML;
         
         // Загрузка footer
-        const footerResponse = await fetch('templates/footer.html');
+        const footerResponse = await fetch('/static/templates/footer.html');
         const footerHTML = await footerResponse.text();
         document.getElementById('footer-placeholder').outerHTML = footerHTML;
         

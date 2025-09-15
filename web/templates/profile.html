@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профиль | Cyberskill</title>
+    <title>{{ user.nickname }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/profile.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/profile.css">
     <!-- Анимации для секций -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
@@ -17,12 +17,12 @@
     <div id="header-placeholder"></div>
     
     <div class="container profile-page-container">
-        <a href="index.html" class="btn back-button">← Назад на главную</a>
+        <a href="/" class="btn back-button">← Назад на главную</a>
         
         <div class="profile-header">
             <div class="avatar-container">
                 <div class="avatar-frame" id="avatarFrame">
-                    <img src="img/avatars/avatar1.jpg" alt="Аватар" class="avatar" id="userAvatar">
+                    <img src="/static/img/avatars/avatar1.jpg" alt="Аватар" class="avatar" id="userAvatar">
                 </div>
                 <div class="avatar-controls">
                     <button class="btn btn-small" id="changeAvatarBtn">Сменить аватар</button>
@@ -31,28 +31,28 @@
             </div>
             
             <div class="profile-info">
-                <h1 class="username" id="username">Neo_Matrix</h1>
-                <span class="user-title" id="userTitle">Новичок в киберпространстве</span>
+                <h1 class="username" id="username">{{ user.nickname }}</h1>
+                <span class="user-title" id="userTitle">{{ user.title.name }}</span>
                 
                 <div class="level-progress">
                     <div class="level-info">
                         <span class="level-label">Уровень</span>
-                        <span class="level-number" id="userLevel">5</span>
+                        <span class="level-number" id="userLevel">{{ user.lvl }}</span>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill" style="width: 65%;"></div>
+                        <div class="progress-fill" id="progressFill" style="width: {{ user.xp }}%;"></div>
                     </div>
                     <div class="xp-info">
-                        <span id="currentXP">650</span>
+                        <span id="currentXP">{{ user.xp }}</span>
                         <span>/</span>
-                        <span id="nextLevelXP">1000</span>
+                        <span id="nextLevelXP">100</span>
                         <span>XP</span>
                     </div>
                 </div>
                 
                 <div class="currency">
                     <span class="currency-icon">ⓒ</span>
-                    <span id="userCurrency">1250</span>
+                    <span id="userCurrency">{{ user.currency }}</span>
                 </div>
             </div>
         </div>
@@ -136,14 +136,17 @@
                         <button class="tab-btn" data-tab="completed" data-translate="completed">Завершенные</button>
                     </div>
                     
+                    
+                    {% if user.course %}
+
                     <div class="tab-content active" id="currentCourses">
                         <div class="course-progress-item">
                             <div class="course-icon">🐍</div>
                             <div class="course-details">
-                                <h3>Python Basics</h3>
-                                <p>Прогресс: 65%</p>
+                                <h3>{{ user.course.title }}</h3>
+                                <p>Прогресс: 42%</p>
                                 <div class="mini-progress-bar">
-                                    <div class="mini-progress-fill" style="width: 65%;"></div>
+                                    <div class="mini-progress-fill" style="width: 42%;"></div>
                                 </div>
                             </div>
                         </div>
@@ -154,6 +157,9 @@
                     </div>
                 </div>
             </div>
+
+            {% else %}
+            {% endif %}
             
             <div class="profile-section">
                 <div class="section-header">
@@ -162,27 +168,15 @@
                 </div>
                 <div class="section-content">
                     <div class="achievements-grid">
+                        {% for ach in user.achievements %}
                         <div class="achievement-item">
                             <div class="achievement-icon">⭐</div>
                             <div class="achievement-info">
-                                <h4>Первые шаги</h4>
-                                <p>Зарегистрировался на платформе</p>
+                                <h4>{{ ach.name }}</h4>
+                                <p>{{ ach.description }}</p>
                             </div>
                         </div>
-                        <div class="achievement-item">
-                            <div class="achievement-icon">📚</div>
-                            <div class="achievement-info">
-                                <h4>Начало пути</h4>
-                                <p>Завершил первый модуль курса</p>
-                            </div>
-                        </div>
-                        <div class="achievement-item locked">
-                            <div class="achievement-icon">🔒</div>
-                            <div class="achievement-info">
-                                <h4>Неизвестное достижение</h4>
-                                <p>Продолжайте учиться, чтобы открыть</p>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -192,7 +186,7 @@
                     <h2 data-translate="shop">Магазин</h2>
                     <div class="currency">
                         <span class="currency-icon">ⓒ</span>
-                        <span id="shopCurrency">1250</span>
+                        <span id="shopCurrency">{{ user.currency }}</span>
                     </div>
                 </div>
                 <div class="section-content">
@@ -206,7 +200,7 @@
                         <div class="shop-items-grid">
                             <div class="shop-item owned">
                                 <div class="item-icon">
-                                    <img src="img/avatars/avatar1.jpg" alt="Аватар 1">
+                                    <img src="/static/img/avatars/avatar1.jpg" alt="Аватар 1">
                                 </div>
                                 <div class="item-info">
                                     <h4>Базовый аватар</h4>
@@ -215,7 +209,7 @@
                             </div>
                             <div class="shop-item">
                                 <div class="item-icon">
-                                    <img src="img/avatars/avatar2.jpg" alt="Аватар 2">
+                                    <img src="/static/img/avatars/avatar2.jpg" alt="Аватар 2">
                                 </div>
                                 <div class="item-info">
                                     <h4>Кибер-аватар</h4>
@@ -228,7 +222,7 @@
                             </div>
                             <div class="shop-item">
                                 <div class="item-icon">
-                                    <img src="img/avatars/avatar3.jpg" alt="Аватар 3">
+                                    <img src="/static/img/avatars/avatar3.jpg" alt="Аватар 3">
                                 </div>
                                 <div class="item-info">
                                     <h4>Хакерский аватар</h4>
@@ -247,7 +241,7 @@
                             <div class="shop-item owned">
                                 <div class="item-icon frame-icon">
                                     <div class="basic-frame">
-                                        <img src="img/avatars/avatar1.jpg" alt="Базовая рамка">
+                                        <img src="/static/img/avatars/avatar1.jpg" alt="Базовая рамка">
                                     </div>
                                 </div>
                                 <div class="item-info">
@@ -258,7 +252,7 @@
                             <div class="shop-item">
                                 <div class="item-icon frame-icon">
                                     <div class="premium-frame">
-                                        <img src="img/avatars/avatar1.jpg" alt="Золотая рамка">
+                                        <img src="/static/img/avatars/avatar1.jpg" alt="Золотая рамка">
                                     </div>
                                 </div>
                                 <div class="item-info">
@@ -395,16 +389,16 @@
             <h2 class="modal-title">Выбор аватара</h2>
             <div class="avatars-grid">
                 <div class="avatar-option selected">
-                    <img src="img/avatars/avatar1.jpg" alt="Аватар 1">
+                    <img src="/static/img/avatars/avatar1.jpg" alt="Аватар 1">
                 </div>
                 <div class="avatar-option">
-                    <img src="img/avatars/avatar2.jpg" alt="Аватар 2">
+                    <img src="/static/img/avatars/avatar2.jpg" alt="Аватар 2">
                 </div>
                 <div class="avatar-option">
-                    <img src="img/avatars/avatar3.jpg" alt="Аватар 3">
+                    <img src="/static/img/avatars/avatar3.jpg" alt="Аватар 3">
                 </div>
                 <div class="avatar-option locked">
-                    <img src="img/avatars/avatar4.jpg" alt="Аватар 4">
+                    <img src="/static/img/avatars/avatar4.jpg" alt="Аватар 4">
                     <div class="lock-overlay">🔒</div>
                 </div>
             </div>
@@ -423,9 +417,11 @@
         </div>
     </div>
 
-    <script src="js/auth.js"></script>
-    <script src="js/templateLoader.js"></script>
-    <script src="js/profile.js"></script>
-    <script src="js/script.js"></script>
+
+
+    <script src="/static/js/auth.js"></script>
+    <script src="/static/js/templateLoader.js"></script>
+    <script src="/static/js/profile.js"></script>
+    <script src="/static/js/script.js"></script>
 </body>
 </html>
