@@ -41,6 +41,220 @@
             margin: 20px 0;
             font-style: italic;
         }
+        
+        /* Стили для списка курсов */
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .course-card {
+            background: var(--dark-secondary);
+            border: 1px solid var(--neon-blue);
+            border-radius: 10px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 25px rgba(0, 238, 255, 0.3);
+            border-color: var(--neon-pink);
+        }
+        
+        .course-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(0, 238, 255, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .course-card:hover::before {
+            opacity: 1;
+        }
+        
+        .course-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .course-title {
+            font-size: 1.5rem;
+            color: var(--neon-blue);
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px var(--neon-blue);
+        }
+        
+        .course-description {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .course-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .course-level {
+            padding: 5px 10px;
+            border-radius: 15px;
+            background: var(--neon-blue);
+            color: var(--dark-primary);
+            font-weight: 600;
+        }
+        
+        .course-price {
+            font-size: 1.3rem;
+            color: var(--neon-pink);
+            text-shadow: 0 0 5px var(--neon-pink);
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .course-warning {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid var(--neon-pink);
+            border-radius: 5px;
+            padding: 15px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        /* Модальное окно курса */
+        .course-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .course-modal-content {
+            background: var(--dark-secondary);
+            border: 2px solid var(--neon-blue);
+            border-radius: 10px;
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0, 238, 255, 0.3);
+        }
+        
+        .close-course-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .course-modal-icon {
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .course-modal-title {
+            font-size: 2rem;
+            color: var(--neon-blue);
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+        
+        .course-modal-description {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .course-modal-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .course-modal-detail {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .detail-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .course-modal-price {
+            text-align: center;
+            font-size: 1.8rem;
+            color: var(--neon-pink);
+            margin: 20px 0;
+            text-shadow: 0 0 8px var(--neon-pink);
+        }
+        
+        .buy-course-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue));
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .buy-course-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+        }
+        
+        @media (max-width: 768px) {
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .course-modal-details {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -53,27 +267,112 @@
         <a href="{{ url_for('index') }}" class="btn back-button">← Назад на главную</a>
         <h1 class="page-title">Все курсы Cyberskill</h1>
         
-        <div class="courses-info">
-            <h2>Страница находится в разработке</h2>
-            <p>Здесь будет полный список всех доступных курсов с фильтрами по категориям, уровням сложности и темам.</p>
-            
-            <div class="dev-comment">
-                <strong>Комментарий для бэкендера:</strong> необходимо реализовать систему управления курсами, 
-                включая категории, модули, уроки и систему прогресса пользователей.
+        <div class="course-warning">
+            <h3>⚠️ Важная информация</h3>
+            <p>Вы можете приобрести только один курс за раз. Нельзя взять другой курс, пока не пройден текущий.</p>
+            <p>При отказе от курса потребуется приобрести его заново для доступа.</p>
+        </div>
+        
+        <div class="courses-grid" id="coursesGrid">
+            <!-- Заглушки курсов - в будущем будут заменены данными из БД -->
+            <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-course-id="1">
+                <div class="course-icon">🐍</div>
+                <h3 class="course-title">Python Basics</h3>
+                <p class="course-description">Изучите основы самого популярного языка для анализа данных и искусственного интеллекта.</p>
+                <div class="course-meta">
+                    <span>12 модулей</span>
+                    <span class="course-level">Начальный</span>
+                </div>
+                <div class="course-price">2 500 ₽</div>
             </div>
             
-            <h3>Планируемый функционал:</h3>
-            <ul>
-                <li>Каталог курсов с фильтрацией и поиском</li>
-                <li>Система прогресса и отслеживания пройденных уроков</li>
-                <li>Интерактивные задания и проекты</li>
-                <li>Система сертификации по завершении курсов</li>
-                <li>Интеграция с лидербордом и системой достижений</li>
-            </ul>
-            
-            <div style="text-align: center; margin-top: 30px;">
-                <a href="{{ url_for('index') }}" class="btn">Вернуться на главную</a>
+            <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="100" data-course-id="2">
+                <div class="course-icon">⚡</div>
+                <h3 class="course-title">JavaScript Fundamentals</h3>
+                <p class="course-description">Освойте язык, который powers современный веб и позволяет создавать интерактивные приложения.</p>
+                <div class="course-meta">
+                    <span>10 модулей</span>
+                    <span class="course-level">Начальный</span>
+                </div>
+                <div class="course-price">2 200 ₽</div>
             </div>
+            
+            <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="200" data-course-id="3">
+                <div class="course-icon">☕</div>
+                <h3 class="course-title">Java Essentials</h3>
+                <p class="course-description">Начните путь в enterprise разработке с одного из самых стабильных и надежных языков.</p>
+                <div class="course-meta">
+                    <span>14 модулей</span>
+                    <span class="course-level">Начальный</span>
+                </div>
+                <div class="course-price">2 800 ₽</div>
+            </div>
+            
+            <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="300" data-course-id="4">
+                <div class="course-icon">🤖</div>
+                <h3 class="course-title">AI with Python</h3>
+                <p class="course-description">Создавайте нейронные сети и алгоритмы машинного обучения для решения сложных задач.</p>
+                <div class="course-meta">
+                    <span>16 модулей</span>
+                    <span class="course-level">Продвинутый</span>
+                </div>
+                <div class="course-price">4 500 ₽</div>
+            </div>
+            
+            <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="400" data-course-id="5">
+                <div class="course-icon">🌐</div>
+                <h3 class="course-title">Advanced JS Frameworks</h3>
+                <p class="course-description">Изучите современные фреймворки для создания сложных веб-приложений.</p>
+                <div class="course-meta">
+                    <span>15 модулей</span>
+                    <span class="course-level">Продвинутый</span>
+                </div>
+                <div class="course-price">3 900 ₽</div>
+            </div>
+            
+            <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="500" data-course-id="6">
+                <div class="course-icon">🔐</div>
+                <h3 class="course-title">Java Security</h3>
+                <p class="course-description">Освойте методы защиты enterprise приложений от современных киберугроз.</p>
+                <div class="course-meta">
+                    <span>18 модулей</span>
+                    <span class="course-level">Продвинутый</span>
+                </div>
+                <div class="course-price">4 200 ₽</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно курса -->
+    <div class="course-modal" id="courseModal">
+        <div class="course-modal-content">
+            <button class="close-course-modal" id="closeCourseModal">&times;</button>
+            <div class="course-modal-icon" id="courseModalIcon">🐍</div>
+            <h2 class="course-modal-title" id="courseModalTitle">Название курса</h2>
+            <p class="course-modal-description" id="courseModalDescription">Описание курса будет здесь...</p>
+            
+            <div class="course-modal-details">
+                <div class="course-modal-detail">
+                    <div class="detail-label">Уровень сложности</div>
+                    <div class="detail-value" id="courseModalLevel">Начальный</div>
+                </div>
+                <div class="course-modal-detail">
+                    <div class="detail-label">Количество модулей</div>
+                    <div class="detail-value" id="courseModalModules">10</div>
+                </div>
+                <div class="course-modal-detail">
+                    <div class="detail-label">Продолжительность</div>
+                    <div class="detail-value" id="courseModalDuration">6 недель</div>
+                </div>
+                <div class="course-modal-detail">
+                    <div class="detail-label">Доступ</div>
+                    <div class="detail-value" id="courseModalAccess">Постоянный</div>
+                </div>
+            </div>
+            
+            <div class="course-modal-price" id="courseModalPrice">2 500 ₽</div>
+            
+            <a href="https://xsolla.com/" target="_blank" class="buy-course-btn" id="buyCourseBtn">Приобрести курс</a>
         </div>
     </div>
     
@@ -168,5 +467,112 @@
     <script src="{{ url_for('static', path='js/auth.js') }}"></script>
     <script src="{{ url_for('static', path='js/templateLoader.js') }}"></script>
     <script src="{{ url_for('static', path='js/script.js') }}"></script>
+    <script>
+        // Данные курсов (заглушки)
+        const coursesData = {
+            1: {
+                icon: "🐍",
+                title: "Python Basics",
+                description: "Изучите основы самого популярного языка для анализа данных и искусственного интеллекта. Этот курс охватывает базовые концепции программирования на Python, включая переменные, типы данных, условия, циклы, функции и основы ООП. Идеально подходит для начинающих.",
+                level: "Начальный",
+                modules: "12 модулей",
+                duration: "6 недель",
+                access: "Постоянный",
+                price: "2 500 ₽"
+            },
+            2: {
+                icon: "⚡",
+                title: "JavaScript Fundamentals",
+                description: "Освойте язык, который powers современный веб и позволяет создавать интерактивные приложения. Курс включает изучение основ JavaScript, работу с DOM, событиями, асинхронным программированием и современными возможностями ES6+.",
+                level: "Начальный",
+                modules: "10 модулей",
+                duration: "5 недель",
+                access: "Постоянный",
+                price: "2 200 ₽"
+            },
+            3: {
+                icon: "☕",
+                title: "Java Essentials",
+                description: "Начните путь в enterprise разработке с одного из самых стабильных и надежных языков. Курс охватывает основы Java, ООП, коллекции, исключения, многопоточность и основы работы с базами данных через JDBC.",
+                level: "Начальный",
+                modules: "14 модулей",
+                duration: "8 недель",
+                access: "Постоянный",
+                price: "2 800 ₽"
+            },
+            4: {
+                icon: "🤖",
+                title: "AI with Python",
+                description: "Создавайте нейронные сети и алгоритмы машинного обучения для решения сложных задач. Этот продвинутый курс включает изучение библиотек для Data Science (NumPy, Pandas, Matplotlib), машинное обучение с Scikit-learn и основы глубокого обучения с TensorFlow/Keras.",
+                level: "Продвинутый",
+                modules: "16 модулей",
+                duration: "10 недель",
+                access: "Постоянный",
+                price: "4 500 ₽"
+            },
+            5: {
+                icon: "🌐",
+                title: "Advanced JS Frameworks",
+                description: "Изучите современные фреймворки для создания сложных веб-приложений. Курс охватывает React, Vue и Angular - их основные концепции, компонентный подход, управление состоянием, маршрутизацию и интеграцию с бэкендом.",
+                level: "Продвинутый",
+                modules: "15 модулей",
+                duration: "9 недель",
+                access: "Постоянный",
+                price: "3 900 ₽"
+            },
+            6: {
+                icon: "🔐",
+                title: "Java Security",
+                description: "Освойте методы защиты enterprise приложений от современных киберугроз. Курс охватывает аутентификацию и авторизацию, безопасность веб-приложений, шифрование, безопасную работу с базами данных и лучшие практики безопасности в Java-разработке.",
+                level: "Продвинутый",
+                modules: "18 модулей",
+                duration: "12 недель",
+                access: "Постоянный",
+                price: "4 200 ₽"
+            }
+        };
+
+        // Инициализация модального окна курса
+        document.addEventListener('DOMContentLoaded', function() {
+            const courseModal = document.getElementById('courseModal');
+            const closeCourseModal = document.getElementById('closeCourseModal');
+            const courseCards = document.querySelectorAll('.course-card');
+            
+            // Обработчик клика по карточке курса
+            courseCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const courseId = this.getAttribute('data-course-id');
+                    const courseData = coursesData[courseId];
+                    
+                    if (courseData) {
+                        // Заполняем модальное окно данными курса
+                        document.getElementById('courseModalIcon').textContent = courseData.icon;
+                        document.getElementById('courseModalTitle').textContent = courseData.title;
+                        document.getElementById('courseModalDescription').textContent = courseData.description;
+                        document.getElementById('courseModalLevel').textContent = courseData.level;
+                        document.getElementById('courseModalModules').textContent = courseData.modules;
+                        document.getElementById('courseModalDuration').textContent = courseData.duration;
+                        document.getElementById('courseModalAccess').textContent = courseData.access;
+                        document.getElementById('courseModalPrice').textContent = courseData.price;
+                        
+                        // Показываем модальное окно
+                        courseModal.style.display = 'flex';
+                    }
+                });
+            });
+            
+            // Закрытие модального окна
+            closeCourseModal.addEventListener('click', function() {
+                courseModal.style.display = 'none';
+            });
+            
+            // Закрытие при клике вне модального окна
+            window.addEventListener('click', function(e) {
+                if (e.target === courseModal) {
+                    courseModal.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
