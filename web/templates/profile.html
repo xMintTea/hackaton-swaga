@@ -412,7 +412,15 @@
             <button class="close-modal" id="closeAchievementsModal">&times;</button>
             <h2 class="modal-title">Все достижения</h2>
             <div class="achievements-grid" id="allAchievements">
-                <!-- Достижения будут загружены через JavaScript -->
+                                        {% for ach in user.achievements %}
+                        <div class="achievement-item">
+                            <div class="achievement-icon">⭐</div>
+                            <div class="achievement-info">
+                                <h4>{{ ach.name }}</h4>
+                                <p>{{ ach.description }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
             </div>
         </div>
     </div>

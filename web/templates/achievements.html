@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Достижения | Cyberskill</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
     <!-- Анимации для секций -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
@@ -86,14 +86,16 @@
         <h1 class="page-title">Все достижения</h1>
         
         <div class="achievements-grid">
+            {% for ach in achievements %}
             <div class="achievement-item">
                 <span class="achievement-icon">⭐</span>
                 <div class="achievement-info">
-                    <h4>Первые шаги</h4>
+                    <h4>{{ ach.name }}</h4>
                     <p>Зарегистрировался на платформе</p>
                 </div>
                 <div class="progress-info">Получено: 15.04.2025</div>
             </div>
+            {% endfor %}
             
             <div class="achievement-item">
                 <span class="achievement-icon">📚</span>
@@ -230,8 +232,8 @@
         </div>
     </div>
 
-    <script src="js/auth.js"></script>
-    <script src="js/templateLoader.js"></script>
-    <script src="js/script.js"></script>
+    <script src="{{ url_for('static', path='js/auth.js') }}"></script>
+    <script src="{{ url_for('static', path='js/templateLoader.js') }}"></script>
+    <script src="{{ url_for('static', path='js/script.js') }}"></script>
 </body>
 </html>

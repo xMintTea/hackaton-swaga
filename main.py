@@ -321,11 +321,17 @@ def cookie_login(request: Request):
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 
-@app.get("/achievements", response_model=List[AchievementResponse])
-def get_all_achievements(db: Session = Depends(get_db)):
+@app.get("/achievements")
+def get_all_achievements(request: Request,db: Session = Depends(get_db)):
     """Получить все ачивки"""
     achievements = db.query(Achievement).all()
-    return achievements
+    
+        
+    return templates.TemplateResponse(
+        request=request,
+        name="achievements.html",
+        context={"request": request, "achievements": achievements})
+    
 
 
 @app.post("/achievements", response_model=AchievementResponse)
