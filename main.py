@@ -334,7 +334,7 @@ def get_all_achievements(request: Request,db: Session = Depends(get_db)):
 
 
 
-@app.get("/contacts")
+@app.get("/contacts", name="contacts")
 def contanct(request: Request):
     return templates.TemplateResponse(
         request=request,
@@ -390,7 +390,7 @@ def create_course(course: CourseCreate, db: Session = Depends(get_db)):
     db.refresh(db_course)
     return db_course
 
-@app.get("/courses", response_model=List[CourseResponse])
+@app.get("/courses", name="courses")
 def get_courses(request: Request, db: Session = Depends(get_db)):
     courses = db.query(Course).options(joinedload(Course.topics)).all()
     
@@ -399,6 +399,53 @@ def get_courses(request: Request, db: Session = Depends(get_db)):
         name="courses.html",
         context={"request": request, "courses": courses})
     
+
+@app.get("/help", name="help")
+def get_help(request: Request):
+    
+    return templates.TemplateResponse(
+        request=request,
+        name="help.html",
+        context={"request": request,})
+
+
+
+@app.get("/partners", name="partners")
+def partners(request: Request):
+    
+    return templates.TemplateResponse(
+        request=request,
+        name="partners.html",
+        context={"request": request,}) 
+
+
+@app.get("/vacancies", name="vacancies")
+def vacancies(request: Request):
+    
+    return templates.TemplateResponse(
+        request=request,
+        name="vacancies.html",
+        context={"request": request}) 
+
+
+@app.get("/team", name="team")
+def team(request: Request):
+    
+    return templates.TemplateResponse(
+        request=request,
+        name="team.html",
+        context={"request": request,}) 
+
+
+
+@app.get("/test", name="test")
+def test(request: Request):
+    
+    return templates.TemplateResponse(
+        request=request,
+        name="test.html",
+        context={"request": request,}) 
+
 
 
 @app.get("/courses/{course_id}", response_model=CourseResponse)

@@ -21,8 +21,8 @@
                 <h1 class="animate__animated animate__fadeInDown">Будущее <span>обучения</span> уже здесь</h1>
                 <p class="animate__animated animate__fadeIn animate__delay-1s">Освойте технологии будущего с нашими инновационными курсы по программированию, кибербезопасности, искусственному интеллекту и многому другому.</p>
                 <div class="hero-buttons animate__animated animate__fadeInUp animate__delay-2s">
-                    <a href="#courses" class="btn">Начать обучение</a>
-                    <a href="../test.html" class="btn btn-pink">Пройти тест</a>
+                    <a href="{{ url_for('courses') }}" class="btn">Начать обучение</a>
+                    <a href="{{ url_for('test') }}" class="btn btn-pink">Пройти тест</a>
                 </div>
             </div>
         </div>
@@ -39,7 +39,7 @@
                 <h2>Добро пожаловать в киберпространство</h2>
                 <p>В 2025 году технологии изменили всё. Теперь каждый может стать кибер-разработчиком и изменить цифровой мир. Наша платформа предоставляет все необходимые инструменты для освоения самых востребованных навыков будущего.</p>
                 <p>Присоединяйся к сообществу киберпионеров и начни свой путь в мире программирования уже сегодня.</p>
-                <a href="#courses" class="btn">Исследовать курсы</a>
+                <a href="{{ url_for('courses') }}" class="btn">Исследовать курсы</a>
             </div>
         </div>
     </section>
@@ -117,7 +117,7 @@
             </div>
 
             <div style="text-align: center; margin-top: 40px;">
-                <a href="courses.html" class="btn">Все курсы</a>
+                <a href="{{ url_for('courses') }}" class="btn">Все курсы</a>
             </div>
         </div>
     </section>
@@ -131,7 +131,7 @@
             <div class="test-container animate-on-scroll" data-animation="zoomIn">
                 <h2>"Хочешь проверить себя?"</h2>
                 <p>Прими вызов и пройди наш специальный тест, чтобы определить свой уровень и получить персональные рекомендации по обучению.</p>
-                <a href="../test.html" class="btn btn-pink">Начать тест</a>
+                <a href="{{ url_for('test') }}" class="btn btn-pink">Начать тест</a>
             </div>
         </div>
     </section>

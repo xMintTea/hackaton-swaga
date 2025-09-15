@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Команда | Cyberskill</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
     <!-- Анимации для секций -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
@@ -171,21 +171,21 @@
         
         <div class="team-grid">
             <div class="team-member" data-member="flyaflayer">
-                <img src="img/FLYaFLYer_Avatar.jpg" alt="FLYaFLYer" class="member-photo">
+                <img src="{{ url_for('static', path='img/FLYaFLYer_Avatar.jpg') }}" alt="FLYaFLYer" class="member-photo">
                 <h3 class="member-name">FLYaFLYer</h3>
                 <p class="member-role">Frontend Developer</p>
                 <p class="member-bio">Специалист по современным веб-технологиям с глубокими знаниями JavaScript и фреймворков...</p>
             </div>
             
             <div class="team-member" data-member="minttea">
-                <img src="img/MintTea_Avatar.jpg" alt="Mint Tea" class="member-photo">
+                <img src="{{ url_for('static', path='img/MintTea_Avatar.jpg') }}" alt="Mint Tea" class="member-photo">
                 <h3 class="member-name">Mint Tea</h3>
                 <p class="member-role">Backend Developer</p>
                 <p class="member-bio">Эксперт в серверной разработке и архитектуре баз данных с многолетним опытом...</p>
             </div>
             
             <div class="team-member" data-member="alexander">
-                <img src="img/Anonymous_Avatar.jpeg" alt="Александр" class="member-photo">
+                <img src="{{ url_for('static', path='img/Anonymous_Avatar.jpeg') }}" alt="Александр" class="member-photo">
                 <h3 class="member-name">Александр</h3>
                 <p class="member-role">Project Manager & Presenter</p>
                 <p class="member-bio">Специалист по презентации проектов и коммуникации с клиентами и инвесторами...</p>
@@ -285,7 +285,7 @@
     <div class="team-modal" id="flyaflayerModal">
         <div class="team-modal-content">
             <button class="close-team-modal" data-modal="flyaflayerModal">&times;</button>
-            <img src="img/FLYaFLYer_Avatar2.jpg" alt="FLYaFLYer" class="modal-member-photo">
+            <img src="{{ url_for('static', path='img/FLYaFLYer_Avatar2.jpg') }}" alt="FLYaFLYer" class="modal-member-photo">
             <h2 class="modal-member-name">FLYaFLYer</h2>
             <p class="modal-member-role">Frontend Developer</p>
             <div class="modal-member-details">
@@ -309,7 +309,7 @@
     <div class="team-modal" id="mintteaModal">
         <div class="team-modal-content">
             <button class="close-team-modal" data-modal="mintteaModal">&times;</button>
-            <img src="img/MintTea_Avatar2.jpg" alt="Mint Tea" class="modal-member-photo">
+            <img src="{{ url_for('static', path='img/MintTea_Avatar2.jpg') }}" alt="Mint Tea" class="modal-member-photo">
             <h2 class="modal-member-name">Mint Tea</h2>
             <p class="modal-member-role">Backend Developer</p>
             <div class="modal-member-details">
@@ -333,7 +333,7 @@
     <div class="team-modal" id="alexanderModal">
         <div class="team-modal-content">
             <button class="close-team-modal" data-modal="alexanderModal">&times;</button>
-            <img src="img/Anonymous_Avatar.jpeg" alt="Александр" class="modal-member-photo">
+            <img src="{{ url_for('static', path='img/Anonymous_Avatar.jpeg') }}" alt="Александр" class="modal-member-photo">
             <h2 class="modal-member-name">Александр</h2>
             <p class="modal-member-role">Project Manager & Presenter</p>
             <div class="modal-member-details">
@@ -389,8 +389,8 @@
             });
         });
     </script>
-    <script src="js/auth.js"></script>
-    <script src="js/templateLoader.js"></script>
-    <script src="js/script.js"></script>
+    <script src="{{ url_for('static', path='js/auth.js') }}"></script>
+    <script src="{{ url_for('static', path='js/templateLoader.js') }}"></script>
+    <script src="{{ url_for('static', path='js/script.js') }}"></script>
 </body>
 </html>
