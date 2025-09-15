@@ -1,8 +1,60 @@
+// Константы для классов и идентификаторов
+const CLASSES = {
+    VISIBLE: 'visible',
+    ANIMATED: 'animate__animated',
+    SCROLLED: 'scrolled',
+    ACTIVE: 'active',
+    ANIMATE_ON_SCROLL: 'animate-on-scroll'
+};
+
+const SELECTORS = {
+    HEADER: '#header',
+    MATRIX_RAIN: '#matrixRain',
+    MOBILE_MENU_BTN: '#mobileMenuBtn',
+    LOGIN_BTN: '#loginBtn',
+    REGISTER_BTN: '#registerBtn',
+    LOGIN_MODAL: '#loginModal',
+    REGISTER_MODAL: '#registerModal',
+    FORGOT_PASSWORD_MODAL: '#forgotPasswordModal',
+    CLOSE_LOGIN_MODAL: '#closeLoginModal',
+    CLOSE_REGISTER_MODAL: '#closeRegisterModal',
+    CLOSE_FORGOT_PASSWORD_MODAL: '#closeForgotPasswordModal',
+    LOGIN_FORM: '#loginForm',
+    REGISTER_FORM: '#registerForm',
+    FORGOT_PASSWORD_FORM: '#forgotPasswordForm',
+    LEADERBOARD_LIST: '#leaderboardList',
+    JOHNNY_IMAGE: '#johnnyImage',
+    JOHNNY_TEXT: '#johnnyText',
+    TOGGLE_ADMIN_BTN: '#toggleAdminBtn',
+    ADMIN_SECTION: '#adminSection',
+    FORGOT_PASSWORD_BTN: '#forgotPasswordBtn'
+};
+
+// Глобальные переменные для управления анимациями
+let animationObservers = [];
+
+// Основная функция инициализации
 document.addEventListener('DOMContentLoaded', function() {
-    // Matrix rain effect
+    console.log('Инициализация сайта Cyberskill...');
+    
+    // Инициализация всех модулей
+    initMatrixRain();
+    initAnimations();
+    initNavigation();
+    initModals();
+    initForms();
+    initLeaderboard();
+    initScrollEffects();
+    initAdminToggle();
+});
+
+// Инициализация матричного дождя
+function initMatrixRain() {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    const container = document.getElementById('matrixRain');
+    const container = document.querySelector(SELECTORS.MATRIX_RAIN);
+    
+    if (!container) return;
     
     container.appendChild(canvas);
     
@@ -14,21 +66,21 @@ document.addEventListener('DOMContentLoaded', function() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
     
-    // Matrix characters
-    const matrixChars = "01010101NeuroAcademy10101010コードコードコード";
+    // Символы для матричного эффекта
+    const matrixChars = "01010101Cyberskill10101010コードコードコード";
     const fontSize = 14;
     let columns = Math.floor(canvas.width / fontSize);
     
-    // Drops array
+    // Массив для хранения позиций капель
     let drops = [];
     for (let i = 0; i < columns; i++) {
         drops[i] = Math.floor(Math.random() * canvas.height / fontSize);
     }
     
-    // Drawing function
+    // Функция отрисовки матричного дождя
     function draw() {
-        // Semi-transparent black to create trail effect
-        ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+        // Полупрозрачный черный для создания эффекта шлейфа
+        ctx.fillStyle = 'rgba(10, 10, 10, 0.04)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         ctx.fillStyle = '#00ff00';
@@ -47,35 +99,103 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Animation loop
+    // Запуск анимации матричного дождя
     setInterval(draw, 33);
     
-    // Glitch effect on title
+    // Глитч-эффект для заголовка
     const title = document.querySelector('.logo');
-    setInterval(() => {
-        if (Math.random() > 0.9) {
-            title.style.animation = 'glitch 0.3s linear';
-            setTimeout(() => {
-                title.style.animation = '';
-            }, 300);
-        }
-    }, 5000);
+    if (title) {
+        setInterval(() => {
+            if (Math.random() > 0.9) {
+                title.style.animation = 'glitch 0.3s linear';
+                setTimeout(() => {
+                    title.style.animation = '';
+                }, 300);
+            }
+        }, 5000);
+    }
+}
+
+// Инициализация анимаций
+function initAnimations() {
+    console.log('Инициализация анимаций...');
     
-    // Mobile menu toggle
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const nav = document.querySelector('nav');
+    // Анимация появления элементов при скролле
+    const animatedElements = document.querySelectorAll('.' + CLASSES.ANIMATE_ON_SCROLL);
     
-    mobileMenuBtn.addEventListener('click', function() {
-        this.classList.toggle('active');
-        nav.classList.toggle('active');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const animation = entry.target.getAttribute('data-animation') || 'animate__fadeInUp';
+                const delay = entry.target.getAttribute('data-delay') || 0;
+                
+                setTimeout(() => {
+                    entry.target.classList.add(CLASSES.ANIMATED, animation);
+                    // Убираем начальную прозрачность после анимации
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                    }, parseInt(delay) + 1000);
+                    
+                }, parseInt(delay));
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    animatedElements.forEach(element => {
+        observer.observe(element);
     });
     
-    // Smooth scrolling for navigation links
-    document.querySelectorAll('a[data-scroll]').forEach(anchor => {
+    // Сохраняем observer для последующей очистки
+    animationObservers.push(observer);
+}
+
+// Инициализация навигации
+function initNavigation() {
+    console.log('Инициализация навигации...');
+    
+    // Переключение мобильного меню
+    const mobileMenuBtn = document.querySelector(SELECTORS.MOBILE_MENU_BTN);
+    const nav = document.querySelector('nav');
+    
+    if (mobileMenuBtn && nav) {
+        mobileMenuBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            this.classList.toggle(CLASSES.ACTIVE);
+            nav.classList.toggle(CLASSES.ACTIVE);
+        });
+        
+        // Закрытие меню при клике на ссылку
+        const navLinks = nav.querySelectorAll('a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenuBtn.classList.remove(CLASSES.ACTIVE);
+                nav.classList.remove(CLASSES.ACTIVE);
+            });
+        });
+        
+        // Закрытие меню при клике вне его области
+        document.addEventListener('click', function(e) {
+            if (nav.classList.contains(CLASSES.ACTIVE) && 
+                !nav.contains(e.target) && 
+                e.target !== mobileMenuBtn && 
+                !mobileMenuBtn.contains(e.target)) {
+                mobileMenuBtn.classList.remove(CLASSES.ACTIVE);
+                nav.classList.remove(CLASSES.ACTIVE);
+            }
+        });
+    }
+    
+    // Плавная прокрутка для навигационных ссылок
+    document.querySelectorAll('nav a').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
+            // Для внешних ссылок не предотвращаем стандартное поведение
+            if (this.getAttribute('href').startsWith('http') || this.getAttribute('href').includes('.html')) {
+                return;
+            }
+            
             e.preventDefault();
             
-            const targetId = this.getAttribute('data-scroll');
+            const targetId = this.getAttribute('href').substring(1);
             const targetElement = document.getElementById(targetId);
             
             if (targetElement) {
@@ -83,76 +203,286 @@ document.addEventListener('DOMContentLoaded', function() {
                     top: targetElement.offsetTop - 80,
                     behavior: 'smooth'
                 });
-                
-                // Close mobile menu if open
-                mobileMenuBtn.classList.remove('active');
-                nav.classList.remove('active');
             }
         });
     });
+}
+
+// Инициализация модальных окон
+function initModals() {
+    console.log('Инициализация модальных окон...');
     
-    // Header scroll effect
-    window.addEventListener('scroll', function() {
-        const header = document.querySelector('header');
-        if (window.scrollY > 50) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
+    const loginBtn = document.querySelector(SELECTORS.LOGIN_BTN);
+    const registerBtn = document.querySelector(SELECTORS.REGISTER_BTN);
+    const loginModal = document.querySelector(SELECTORS.LOGIN_MODAL);
+    const registerModal = document.querySelector(SELECTORS.REGISTER_MODAL);
+    const forgotPasswordModal = document.querySelector(SELECTORS.FORGOT_PASSWORD_MODAL);
+    const closeLoginModal = document.querySelector(SELECTORS.CLOSE_LOGIN_MODAL);
+    const closeRegisterModal = document.querySelector(SELECTORS.CLOSE_REGISTER_MODAL);
+    const closeForgotPasswordModal = document.querySelector(SELECTORS.CLOSE_FORGOT_PASSWORD_MODAL);
+    const forgotPasswordBtn = document.querySelector(SELECTORS.FORGOT_PASSWORD_BTN);
+    
+    // Функция для закрытия всех модальных окон
+    function closeAllModals() {
+        if (loginModal) loginModal.style.display = 'none';
+        if (registerModal) registerModal.style.display = 'none';
+        if (forgotPasswordModal) forgotPasswordModal.style.display = 'none';
+    }
+    
+    // Открытие модальных окон
+    if (loginBtn && loginModal) {
+        loginBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeAllModals();
+            loginModal.style.display = 'flex';
+        });
+    }
+    
+    if (registerBtn && registerModal) {
+        registerBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeAllModals();
+            registerModal.style.display = 'flex';
+        });
+    }
+    
+    if (forgotPasswordBtn && forgotPasswordModal && loginModal) {
+        forgotPasswordBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeAllModals();
+            forgotPasswordModal.style.display = 'flex';
+        });
+    }
+    
+    // Закрытие модальных окон
+    if (closeLoginModal && loginModal) {
+        closeLoginModal.addEventListener('click', function() {
+            loginModal.style.display = 'none';
+        });
+    }
+    
+    if (closeRegisterModal && registerModal) {
+        closeRegisterModal.addEventListener('click', function() {
+            registerModal.style.display = 'none';
+        });
+    }
+    
+    if (closeForgotPasswordModal && forgotPasswordModal) {
+        closeForgotPasswordModal.addEventListener('click', function() {
+            forgotPasswordModal.style.display = 'none';
+        });
+    }
+    
+    // Закрытие модальных окон при клике вне их области
+    window.addEventListener('click', function(e) {
+        if (e.target === loginModal) {
+            loginModal.style.display = 'none';
+        }
+        if (e.target === registerModal) {
+            registerModal.style.display = 'none';
+        }
+        if (e.target === forgotPasswordModal) {
+            forgotPasswordModal.style.display = 'none';
         }
     });
+}
+
+// Инициализация переключателя режима администратора
+function initAdminToggle() {
+    console.log('Инициализация переключателя администратора...');
     
-    // Animate progress bars
-    function animateProgressBars() {
-        document.querySelectorAll('.progress').forEach(progressBar => {
-            const progress = progressBar.getAttribute('data-progress');
-            progressBar.style.width = progress + '%';
-        });
-    }
+    const toggleAdminBtn = document.querySelector(SELECTORS.TOGGLE_ADMIN_BTN);
+    const adminSection = document.querySelector(SELECTORS.ADMIN_SECTION);
     
-    // Animate stats counter
-    function animateStats() {
-        const statElements = document.querySelectorAll('.stat-number');
-        
-        statElements.forEach(stat => {
-            const target = parseInt(stat.getAttribute('data-target'));
-            const duration = 2000; // 2 seconds
-            const steps = 60; // 60 frames per second
-            const stepValue = target / (duration / (1000 / steps));
-            let current = 0;
+    if (toggleAdminBtn && adminSection) {
+        toggleAdminBtn.addEventListener('click', function(e) {
+            e.preventDefault();
             
-            const timer = setInterval(() => {
-                current += stepValue;
-                if (current >= target) {
-                    current = target;
-                    clearInterval(timer);
-                }
-                stat.textContent = Math.floor(current);
-            }, 1000 / steps);
-        });
-    }
-    
-    // Intersection Observer for animations
-    const observerOptions = {
-        threshold: 0.5,
-        rootMargin: '0px'
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                if (entry.target.classList.contains('courses')) {
-                    animateProgressBars();
-                } else if (entry.target.classList.contains('community')) {
-                    animateStats();
-                }
+            if (adminSection.style.display === 'none') {
+                adminSection.style.display = 'block';
+                this.textContent = 'Я ученик';
+            } else {
+                adminSection.style.display = 'none';
+                this.textContent = 'Вы не ученик?';
             }
         });
-    }, observerOptions);
+    }
+}
+
+// Инициализация форм
+function initForms() {
+    console.log('Инициализация форм...');
     
-    // Observe sections
-    const coursesSection = document.querySelector('.courses');
-    const communitySection = document.querySelector('.community');
+    const loginForm = document.querySelector(SELECTORS.LOGIN_FORM);
+    const registerForm = document.querySelector(SELECTORS.REGISTER_FORM);
+    const forgotPasswordForm = document.querySelector(SELECTORS.FORGOT_PASSWORD_FORM);
+    const loginModal = document.querySelector(SELECTORS.LOGIN_MODAL);
+    const registerModal = document.querySelector(SELECTORS.REGISTER_MODAL);
+    const forgotPasswordModal = document.querySelector(SELECTORS.FORGOT_PASSWORD_MODAL);
     
-    if (coursesSection) observer.observe(coursesSection);
-    if (communitySection) observer.observe(communitySection);
+    // Обработка отправки формы входа
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Функционал входа будет реализован с бэкендом!');
+            if (loginModal) loginModal.style.display = 'none';
+        });
+    }
+    
+    // Обработка отправки формы регистрации
+    if (registerForm) {
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const secretCode = document.getElementById('secretCode').value;
+            const userRole = document.getElementById('userRole').value;
+            const adminSection = document.querySelector(SELECTORS.ADMIN_SECTION);
+            
+            // В реальном приложении проверка кода должна быть на бэкенде
+            // Здесь просто отправляем данные на сервер
+            const formData = {
+                name: document.getElementById('registerName').value,
+                email: document.getElementById('registerEmail').value,
+                password: document.getElementById('registerPassword').value,
+                role: adminSection.style.display !== 'none' ? userRole : 'student',
+                secretCode: adminSection.style.display !== 'none' ? secretCode : ''
+            };
+            
+            console.log('Данные для регистрации:', formData);
+            alert('Регистрация отправлена на сервер. Проверка секретного кода будет выполнена на бэкенде.');
+            
+            if (registerModal) registerModal.style.display = 'none';
+        });
+    }
+    
+    // Обработка отправки формы восстановления пароля
+    if (forgotPasswordForm) {
+        forgotPasswordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Запрос на восстановление пароля отправлен! Проверьте вашу электронную почту.');
+            if (forgotPasswordModal) forgotPasswordModal.style.display = 'none';
+        });
+    }
+}
+
+// Инициализация лидерборда
+function initLeaderboard() {
+    console.log('Инициализация лидерборда...');
+    
+    const leaderboardList = document.querySelector(SELECTORS.LEADERBOARD_LIST);
+    if (!leaderboardList) return;
+    
+    // Загрузка данных лидерборда (заглушка)
+    const leaderboardData = [
+        { rank: 1, player: 'Neo_Matrix', points: 2450 },
+        { rank: 2, player: 'Cyber_Tr1x', points: 2280 },
+        { rank: 3, player: 'Data_Stream', points: 2150 },
+        { rank: 4, player: 'Byte_Runner', points: 1980 },
+        { rank: 5, player: 'Code_Hunter', points: 1840 }
+    ];
+    
+    leaderboardList.innerHTML = '';
+    
+    leaderboardData.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.className = `leaderboard-item ${item.rank <= 3 ? 'top-' + item.rank : ''}`;
+        
+        itemElement.innerHTML = `
+            <span class="rank">${item.rank}</span>
+            <span class="player">${item.player}</span>
+            <span class="points">${item.points}</span>
+        `;
+        
+        leaderboardList.appendChild(itemElement);
+    });
+}
+
+// Инициализация эффектов скролла
+function initScrollEffects() {
+    console.log('Инициализация эффектов скролла...');
+    
+    const header = document.querySelector(SELECTORS.HEADER);
+    const johnnySection = document.getElementById('about');
+    const johnnyImage = document.querySelector(SELECTORS.JOHNNY_IMAGE);
+    const johnnyText = document.querySelector(SELECTORS.JOHNNY_TEXT);
+    
+    // Эффект скролла для хедера
+    window.addEventListener('scroll', function() {
+        if (header) {
+            if (window.scrollY > 50) {
+                header.classList.add(CLASSES.SCROLLED);
+            } else {
+                header.classList.remove(CLASSES.SCROLLED);
+            }
+        }
+        
+        // Анимация секции Johnny Silverhand
+        if (johnnySection && johnnyImage && johnnyText) {
+            const sectionTop = johnnySection.offsetTop;
+            const sectionHeight = johnnySection.offsetHeight;
+            
+            if (window.scrollY > sectionTop - window.innerHeight / 2 && 
+                window.scrollY < sectionTop + sectionHeight - window.innerHeight / 2) {
+                johnnyImage.classList.add(CLASSES.VISIBLE);
+                johnnyText.classList.add(CLASSES.VISIBLE);
+            } else {
+                johnnyImage.classList.remove(CLASSES.VISIBLE);
+                johnnyText.classList.remove(CLASSES.VISIBLE);
+            }
+        }
+    });
+}
+
+// Утилитарные функции
+const utils = {
+    // Форматирование чисел
+    formatNumber: function(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    },
+    
+    // Генерация случайного числа в диапазоне
+    randomInt: function(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    },
+    
+    // Проверка поддержки WebGL
+    supportsWebGL: function() {
+        try {
+            const canvas = document.createElement('canvas');
+            return !!window.WebGLRenderingContext && 
+                (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+        } catch (e) {
+            return false;
+        }
+    },
+    
+    // Очистка всех observers
+    cleanupObservers: function() {
+        animationObservers.forEach(observer => {
+            observer.disconnect();
+        });
+        animationObservers = [];
+    }
+};
+
+// Обработка изменения размера окна
+window.addEventListener('resize', function() {
+    // Переинициализация анимаций при изменении размера окна
+    utils.cleanupObservers();
+    initAnimations();
 });
+
+// Экспорт для использования в других модулях (если нужно)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        initMatrixRain,
+        initAnimations,
+        initNavigation,
+        initModals,
+        initForms,
+        initLeaderboard,
+        initScrollEffects,
+        initAdminToggle,
+        utils
+    };
+}
