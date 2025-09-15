@@ -7,44 +7,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/profile.css">
+    <!-- Анимации для секций -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
 <body>
     <div class="matrix-rain" id="matrixRain"></div>
     
-    <header id="header">
-        <div class="container">
-            <div class="header-content">
-                <a href="index.html" class="logo">Cyberskill</a>
-                <nav>
-                    <ul>
-                        <li><a href="index.html#courses">Курсы</a></li>
-                        <li><a href="test.html">Тестирование</a></li>
-                        <li><a href="index.html#leaderboard">Лидерборд</a></li>
-                        <li><a href="index.html#about">О нас</a></li>
-                        <li><a href="contacts.html">Контакты</a></li>
-                    </ul>
-                </nav>
-                <div class="auth-buttons">
-                    <a href="#" class="btn" id="loginBtn">Вход</a>
-                    <a href="#" class="btn btn-pink" id="registerBtn">Регистрация</a>
-                    <div id="userMenu" style="display: none;">
-                        <a href="profile.html" class="btn btn-pink" id="profileBtn">Профиль</a>
-                        <a href="#" class="btn" id="logoutBtn">Выход</a>
-                    </div>
-                </div>
-                <div class="language-switcher">
-                    <button class="btn btn-small" onclick="changeLanguage('ru')">RU</button>
-                    <button class="btn btn-small" onclick="changeLanguage('en')">EN</button>
-                    <button class="btn btn-small" onclick="changeLanguage('kz')">KZ</button>
-                </div>
-                <div class="mobile-menu-btn" id="mobileMenuBtn">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        </div>
-    </header>
+    <!-- Заполнитель для header -->
+    <div id="header-placeholder"></div>
     
     <div class="container profile-page-container">
         <a href="index.html" class="btn back-button">← Назад на главную</a>
@@ -330,6 +300,94 @@
         </div>
     </div>
     
+    <!-- Заполнитель для footer -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Модальные окна -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeLoginModal">&times;</button>
+            <h2 class="modal-title">Вход в систему</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Пароль</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Войти</button>
+                
+                <div style="text-align: center; margin-top: 15px;">
+                    <button id="forgotPasswordBtn" class="btn-link">Забыли пароль?</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeRegisterModal">&times;</button>
+            <h2 class="modal-title">Регистрация</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerName">Имя</label>
+                    <input type="text" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Пароль</label>
+                    <input type="password" id="registerPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerConfirmPassword">Подтверждение пароля</label>
+                    <input type="password" id="registerConfirmPassword" required>
+                </div>
+                
+                <!-- Секция для преподавателей/админов -->
+                <div id="adminSection" style="display: none;">
+                    <div class="form-group">
+                        <label for="secretCode">Секретный код</label>
+                        <input type="password" id="secretCode" placeholder="Введите секретный код">
+                    </div>
+                    <div class="form-group">
+                        <label for="userRole">Роль</label>
+                        <select id="userRole">
+                            <option value="student">Студент</option>
+                            <option value="teacher">Преподаватель</option>
+                            <option value="admin">Администратор</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn" style="width: 100%;">Зарегистрироваться</button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 15px;">
+                <button id="toggleAdminBtn" class="btn-link">Вы не ученик?</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно восстановления пароля -->
+    <div class="modal" id="forgotPasswordModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeForgotPasswordModal">&times;</button>
+            <h2 class="modal-title">Восстановление пароля</h2>
+            <form id="forgotPasswordForm">
+                <div class="form-group">
+                    <label for="forgotPasswordEmail">Email</label>
+                    <input type="email" id="forgotPasswordEmail" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Восстановить пароль</button>
+            </form>
+        </div>
+    </div>
+
     <!-- Модальное окно выбора аватара -->
     <div class="modal" id="avatarModal">
         <div class="modal-content">
@@ -364,54 +422,9 @@
             </div>
         </div>
     </div>
-    
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <h3>Cyberskill</h3>
-                    <ul>
-                        <li><a href="index.html#about">О нас</a></li>
-                        <li><a href="team.html">Команда</a></li>
-                        <li><a href="vacancies.html">Вакансии</a></li>
-                        <li><a href="partners.html">Партнеры</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>Курсы</h3>
-                    <ul>
-                        <li><a href="courses.html">Все курсы</a></li>
-                        <li><a href="#">Новые программы</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>Поддержка</h3>
-                    <ul>
-                        <li><a href="help.html">Помощь</a></li>
-                        <li><a href="contacts.html">Контакты</a></li>
-                        <li><a href="#">FAQ</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>Социальные сети</h3>
-                    <div class="social-links">
-                        <a href="https://youtube.com" target="_blank" title="YouTube">📺</a>
-                        <a href="https://t.me" target="_blank" title="Telegram">📨</a>
-                        <a href="https://github.com" target="_blank" title="GitHub">🐙</a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="copyright">
-                <p>© 2025 Cyberskill. Все права защищены. | Сделано в киберпространстве</p>
-            </div>
-        </div>
-    </footer>
 
     <script src="js/auth.js"></script>
+    <script src="js/templateLoader.js"></script>
     <script src="js/profile.js"></script>
     <script src="js/script.js"></script>
 </body>
