@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Users List
+{% endblock %}
+
+{% block body %}
+<h1>{{ user.nickname }} | {{ user.title.name }}</h1>
+<p>role: {{ user.role.value}}</p>
+
+<div>
+    <a href="{{ url_for('index') }}">Back to homepage</a>
+</div>
+{% endblock %}

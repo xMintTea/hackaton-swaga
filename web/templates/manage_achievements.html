@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление ачивками</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        .alert {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .edit-form {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .description-cell {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Управление ачивками</h1>
+        
+        <div id="alert" class="alert"></div>
+        
+        <!-- Форма создания новой ачивки -->
+        <div class="form-group">
+            <label for="newAchievementName">Название ачивки:</label>
+            <input type="text" id="newAchievementName" placeholder="Введите название ачивки">
+        </div>
+        <div class="form-group">
+            <label for="newAchievementDescription">Описание ачивки:</label>
+            <textarea id="newAchievementDescription" placeholder="Введите описание ачивки"></textarea>
+        </div>
+        <button class="btn-primary" onclick="createAchievement()">Создать</button>
+        
+        <!-- Форма редактирования ачивки (изначально скрыта) -->
+        <div id="editForm" class="edit-form">
+            <h3>Редактирование ачивки</h3>
+            <div class="form-group">
+                <label for="editAchievementId">ID:</label>
+                <input type="text" id="editAchievementId" readonly>
+            </div>
+            <div class="form-group">
+                <label for="editAchievementName">Название:</label>
+                <input type="text" id="editAchievementName">
+            </div>
+            <div class="form-group">
+                <label for="editAchievementDescription">Описание:</label>
+                <textarea id="editAchievementDescription"></textarea>
+            </div>
+            <button class="btn-primary" onclick="updateAchievement()">Сохранить</button>
+            <button class="btn-secondary" onclick="cancelEdit()">Отмена</button>
+        </div>
+        
+        <!-- Таблица с существующими ачивками -->
+        <h2>Список ачивок</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Название</th>
+                    <th>Описание</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody id="achievementsTable">
+                {% for achievement in achievements %}
+                <tr id="achievement-{{ achievement.id }}">
+                    <td>{{ achievement.id }}</td>
+                    <td>{{ achievement.name }}</td>
+                    <td class="description-cell">{{ achievement.description }}</td>
+                    <td class="action-buttons">
+                        <button class="btn-warning" onclick="startEdit({{ achievement.id }}, '{{ achievement.name }}', `{{ achievement.description }}`)">Редактировать</button>
+                        <button class="btn-danger" onclick="deleteAchievement({{ achievement.id }})">Удалить</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Функция для отображения уведомлений
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = type === 'success' ? 'alert alert-success' : 'alert alert-error';
+            alert.style.display = 'block';
+            
+            // Скрыть уведомление через 5 секунд
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Функция для создания новой ачивки
+        async function createAchievement() {
+            const nameInput = document.getElementById('newAchievementName');
+            const descriptionInput = document.getElementById('newAchievementDescription');
+            const name = nameInput.value.trim();
+            const description = descriptionInput.value.trim();
+            
+            if (!name) {
+                showAlert('Введите название ачивки', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/achievements', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, description })
+                });
+                
+                if (response.ok) {
+                    const newAchievement = await response.json();
+                    
+                    // Добавляем новую ачивку в таблицу
+                    const table = document.getElementById('achievementsTable');
+                    const newRow = document.createElement('tr');
+                    newRow.id = `achievement-${newAchievement.id}`;
+                    newRow.innerHTML = `
+                        <td>${newAchievement.id}</td>
+                        <td>${newAchievement.name}</td>
+                        <td class="description-cell">${newAchievement.description}</td>
+                        <td class="action-buttons">
+                            <button class="btn-warning" onclick="startEdit(${newAchievement.id}, '${newAchievement.name}', \`${newAchievement.description}\`)">Редактировать</button>
+                            <button class="btn-danger" onclick="deleteAchievement(${newAchievement.id})">Удалить</button>
+                        </td>
+                    `;
+                    table.appendChild(newRow);
+                    
+                    // Очищаем поля ввода
+                    nameInput.value = '';
+                    descriptionInput.value = '';
+                    
+                    showAlert('Ачивка успешно создана', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Ошибка при создании ачивки', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при создании ачивки', 'error');
+            }
+        }
+        
+        // Функция для начала редактирования ачивки
+        function startEdit(id, name, description) {
+            document.getElementById('editAchievementId').value = id;
+            document.getElementById('editAchievementName').value = name;
+            document.getElementById('editAchievementDescription').value = description;
+            document.getElementById('editForm').style.display = 'block';
+            
+            // Прокручиваем к форме редактирования
+            document.getElementById('editForm').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Функция для отмены редактирования
+        function cancelEdit() {
+            document.getElementById('editForm').style.display = 'none';
+            document.getElementById('editAchievementId').value = '';
+            document.getElementById('editAchievementName').value = '';
+            document.getElementById('editAchievementDescription').value = '';
+        }
+        
+        // Функция для обновления ачивки
+        async function updateAchievement() {
+            const id = document.getElementById('editAchievementId').value;
+            const name = document.getElementById('editAchievementName').value.trim();
+            const description = document.getElementById('editAchievementDescription').value.trim();
+            
+            if (!name) {
+                showAlert('Введите название ачивки', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/achievements/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, description })
+                });
+                
+                if (response.ok) {
+                    const updatedAchievement = await response.json();
+                    
+                    // Обновляем строку в таблице
+                    const row = document.getElementById(`achievement-${id}`);
+                    row.innerHTML = `
+                        <td>${updatedAchievement.id}</td>
+                        <td>${updatedAchievement.name}</td>
+                        <td class="description-cell">${updatedAchievement.description}</td>
+                        <td class="action-buttons">
+                            <button class="btn-warning" onclick="startEdit(${updatedAchievement.id}, '${updatedAchievement.name}', \`${updatedAchievement.description}\`)">Редактировать</button>
+                            <button class="btn-danger" onclick="deleteAchievement(${updatedAchievement.id})">Удалить</button>
+                        </td>
+                    `;
+                    
+                    // Скрываем форму редактирования
+                    cancelEdit();
+                    
+                    showAlert('Ачивка успешно обновлена', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Ошибка при обновлении ачивки', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при обновлении ачивки', 'error');
+            }
+        }
+        
+        // Функция для удаления ачивки
+        async function deleteAchievement(id) {
+            if (!confirm('Вы уверены, что хотите удалить эту ачивку?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/achievements/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    // Удаляем строку из таблицы
+                    const row = document.getElementById(`achievement-${id}`);
+                    row.remove();
+                    
+                    showAlert('Ачивка успешно удалена', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Ошибка при удалении ачивки', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при удалении ачивки', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Users List
+{% endblock %}
+
+{% block body %}
+<h1>{{ course.title }}</h1>
+<p>desc: {{ course.desc }}</p>
+
+<p>Студенты курса:</p>
+<ul>
+    {% for stud in course.studs %}
+    <li>{{ stud.user.nickname }}</li>
+    {% endfor %}
+</ul>
+
+<div>
+    <a href="{{ url_for('index') }}">Back to homepage</a>
+</div>
+{% endblock %}

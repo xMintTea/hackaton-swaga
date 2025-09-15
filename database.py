@@ -9,3 +9,4 @@ engine = create_engine(SQL_DB_URL, connect_args={"check_same_thread": False})
 session_local = sessionmaker(autoflush=False, autocommit=False, bind=engine)
 
 Base = declarative_base()
+
