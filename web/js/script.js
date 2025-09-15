@@ -30,12 +30,15 @@ const SELECTORS = {
     FORGOT_PASSWORD_BTN: '#forgotPasswordBtn'
 };
 
-// Глобальные переменные для управления анимациями
+// Глобальные переменные для управления анимациями// Функция для загрузки шаблонов хедера и футера
 let animationObservers = [];
 
 // Основная функция инициализации
-document.addEventListener('DOMContentLoaded', function() {
+function initScripts() {
     console.log('Инициализация сайта Cyberskill...');
+    
+    // Создаем контейнер для уведомлений
+    createNotificationContainer();
     
     // Инициализация всех модулей
     initMatrixRain();
@@ -46,7 +49,18 @@ document.addEventListener('DOMContentLoaded', function() {
     initLeaderboard();
     initScrollEffects();
     initAdminToggle();
-});
+    
+    // Запрос разрешения на уведомления
+    initNotifications();
+}
+
+// Создание контейнера для уведомлений
+function createNotificationContainer() {
+    const container = document.createElement('div');
+    container.className = 'notification-container';
+    container.id = 'notificationContainer';
+    document.body.appendChild(container);
+}
 
 // Инициализация матричного дождя
 function initMatrixRain() {
@@ -111,7 +125,7 @@ function initMatrixRain() {
                 setTimeout(() => {
                     title.style.animation = '';
                 }, 300);
-            }
+        }
         }, 5000);
     }
 }
@@ -324,7 +338,10 @@ function initForms() {
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Функционал входа будет реализован с бэкендом!');
+            
+            // Показываем тестовое уведомление при нажатии на кнопку входа
+            showNotification('Тест', 'Это тестовое уведомление при нажатии на кнопку входа', 'success');
+            
             if (loginModal) loginModal.style.display = 'none';
         });
     }
@@ -349,7 +366,7 @@ function initForms() {
             };
             
             console.log('Данные для регистрации:', formData);
-            alert('Регистрация отправлена на сервер. Проверка секретного кода будет выполнена на бэкенде.');
+            showNotification('Регистрация', 'Регистрация отправлена на сервер. Проверка секретного кода будет выполнена на бэкенде.', 'success');
             
             if (registerModal) registerModal.style.display = 'none';
         });
@@ -359,7 +376,7 @@ function initForms() {
     if (forgotPasswordForm) {
         forgotPasswordForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Запрос на восстановление пароля отправлен! Проверьте вашу электронную почту.');
+            showNotification('Восстановление пароля', 'Запрос на восстановление пароля отправлен! Проверьте вашу электронную почту.', 'success');
             if (forgotPasswordModal) forgotPasswordModal.style.display = 'none';
         });
     }
@@ -472,6 +489,121 @@ window.addEventListener('resize', function() {
     initAnimations();
 });
 
+// Функция для показа уведомлений
+function showNotification(title, message, type = 'info') {
+    const container = document.getElementById('notificationContainer');
+    if (!container) return;
+    
+    // Создаем элемент уведомления
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    
+    // Создаем содержимое уведомления
+    notification.innerHTML = `
+        <div class="notification-content">
+            <div class="notification-title">${title}</div>
+            <div class="notification-message">${message}</div>
+        </div>
+        <button class="notification-close">&times;</button>
+    `;
+    
+    // Добавляем уведомление в контейнер
+    container.appendChild(notification);
+    
+    // Показываем уведомление
+    setTimeout(() => {
+        notification.classList.add('slide-in');
+    }, 10);
+    
+    // Обработчик закрытия уведомления
+    const closeBtn = notification.querySelector('.notification-close');
+    closeBtn.addEventListener('click', function() {
+        notification.classList.remove('slide-in');
+        notification.classList.add('slide-out');
+        setTimeout(() => {
+            if (notification.parentNode) {
+                container.removeChild(notification);
+            }
+        }, 300);
+    });
+    
+    // Убираем уведомление через 5 секунд
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.classList.remove('slide-in');
+            notification.classList.add('slide-out');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    container.removeChild(notification);
+                }
+            }, 300);
+        }
+    }, 5000);
+}
+
+// Инициализация системы уведомлений
+function initNotifications() {
+    // Запрос разрешения на уведомления
+    if (!("Notification" in window)) {
+        console.log("Этот браузер не поддерживает уведомления");
+        return;
+    }
+
+    // Показываем модальное окно с запросом разрешения
+    if (Notification.permission === "default") {
+        setTimeout(() => {
+            showNotificationPermissionModal();
+        }, 3000);
+    }
+}
+
+// Функция для показа модального окна запроса разрешения на уведомления
+function showNotificationPermissionModal() {
+    const notificationModal = document.createElement('div');
+    notificationModal.className = 'modal';
+    notificationModal.id = 'notificationPermissionModal';
+    notificationModal.innerHTML = `
+        <div class="modal-content">
+            <h2 class="modal-title">Уведомления</h2>
+            <p>Разрешить Cyberskill отправлять вам уведомления о новых курсах, достижениях и событиях?</p>
+            <div class="modal-buttons">
+                <button class="btn" id="allowNotifications">Разрешить</button>
+                <button class="btn btn-pink" id="denyNotifications">Отклонить</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(notificationModal);
+    notificationModal.style.display = 'flex';
+
+    // Обработчики для кнопок
+    document.getElementById('allowNotifications').addEventListener('click', function() {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                console.log("Notification permission granted.");
+                showNotification("Cyberskill", "Добро пожаловать в киберпространство!", "success");
+                
+                // Создаем тестовое пуш-уведомление
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.ready.then(function(registration) {
+                        registration.showNotification('Добро пожаловать в киберпространство!', {
+                            body: 'Теперь вы будете получать уведомления о новых курсах и событиях',
+                            icon: 'img/icon-192.png',
+                            vibrate: [200, 100, 200],
+                            tag: 'welcome-notification'
+                        });
+                    });
+                }
+            }
+            notificationModal.style.display = 'none';
+        });
+    });
+
+    document.getElementById('denyNotifications').addEventListener('click', function() {
+        notificationModal.style.display = 'none';
+    });
+}
+
 // Экспорт для использования в других модулях (если нужно)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
@@ -483,6 +615,7 @@ if (typeof module !== 'undefined' && module.exports) {
         initLeaderboard,
         initScrollEffects,
         initAdminToggle,
-        utils
+        utils,
+        showNotification
     };
 }

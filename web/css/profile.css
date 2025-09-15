@@ -1,0 +1,580 @@
+/* Стили для страницы профиля */
+.profile-page-container {
+    padding: 150px 0 100px;
+    min-height: 100vh;
+}
+
+.back-button {
+    margin-bottom: 30px;
+    display: inline-block;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+    background: var(--dark-secondary);
+    border: 1px solid var(--neon-blue);
+    padding: 30px;
+    box-shadow: 0 0 20px rgba(0, 238, 255, 0.2);
+}
+
+.avatar-container {
+    flex: 0 0 200px;
+    margin-right: 30px;
+    text-align: center;
+}
+
+.avatar-frame {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 3px solid var(--neon-blue);
+    padding: 5px;
+    margin: 0 auto 15px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(0, 238, 255, 0.3);
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.premium-frame {
+    border: 3px solid gold;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.avatar-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-small {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.username {
+    font-size: 2.2rem;
+    margin-bottom: 5px;
+    color: var(--neon-pink);
+    text-shadow: 0 0 10px var(--neon-pink);
+}
+
+.user-title {
+    display: inline-block;
+    padding: 5px 10px;
+    background: rgba(153, 0, 255, 0.2);
+    border: 1px solid var(--neon-purple);
+    color: var(--neon-purple);
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+.level-progress {
+    margin-bottom: 20px;
+}
+
+.level-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.level-label {
+    color: var(--text-secondary);
+}
+
+.level-number {
+    color: var(--neon-green);
+    font-weight: bold;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+    border-radius: 5px;
+    transition: width 0.5s ease;
+}
+
+.mini-progress-bar {
+    width: 100%;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+.mini-progress-fill {
+    height: 100%;
+    background: var(--neon-blue);
+    border-radius: 3px;
+}
+
+.xp-info {
+    display: flex;
+    gap: 5px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.xp-info span:first-child {
+    color: var(--neon-green);
+    font-weight: bold;
+}
+
+.currency {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 1.2rem;
+    color: var(--neon-green);
+}
+
+.currency-icon {
+    font-size: 1.5rem;
+}
+
+.profile-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.profile-section {
+    background: var(--dark-secondary);
+    border: 1px solid var(--neon-blue);
+    padding: 25px;
+    box-shadow: 0 0 15px rgba(0, 238, 255, 0.1);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-header h2 {
+    color: var(--neon-blue);
+    font-size: 1.5rem;
+}
+
+.user-description {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.edit-description textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--neon-blue);
+    color: var(--text-primary);
+    padding: 10px;
+    font-family: 'Rajdhani', sans-serif;
+    resize: vertical;
+    margin-bottom: 10px;
+}
+
+.edit-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.social-links-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.social-link-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+}
+
+.social-icon {
+    font-size: 1.2rem;
+}
+
+.social-url {
+    color: var(--text-secondary);
+}
+
+.edit-socials {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.social-input-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.social-input-group select,
+.social-input-group input {
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--neon-blue);
+    color: var(--text-primary);
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.social-input-group input {
+    flex: 1;
+    min-width: 200px;
+}
+
+.privacy-setting {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: var(--text-primary);
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--neon-blue);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.privacy-label {
+    color: var(--text-secondary);
+}
+
+.courses-tabs,
+.shop-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    padding: 8px 15px;
+    background: transparent;
+    border: 1px solid var(--neon-blue);
+    color: var(--neon-blue);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+    background: rgba(0, 238, 255, 0.1);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.course-progress-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.course-progress-item .course-icon {
+    font-size: 2rem;
+}
+
+.course-details h3 {
+    margin-bottom: 5px;
+    color: var(--neon-blue);
+}
+
+.course-details p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.achievement-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--neon-green);
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.achievement-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+}
+
+.achievement-item.locked {
+    border-color: rgba(255, 255, 255, 0.1);
+    opacity: 0.6;
+}
+
+.achievement-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.achievement-info h4 {
+    color: var(--neon-blue);
+    margin-bottom: 5px;
+}
+
+.achievement-info p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.shop-items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.shop-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--neon-purple);
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.shop-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 15px rgba(153, 0, 255, 0.2);
+}
+
+.shop-item.owned {
+    border-color: var(--neon-green);
+}
+
+.shop-item.owned::after {
+    content: "✓ Приобретено";
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: var(--neon-green);
+    color: var(--dark-bg);
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.item-icon {
+    margin-bottom: 10px;
+}
+
+.item-icon img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.frame-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.frame-icon div {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.frame-icon img {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.item-info h4 {
+    color: var(--neon-blue);
+    margin-bottom: 5px;
+}
+
+.item-info p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.item-price {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    color: var(--neon-green);
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.avatars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.avatar-option {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.avatar-option:hover {
+    transform: scale(1.05);
+}
+
+.avatar-option.selected {
+    border-color: var(--neon-green);
+    box-shadow: 0 0 15px var(--neon-green);
+}
+
+.avatar-option.locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.avatar-option img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.lock-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .avatar-container {
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .social-input-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .social-input-group input {
+        min-width: auto;
+    }
+    
+    .achievements-grid,
+    .shop-items-grid {
+        grid-template-columns: 1fr;
+    }
+}
