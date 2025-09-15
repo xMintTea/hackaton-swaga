@@ -331,7 +331,15 @@ def get_all_achievements(request: Request,db: Session = Depends(get_db)):
         request=request,
         name="achievements.html",
         context={"request": request, "achievements": achievements})
-    
+
+
+
+@app.get("/contacts")
+def contanct(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="contacts.html",
+        context={"request": request})
 
 
 @app.post("/achievements", response_model=AchievementResponse)
@@ -383,9 +391,15 @@ def create_course(course: CourseCreate, db: Session = Depends(get_db)):
     return db_course
 
 @app.get("/courses", response_model=List[CourseResponse])
-def get_courses(db: Session = Depends(get_db)):
+def get_courses(request: Request, db: Session = Depends(get_db)):
     courses = db.query(Course).options(joinedload(Course.topics)).all()
-    return courses
+    
+    return templates.TemplateResponse(
+        request=request,
+        name="courses.html",
+        context={"request": request, "courses": courses})
+    
+
 
 @app.get("/courses/{course_id}", response_model=CourseResponse)
 def get_course(course_id: int,  request: Request, db: Session = Depends(get_db)):

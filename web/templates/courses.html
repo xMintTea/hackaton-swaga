@@ -1,21 +1,172 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Все курсы | Cyberskill</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
+    <!-- Анимации для секций -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        .courses-page-container {
+            padding: 150px 0 100px;
+            min-height: 100vh;
+        }
+        
+        .back-button {
+            margin-bottom: 30px;
+            display: inline-block;
+        }
+        
+        .courses-info {
+            background: var(--dark-secondary);
+            border: 1px solid var(--neon-blue);
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 0 20px rgba(0, 238, 255, 0.2);
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+        
+        .dev-comment {
+            background: rgba(255, 0, 255, 0.1);
+            border-left: 3px solid var(--neon-pink);
+            padding: 15px;
+            margin: 20px 0;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-rain" id="matrixRain"></div>
+    
+    <!-- Заполнитель для header -->
+    <div id="header-placeholder"></div>
+    
+    <div class="container courses-page-container">
+        <a href="index.html" class="btn back-button">← Назад на главную</a>
+        <h1 class="page-title">Все курсы Cyberskill</h1>
+        
+        <div class="courses-info">
+            <h2>Страница находится в разработке</h2>
+            <p>Здесь будет полный список всех доступных курсов с фильтрами по категориям, уровням сложности и темам.</p>
+            
+            <div class="dev-comment">
+                <strong>Комментарий для бэкендера:</strong> необходимо реализовать систему управления курсами, 
+                включая категории, модули, уроки и систему прогресса пользователей.
+            </div>
+            
+            <h3>Планируемый функционал:</h3>
+            <ul>
+                <li>Каталог курсов с фильтрацией и поиском</li>
+                <li>Система прогресса и отслеживания пройденных уроков</li>
+                <li>Интерактивные задания и проекты</li>
+                <li>Система сертификации по завершении курсов</li>
+                <li>Интеграция с лидербордом и системой достижений</li>
+            </ul>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="index.html" class="btn">Вернуться на главную</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Заполнитель для footer -->
+    <div id="footer-placeholder"></div>
 
-{% block title %}
-Users List
-{% endblock %}
+    <!-- Модальные окна (те же, что и на index.html) -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeLoginModal">&times;</button>
+            <h2 class="modal-title">Вход в систему</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Пароль</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Войти</button>
+                
+                <div style="text-align: center; margin-top: 15px;">
+                    <button id="forgotPasswordBtn" class="btn-link">Забыли пароль?</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-{% block body %}
-<h1>{{ course.title }}</h1>
-<p>desc: {{ course.desc }}</p>
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeRegisterModal">&times;</button>
+            <h2 class="modal-title">Регистрация</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerName">Имя</label>
+                    <input type="text" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Пароль</label>
+                    <input type="password" id="registerPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerConfirmPassword">Подтверждение пароля</label>
+                    <input type="password" id="registerConfirmPassword" required>
+                </div>
+                
+                <!-- Секция для преподавателей/админов -->
+                <div id="adminSection" style="display: none;">
+                    <div class="form-group">
+                        <label for="secretCode">Секретный код</label>
+                        <input type="password" id="secretCode" placeholder="Введите секретный код">
+                    </div>
+                    <div class="form-group">
+                        <label for="userRole">Роль</label>
+                        <select id="userRole">
+                            <option value="student">Студент</option>
+                            <option value="teacher">Преподаватель</option>
+                            <option value="admin">Администратор</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn" style="width: 100%;">Зарегистрироваться</button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 15px;">
+                <button id="toggleAdminBtn" class="btn-link">Вы не ученик?</button>
+            </div>
+        </div>
+    </div>
 
-<p>Студенты курса:</p>
-<ul>
-    {% for stud in course.studs %}
-    <li>{{ stud.user.nickname }}</li>
-    {% endfor %}
-</ul>
+    <!-- Модальное окно восстановления пароля -->
+    <div class="modal" id="forgotPasswordModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeForgotPasswordModal">&times;</button>
+            <h2 class="modal-title">Восстановление пароля</h2>
+            <form id="forgotPasswordForm">
+                <div class="form-group">
+                    <label for="forgotPasswordEmail">Email</label>
+                    <input type="email" id="forgotPasswordEmail" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Восстановить пароль</button>
+            </form>
+        </div>
+    </div>
 
-<div>
-    <a href="{{ url_for('index') }}">Back to homepage</a>
-</div>
-{% endblock %}
+    <script src="{{ url_for('static', path='js/auth.js') }}"></script>
+    <script src="{{ url_for('static', path='js/templateLoader.js') }}"></script>
+    <script src="{{ url_for('static', path='js/script.js') }}"></script>
+</body>
+</html>
