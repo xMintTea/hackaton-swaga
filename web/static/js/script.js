@@ -426,7 +426,7 @@ if (loginForm) {
 }
 
 // Инициализация лидерборда
-function initLeaderboard() {
+function initLeaderboard2() {
     console.log('Инициализация лидерборда...');
     
     const leaderboardList = document.querySelector(SELECTORS.LEADERBOARD_LIST);

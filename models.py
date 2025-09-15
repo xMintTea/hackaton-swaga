@@ -30,10 +30,10 @@ class Student(Base):
     xp = Column(Integer, default=0)
     lvl = Column(Integer, default=1)
     currency = Column(Integer, default=0)
-    current_course_id = Column(Integer, ForeignKey('courses.id'))  # ДОБАВЛЕНО
+    current_course_id = Column(Integer, ForeignKey('courses.id')) 
     
     user = relationship("User", back_populates="student")
-    current_course = relationship("Course", back_populates="students")  # Обновлено
+    current_course = relationship("Course", back_populates="students") 
 
 class Achievement(Base):
     __tablename__ = "achievements"

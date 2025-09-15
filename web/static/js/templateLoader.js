@@ -40,7 +40,7 @@ function initScripts() {
     if (typeof initNavigation !== 'undefined') initNavigation();
     if (typeof initModals !== 'undefined') initModals();
     if (typeof initForms !== 'undefined') initForms();
-    if (typeof initLeaderboard !== 'undefined') initLeaderboard();
+    // if (typeof initLeaderboard !== 'undefined') initLeaderboard();
     if (typeof initScrollEffects !== 'undefined') initScrollEffects();
     if (typeof initAdminToggle !== 'undefined') initAdminToggle();
 }

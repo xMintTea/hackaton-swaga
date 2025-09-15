@@ -77,11 +77,15 @@ app.add_middleware(
 
 @app.get("/", name="index")
 def index_page(
-    request: Request
+    request: Request,
+    db: Session = Depends(get_db)
 ):
+    
+    leaders = get_leaderboard(db)
     return templates.TemplateResponse(
         request=request,
-        name="index.html")
+        name="index.html",
+        context={"request": request, "leaders": leaders})
  
 
 @app.get("/users/")
@@ -90,6 +94,7 @@ def users_page(
     db: Session = Depends(get_db)
 ):
     users = db.query(User).all()
+
     
     return templates.TemplateResponse(
         request=request,
@@ -1040,3 +1045,28 @@ def get_student_level_by_user_id(user_id: int, db: Session = Depends(get_db)):
     
     return {"level": student.lvl}
 
+
+
+def get_leaderboard(db: Session = Depends(get_db)):
+    students = db.query(Student).options(joinedload(Student.user)).all()
+    
+    leaderboard_list = []
+    for student in students:
+        if student.user:
+            points = round(student.xp / 2.5)  # type: ignore
+            leaderboard_list.append((student.user.nickname, points))
+    
+    leaderboard_list.sort(key=lambda x: x[1], reverse=True)
+    
+    result = []
+    for position, (nickname, points) in enumerate(leaderboard_list, 1):
+        if position > 5:
+            break
+        
+        result.append({
+            "position": position,
+            "nickname": nickname,
+            "points": points
+        })
+    
+    return result

@@ -149,7 +149,18 @@
                     <span>Очки</span>
                 </div>
                 <div class="leaderboard-list" id="leaderboardList">
-                    <!-- Данные будут загружены через JavaScript -->
+                    
+                    {% for leader in leaders %}
+                    <div class="leaderboard-item top-{{ leader.position }}">
+                                <span class="rank">{{ leader.position }}</span>
+                                <span class="player">{{ leader.nickname }}</span>
+                                <span class="points">{{ leader.points }}</span>
+                    </div>
+
+                    {% endfor %}
+
+
+
                 </div>
             </div>
         </div>
@@ -307,7 +318,6 @@ if (registerForm) {
     </script>
 
     
-    <script src="{{ url_for('static', path='js/auth.js') }}'"></script>
     <script src="{{ url_for('static', path='js/templateLoader.js') }}"></script>
     <script src="{{ url_for('static', path='js/script.js') }}"></script>
 </body>
