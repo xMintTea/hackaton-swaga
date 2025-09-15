@@ -72,7 +72,14 @@ class Token(BaseModel):
     token_type: str = "Bearer"
     
 
+class LevelUpdate(BaseModel):
+    level: int
 
+class XPUpdate(BaseModel):
+    xp: int
+
+class CurrencyUpdate(BaseModel):
+    currency: int
 
 
 class CourseCreate(BaseModel):
