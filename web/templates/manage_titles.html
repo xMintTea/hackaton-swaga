@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление титулами</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        .alert {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .edit-form {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Управление титулами</h1>
+        
+        <div id="alert" class="alert"></div>
+        
+        <!-- Форма создания нового титула -->
+        <div class="form-group">
+            <label for="newTitleName">Новый титул:</label>
+            <input type="text" id="newTitleName" placeholder="Введите название титула">
+            <button class="btn-primary" onclick="createTitle()">Создать</button>
+        </div>
+        
+        <!-- Форма редактирования титула (изначально скрыта) -->
+        <div id="editForm" class="edit-form">
+            <h3>Редактирование титула</h3>
+            <div class="form-group">
+                <label for="editTitleId">ID:</label>
+                <input type="text" id="editTitleId" readonly>
+            </div>
+            <div class="form-group">
+                <label for="editTitleName">Название:</label>
+                <input type="text" id="editTitleName">
+            </div>
+            <button class="btn-primary" onclick="updateTitle()">Сохранить</button>
+            <button class="btn-secondary" onclick="cancelEdit()">Отмена</button>
+        </div>
+        
+        <!-- Таблица с существующими титулами -->
+        <h2>Список титулов</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Название</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody id="titlesTable">
+                {% for title in titles %}
+                <tr id="title-{{ title.id }}">
+                    <td>{{ title.id }}</td>
+                    <td>{{ title.name }}</td>
+                    <td class="action-buttons">
+                        <button class="btn-warning" onclick="startEdit({{ title.id }}, '{{ title.name }}')">Редактировать</button>
+                        <button class="btn-danger" onclick="deleteTitle({{ title.id }})">Удалить</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Функция для отображения уведомлений
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = type === 'success' ? 'alert alert-success' : 'alert alert-error';
+            alert.style.display = 'block';
+            
+            // Скрыть уведомление через 5 секунд
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Функция для создания нового титула
+        async function createTitle() {
+            const nameInput = document.getElementById('newTitleName');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                showAlert('Введите название титула', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/titles', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name })
+                });
+                
+                if (response.ok) {
+                    const newTitle = await response.json();
+                    
+                    // Добавляем новый титул в таблицу
+                    const table = document.getElementById('titlesTable');
+                    const newRow = document.createElement('tr');
+                    newRow.id = `title-${newTitle.id}`;
+                    newRow.innerHTML = `
+                        <td>${newTitle.id}</td>
+                        <td>${newTitle.name}</td>
+                        <td class="action-buttons">
+                            <button class="btn-warning" onclick="startEdit(${newTitle.id}, '${newTitle.name}')">Редактировать</button>
+                            <button class="btn-danger" onclick="deleteTitle(${newTitle.id})">Удалить</button>
+                        </td>
+                    `;
+                    table.appendChild(newRow);
+                    
+                    // Очищаем поле ввода
+                    nameInput.value = '';
+                    
+                    showAlert('Титул успешно создан', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Ошибка при создании титула', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при создании титула', 'error');
+            }
+        }
+        
+        // Функция для начала редактирования титула
+        function startEdit(id, name) {
+            document.getElementById('editTitleId').value = id;
+            document.getElementById('editTitleName').value = name;
+            document.getElementById('editForm').style.display = 'block';
+            
+            // Прокручиваем к форме редактирования
+            document.getElementById('editForm').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Функция для отмены редактирования
+        function cancelEdit() {
+            document.getElementById('editForm').style.display = 'none';
+            document.getElementById('editTitleId').value = '';
+            document.getElementById('editTitleName').value = '';
+        }
+        
+        // Функция для обновления титула
+        async function updateTitle() {
+            const id = document.getElementById('editTitleId').value;
+            const name = document.getElementById('editTitleName').value.trim();
+            
+            if (!name) {
+                showAlert('Введите название титула', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/titles/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name })
+                });
+                
+                if (response.ok) {
+                    const updatedTitle = await response.json();
+                    
+                    // Обновляем строку в таблице
+                    const row = document.getElementById(`title-${id}`);
+                    row.innerHTML = `
+                        <td>${updatedTitle.id}</td>
+                        <td>${updatedTitle.name}</td>
+                        <td class="action-buttons">
+                            <button class="btn-warning" onclick="startEdit(${updatedTitle.id}, '${updatedTitle.name}')">Редактировать</button>
+                            <button class="btn-danger" onclick="deleteTitle(${updatedTitle.id})">Удалить</button>
+                        </td>
+                    `;
+                    
+                    // Скрываем форму редактирования
+                    cancelEdit();
+                    
+                    showAlert('Титул успешно обновлен', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Ошибка при обновлении титула', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при обновлении титула', 'error');
+            }
+        }
+        
+        // Функция для удаления титула
+        async function deleteTitle(id) {
+            if (!confirm('Вы уверены, что хотите удалить этот титул?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/titles/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    // Удаляем строку из таблицы
+                    const row = document.getElementById(`title-${id}`);
+                    row.remove();
+                    
+                    showAlert('Титул успешно удален', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Ошибка при удалении титула', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при удалении титула', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

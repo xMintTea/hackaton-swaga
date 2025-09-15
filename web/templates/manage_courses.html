@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление курсами и темами</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        h1 {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .alert {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .edit-form {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .description-cell {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .course-details {
+            margin-left: 20px;
+            border-left: 3px solid #eee;
+            padding-left: 15px;
+            display: none;
+        }
+        .topic-list {
+            margin-top: 15px;
+        }
+        .toggle-details {
+            cursor: pointer;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Управление курсами и темами</h1>
+        
+        <div id="alert" class="alert"></div>
+        
+        <!-- Раздел управления курсами -->
+        <div class="section">
+            <h2>Управление курсами</h2>
+            
+            <!-- Форма создания нового курса -->
+            <div class="form-group">
+                <label for="newCourseTitle">Название курса:</label>
+                <input type="text" id="newCourseTitle" placeholder="Введите название курса">
+            </div>
+            <div class="form-group">
+                <label for="newCourseDescription">Описание курса:</label>
+                <textarea id="newCourseDescription" placeholder="Введите описание курса"></textarea>
+            </div>
+            <button class="btn-primary" onclick="createCourse()">Создать курс</button>
+            
+            <!-- Форма редактирования курса (изначально скрыта) -->
+            <div id="editCourseForm" class="edit-form">
+                <h3>Редактирование курса</h3>
+                <div class="form-group">
+                    <label for="editCourseId">ID:</label>
+                    <input type="text" id="editCourseId" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="editCourseTitle">Название:</label>
+                    <input type="text" id="editCourseTitle">
+                </div>
+                <div class="form-group">
+                    <label for="editCourseDescription">Описание:</label>
+                    <textarea id="editCourseDescription"></textarea>
+                </div>
+                <button class="btn-primary" onclick="updateCourse()">Сохранить</button>
+                <button class="btn-secondary" onclick="cancelCourseEdit()">Отмена</button>
+            </div>
+            
+            <!-- Таблица с существующими курсами -->
+            <h3>Список курсов</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Название</th>
+                        <th>Описание</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="coursesTable">
+                    {% for course in courses %}
+                    <tr id="course-{{ course.id }}">
+                        <td>{{ course.id }}</td>
+                        <td>{{ course.title }}</td>
+                        <td class="description-cell">{{ course.description }}</td>
+                        <td class="action-buttons">
+                            <button class="btn-info" onclick="toggleCourseDetails({{ course.id }})">Темы</button>
+                            <button class="btn-warning" onclick="startCourseEdit({{ course.id }}, '{{ course.title }}', `{{ course.description }}`)">Редактировать</button>
+                            <button class="btn-danger" onclick="deleteCourse({{ course.id }})">Удалить</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">
+                            <div id="course-details-{{ course.id }}" class="course-details">
+                                <h4>Управление темами курса "{{ course.title }}"</h4>
+                                
+                                <!-- Форма создания новой темы -->
+                                <div class="form-group">
+                                    <label for="newTopicTitle-{{ course.id }}">Название темы:</label>
+                                    <input type="text" id="newTopicTitle-{{ course.id }}" placeholder="Введите название темы">
+                                </div>
+                                <div class="form-group">
+                                    <label for="newTopicContent-{{ course.id }}">Содержание темы:</label>
+                                    <textarea id="newTopicContent-{{ course.id }}" placeholder="Введите содержание темы"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newTopicOrder-{{ course.id }}">Порядок:</label>
+                                    <input type="number" id="newTopicOrder-{{ course.id }}" placeholder="Порядок отображения" min="1">
+                                </div>
+                                <button class="btn-success" onclick="createTopic({{ course.id }})">Создать тему</button>
+                                
+                                <!-- Форма редактирования темы (изначально скрыта) -->
+                                <div id="editTopicForm-{{ course.id }}" class="edit-form">
+                                    <h5>Редактирование темы</h5>
+                                    <div class="form-group">
+                                        <label for="editTopicId-{{ course.id }}">ID:</label>
+                                        <input type="text" id="editTopicId-{{ course.id }}" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editTopicTitle-{{ course.id }}">Название:</label>
+                                        <input type="text" id="editTopicTitle-{{ course.id }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editTopicContent-{{ course.id }}">Содержание:</label>
+                                        <textarea id="editTopicContent-{{ course.id }}"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editTopicOrder-{{ course.id }}">Порядок:</label>
+                                        <input type="number" id="editTopicOrder-{{ course.id }}" min="1">
+                                    </div>
+                                    <button class="btn-primary" onclick="updateTopic({{ course.id }})">Сохранить</button>
+                                    <button class="btn-secondary" onclick="cancelTopicEdit({{ course.id }})">Отмена</button>
+                                </div>
+                                
+                                <!-- Таблица с темами курса -->
+                                <div class="topic-list">
+                                    <h5>Темы курса</h5>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Название</th>
+                                                <th>Порядок</th>
+                                                <th>Действия</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="topicsTable-{{ course.id }}">
+                                            {% for topic in course.topics %}
+                                            <tr id="topic-{{ topic.id }}">
+                                                <td>{{ topic.id }}</td>
+                                                <td>{{ topic.title }}</td>
+                                                <td>{{ topic.order }}</td>
+                                                <td class="action-buttons">
+                                                    <button class="btn-warning" onclick="startTopicEdit({{ course.id }}, {{ topic.id }}, '{{ topic.title }}', `{{ topic.content }}`, {{ topic.order }})">Редактировать</button>
+                                                    <button class="btn-danger" onclick="deleteTopic({{ topic.id }}, {{ course.id }})">Удалить</button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Функция для отображения уведомлений
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = type === 'success' ? 'alert alert-success' : 'alert alert-error';
+            alert.style.display = 'block';
+            
+            // Скрыть уведомление через 5 секунд
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Функция для переключения отображения деталей курса
+        function toggleCourseDetails(courseId) {
+            const details = document.getElementById(`course-details-${courseId}`);
+            details.style.display = details.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Функции для работы с курсами
+        async function createCourse() {
+            const titleInput = document.getElementById('newCourseTitle');
+            const descriptionInput = document.getElementById('newCourseDescription');
+            const title = titleInput.value.trim();
+            const description = descriptionInput.value.trim();
+            
+            if (!title) {
+                showAlert('Введите название курса', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/courses', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title, description })
+                });
+                
+                if (response.ok) {
+                    const newCourse = await response.json();
+                    
+                    // Обновляем страницу после успешного создания
+                    window.location.reload();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Ошибка при создании курса', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при создании курса', 'error');
+            }
+        }
+        
+        function startCourseEdit(id, title, description) {
+            document.getElementById('editCourseId').value = id;
+            document.getElementById('editCourseTitle').value = title;
+            document.getElementById('editCourseDescription').value = description;
+            document.getElementById('editCourseForm').style.display = 'block';
+            
+            // Прокручиваем к форме редактирования
+            document.getElementById('editCourseForm').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function cancelCourseEdit() {
+            document.getElementById('editCourseForm').style.display = 'none';
+            document.getElementById('editCourseId').value = '';
+            document.getElementById('editCourseTitle').value = '';
+            document.getElementById('editCourseDescription').value = '';
+        }
+        
+        async function updateCourse() {
+            const id = document.getElementById('editCourseId').value;
+            const title = document.getElementById('editCourseTitle').value.trim();
+            const description = document.getElementById('editCourseDescription').value.trim();
+            
+            if (!title) {
+                showAlert('Введите название курса', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/courses/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title, description })
+                });
+                
+                if (response.ok) {
+                    // Обновляем страницу после успешного обновления
+                    window.location.reload();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Ошибка при обновлении курса', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при обновлении курса', 'error');
+            }
+        }
+        
+        async function deleteCourse(id) {
+            if (!confirm('Вы уверены, что хотите удалить этот курс? Все связанные темы также будут удалены.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/courses/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    // Обновляем страницу после успешного удаления
+                    window.location.reload();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Ошибка при удалении курса', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при удалении курса', 'error');
+            }
+        }
+        
+        // Функции для работы с темами
+        async function createTopic(courseId) {
+            const titleInput = document.getElementById(`newTopicTitle-${courseId}`);
+            const contentInput = document.getElementById(`newTopicContent-${courseId}`);
+            const orderInput = document.getElementById(`newTopicOrder-${courseId}`);
+            
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
+            const order = parseInt(orderInput.value) || 1;
+            
+            if (!title) {
+                showAlert('Введите название темы', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/topics', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        course_id: courseId,
+                        title,
+                        content,
+                        order
+                    })
+                });
+                
+                if (response.ok) {
+                    // Очищаем поля ввода
+                    titleInput.value = '';
+                    contentInput.value = '';
+                    orderInput.value = '';
+                    
+                    // Обновляем список тем
+                    loadCourseTopics(courseId);
+                    showAlert('Тема успешно создана', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Ошибка при создании темы', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при создании темы', 'error');
+            }
+        }
+        
+        function startTopicEdit(courseId, topicId, title, content, order) {
+            document.getElementById(`editTopicId-${courseId}`).value = topicId;
+            document.getElementById(`editTopicTitle-${courseId}`).value = title;
+            document.getElementById(`editTopicContent-${courseId}`).value = content;
+            document.getElementById(`editTopicOrder-${courseId}`).value = order;
+            document.getElementById(`editTopicForm-${courseId}`).style.display = 'block';
+            
+            // Прокручиваем к форме редактирования
+            document.getElementById(`editTopicForm-${courseId}`).scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function cancelTopicEdit(courseId) {
+            document.getElementById(`editTopicForm-${courseId}`).style.display = 'none';
+            document.getElementById(`editTopicId-${courseId}`).value = '';
+            document.getElementById(`editTopicTitle-${courseId}`).value = '';
+            document.getElementById(`editTopicContent-${courseId}`).value = '';
+            document.getElementById(`editTopicOrder-${courseId}`).value = '';
+        }
+        
+        async function updateTopic(courseId) {
+            const topicId = document.getElementById(`editTopicId-${courseId}`).value;
+            const title = document.getElementById(`editTopicTitle-${courseId}`).value.trim();
+            const content = document.getElementById(`editTopicContent-${courseId}`).value.trim();
+            const order = parseInt(document.getElementById(`editTopicOrder-${courseId}`).value) || 1;
+            
+            if (!title) {
+                showAlert('Введите название темы', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/topics/${topicId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        course_id: courseId,
+                        title,
+                        content,
+                        order
+                    })
+                });
+                
+                if (response.ok) {
+                    // Скрываем форму редактирования
+                    cancelTopicEdit(courseId);
+                    
+                    // Обновляем список тем
+                    loadCourseTopics(courseId);
+                    showAlert('Тема успешно обновлена', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Ошибка при обновлении темы', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при обновлении темы', 'error');
+            }
+        }
+        
+        async function deleteTopic(topicId, courseId) {
+            if (!confirm('Вы уверены, что хотите удалить эту тему?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/topics/${topicId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    // Обновляем список тем
+                    loadCourseTopics(courseId);
+                    showAlert('Тема успешно удалена', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Ошибка при удалении темы', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при удалении темы', 'error');
+            }
+        }
+        
+        // Функция для загрузки тем курса
+        async function loadCourseTopics(courseId) {
+            try {
+                const response = await fetch(`/courses/${courseId}/topics`);
+                if (response.ok) {
+                    const topics = await response.json();
+                    
+                    // Обновляем таблицу тем
+                    const topicsTable = document.getElementById(`topicsTable-${courseId}`);
+                    topicsTable.innerHTML = '';
+                    
+                    topics.forEach(topic => {
+                        const row = document.createElement('tr');
+                        row.id = `topic-${topic.id}`;
+                        row.innerHTML = `
+                            <td>${topic.id}</td>
+                            <td>${topic.title}</td>
+                            <td>${topic.order}</td>
+                            <td class="action-buttons">
+                                <button class="btn-warning" onclick="startTopicEdit(${courseId}, ${topic.id}, '${topic.title}', \`${topic.content}\`, ${topic.order})">Редактировать</button>
+                                <button class="btn-danger" onclick="deleteTopic(${topic.id}, ${courseId})">Удалить</button>
+                            </td>
+                        `;
+                        topicsTable.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.error('Ошибка при загрузке тем:', error);
+            }
+        }
+        
+        // Инициализация: скрываем все детали курсов при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            const courseDetails = document.querySelectorAll('.course-details');
+            courseDetails.forEach(detail => {
+                detail.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
