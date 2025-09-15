@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление вопросами теста</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea, input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        .alert {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .edit-form {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .answer-options {
+            margin-top: 15px;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+        .answer-option {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border: 1px solid #eee;
+        }
+        .tab-container {
+            margin-top: 20px;
+        }
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+        }
+        .tab-button.active {
+            background: #007bff;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Управление вопросами теста</h1>
+        
+        <div id="alert" class="alert"></div>
+        
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="showTab('questions-tab')">Вопросы</button>
+                <button class="tab-button" onclick="showTab('answers-tab')">Варианты ответов</button>
+            </div>
+            
+            <!-- Вкладка вопросов -->
+            <div id="questions-tab" class="tab-content active">
+                <!-- Форма создания нового вопроса -->
+                <div class="form-group">
+                    <h3>Добавить новый вопрос</h3>
+                    <label for="newQuestionText">Текст вопроса:</label>
+                    <textarea id="newQuestionText" placeholder="Введите текст вопроса"></textarea>
+                    
+                    <label for="newQuestionOrder">Порядок:</label>
+                    <input type="number" id="newQuestionOrder" placeholder="Порядковый номер">
+                    
+                    <button class="btn-primary" onclick="createQuestion()">Создать вопрос</button>
+                </div>
+                
+                <!-- Форма редактирования вопроса (изначально скрыта) -->
+                <div id="editQuestionForm" class="edit-form">
+                    <h3>Редактирование вопроса</h3>
+                    <div class="form-group">
+                        <label for="editQuestionId">ID:</label>
+                        <input type="text" id="editQuestionId" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="editQuestionText">Текст вопроса:</label>
+                        <textarea id="editQuestionText"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="editQuestionOrder">Порядок:</label>
+                        <input type="number" id="editQuestionOrder">
+                    </div>
+                    <button class="btn-primary" onclick="updateQuestion()">Сохранить</button>
+                    <button class="btn-secondary" onclick="cancelEditQuestion()">Отмена</button>
+                </div>
+                
+                <!-- Таблица с вопросами -->
+                <h3>Список вопросов</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Текст вопроса</th>
+                            <th>Порядок</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="questionsTable">
+                        {% for question in questions %}
+                        <tr id="question-{{ question.id }}">
+                            <td>{{ question.id }}</td>
+                            <td>{{ question.text }}</td>
+                            <td>{{ question.order }}</td>
+                            <td class="action-buttons">
+                                <button class="btn-warning" onclick="startEditQuestion({{ question.id }}, `{{ question.text }}`, {{ question.order }})">Редактировать</button>
+                                <button class="btn-info" onclick="manageAnswerOptions({{ question.id }})">Управление ответами</button>
+                                <button class="btn-danger" onclick="deleteQuestion({{ question.id }})">Удалить</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Вкладка вариантов ответов -->
+            <div id="answers-tab" class="tab-content">
+                <div id="answer-management">
+                    <h3>Управление вариантами ответов для вопроса: <span id="current-question-id"></span></h3>
+                    
+                    <!-- Форма создания нового варианта ответа -->
+                    <div class="form-group">
+                        <h4>Добавить вариант ответа</h4>
+                        <label for="newAnswerText">Текст ответа:</label>
+                        <input type="text" id="newAnswerText" placeholder="Введите текст ответа">
+                        
+                        <label for="newAnswerCreative">Баллы за творчество:</label>
+                        <input type="number" id="newAnswerCreative" value="0">
+                        
+                        <label for="newAnswerAnalytical">Баллы за аналитику:</label>
+                        <input type="number" id="newAnswerAnalytical" value="0">
+                        
+                        <button class="btn-success" onclick="createAnswerOption()">Добавить ответ</button>
+                    </div>
+                    
+                    <!-- Форма редактирования варианта ответа (изначально скрыта) -->
+                    <div id="editAnswerForm" class="edit-form">
+                        <h4>Редактирование варианта ответа</h4>
+                        <div class="form-group">
+                            <label for="editAnswerId">ID:</label>
+                            <input type="text" id="editAnswerId" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="editAnswerText">Текст ответа:</label>
+                            <input type="text" id="editAnswerText">
+                        </div>
+                        <div class="form-group">
+                            <label for="editAnswerCreative">Баллы за творчество:</label>
+                            <input type="number" id="editAnswerCreative">
+                        </div>
+                        <div class="form-group">
+                            <label for="editAnswerAnalytical">Баллы за аналитику:</label>
+                            <input type="number" id="editAnswerAnalytical">
+                        </div>
+                        <button class="btn-primary" onclick="updateAnswerOption()">Сохранить</button>
+                        <button class="btn-secondary" onclick="cancelEditAnswer()">Отмена</button>
+                    </div>
+                    
+                    <!-- Таблица с вариантами ответов -->
+                    <h4>Варианты ответов для этого вопроса</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Текст ответа</th>
+                                <th>Творчество</th>
+                                <th>Аналитика</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="answersTable">
+                            <!-- Варианты ответов будут загружаться динамически -->
+                        </tbody>
+                    </table>
+                    
+                    <button class="btn-secondary" onclick="showTab('questions-tab')">Вернуться к вопросам</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestionId = null;
+        
+        // Функция для отображения уведомлений
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = type === 'success' ? 'alert alert-success' : 'alert alert-error';
+            alert.style.display = 'block';
+            
+            // Скрыть уведомление через 5 секунд
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Функция для переключения вкладок
+        function showTab(tabId) {
+            // Скрыть все вкладки
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Показать выбранную вкладку
+            document.getElementById(tabId).classList.add('active');
+            
+            // Обновить активные кнопки вкладок
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+        
+        // Функция для создания нового вопроса
+        async function createQuestion() {
+            const text = document.getElementById('newQuestionText').value.trim();
+            const order = document.getElementById('newQuestionOrder').value;
+            
+            if (!text) {
+                showAlert('Введите текст вопроса', 'error');
+                return;
+            }
+            
+            if (!order) {
+                showAlert('Укажите порядковый номер вопроса', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/test/questions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        text: text,
+                        order: parseInt(order)
+                    })
+                });
+                
+                if (response.ok) {
+                    const newQuestion = await response.json();
+                    
+                    // Добавляем новый вопрос в таблицу
+                    const table = document.getElementById('questionsTable');
+                    const newRow = document.createElement('tr');
+                    newRow.id = `question-${newQuestion.id}`;
+                    newRow.innerHTML = `
+                        <td>${newQuestion.id}</td>
+                        <td>${newQuestion.text}</td>
+                        <td>${newQuestion.order}</td>
+                        <td class="action-buttons">
+                            <button class="btn-warning" onclick="startEditQuestion(${newQuestion.id}, '${newQuestion.text}', ${newQuestion.order})">Редактировать</button>
+                            <button class="btn-info" onclick="manageAnswerOptions(${newQuestion.id})">Управление ответами</button>
+                            <button class="btn-danger" onclick="deleteQuestion(${newQuestion.id})">Удалить</button>
+                        </td>
+                    `;
+                    table.appendChild(newRow);
+                    
+                    // Очищаем поля ввода
+                    document.getElementById('newQuestionText').value = '';
+                    document.getElementById('newQuestionOrder').value = '';
+                    
+                    showAlert('Вопрос успешно создан', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Ошибка при создании вопроса', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при создании вопроса', 'error');
+            }
+        }
+        
+        // Функция для начала редактирования вопроса
+        function startEditQuestion(id, text, order) {
+            document.getElementById('editQuestionId').value = id;
+            document.getElementById('editQuestionText').value = text;
+            document.getElementById('editQuestionOrder').value = order;
+            document.getElementById('editQuestionForm').style.display = 'block';
+            
+            // Прокручиваем к форме редактирования
+            document.getElementById('editQuestionForm').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Функция для отмены редактирования вопроса
+        function cancelEditQuestion() {
+            document.getElementById('editQuestionForm').style.display = 'none';
+            document.getElementById('editQuestionId').value = '';
+            document.getElementById('editQuestionText').value = '';
+            document.getElementById('editQuestionOrder').value = '';
+        }
+        
+        // Функция для обновления вопроса
+        async function updateQuestion() {
+            const id = document.getElementById('editQuestionId').value;
+            const text = document.getElementById('editQuestionText').value.trim();
+            const order = document.getElementById('editQuestionOrder').value;
+            
+            if (!text) {
+                showAlert('Введите текст вопроса', 'error');
+                return;
+            }
+            
+            if (!order) {
+                showAlert('Укажите порядковый номер вопроса', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/test/questions/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        text: text,
+                        order: parseInt(order)
+                    })
+                });
+                
+                if (response.ok) {
+                    const updatedQuestion = await response.json();
+                    
+                    // Обновляем строку в таблице
+                    const row = document.getElementById(`question-${id}`);
+                    row.innerHTML = `
+                        <td>${updatedQuestion.id}</td>
+                        <td>${updatedQuestion.text}</td>
+                        <td>${updatedQuestion.order}</td>
+                        <td class="action-buttons">
+                            <button class="btn-warning" onclick="startEditQuestion(${updatedQuestion.id}, '${updatedQuestion.text}', ${updatedQuestion.order})">Редактировать</button>
+                            <button class="btn-info" onclick="manageAnswerOptions(${updatedQuestion.id})">Управление ответами</button>
+                            <button class="btn-danger" onclick="deleteQuestion(${updatedQuestion.id})">Удалить</button>
+                        </td>
+                    `;
+                    
+                    // Скрываем форму редактирования
+                    cancelEditQuestion();
+                    
+                    showAlert('Вопрос успешно обновлен', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Ошибка при обновлении вопроса', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при обновлении вопроса', 'error');
+            }
+        }
+        
+        // Функция для удаления вопроса
+        async function deleteQuestion(id) {
+            if (!confirm('Вы уверены, что хотите удалить этот вопрос? Все связанные варианты ответов также будут удалены.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/test/questions/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    // Удаляем строку из таблицы
+                    const row = document.getElementById(`question-${id}`);
+                    row.remove();
+                    
+                    showAlert('Вопрос успешно удален', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Ошибка при удалении вопроса', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при удалении вопроса', 'error');
+            }
+        }
+        
+        // Функция для управления вариантами ответов
+        async function manageAnswerOptions(questionId) {
+            currentQuestionId = questionId;
+            document.getElementById('current-question-id').textContent = questionId;
+            
+            // Загружаем варианты ответов для этого вопроса
+            try {
+                const response = await fetch(`/api/test/questions/${questionId}/answers`);
+                if (response.ok) {
+                    const answers = await response.json();
+                    
+                    // Очищаем таблицу ответов
+                    const answersTable = document.getElementById('answersTable');
+                    answersTable.innerHTML = '';
+                    
+                    // Заполняем таблицу ответов
+                    answers.forEach(answer => {
+                        const row = document.createElement('tr');
+                        row.id = `answer-${answer.id}`;
+                        row.innerHTML = `
+                            <td>${answer.id}</td>
+                            <td>${answer.answer_text}</td>
+                            <td>${answer.creative_value}</td>
+                            <td>${answer.analytical_value}</td>
+                            <td class="action-buttons">
+                                <button class="btn-warning" onclick="startEditAnswer(${answer.id}, '${answer.answer_text}', ${answer.creative_value}, ${answer.analytical_value})">Редактировать</button>
+                                <button class="btn-danger" onclick="deleteAnswerOption(${answer.id})">Удалить</button>
+                            </td>
+                        `;
+                        answersTable.appendChild(row);
+                    });
+                    
+                    // Переключаемся на вкладку ответов
+                    showTab('answers-tab');
+                } else {
+                    showAlert('Ошибка при загрузке вариантов ответов', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при загрузке вариантов ответов', 'error');
+            }
+        }
+        
+        // Функция для создания нового варианта ответа
+        async function createAnswerOption() {
+            if (!currentQuestionId) {
+                showAlert('Сначала выберите вопрос', 'error');
+                return;
+            }
+            
+            const text = document.getElementById('newAnswerText').value.trim();
+            const creative = document.getElementById('newAnswerCreative').value;
+            const analytical = document.getElementById('newAnswerAnalytical').value;
+            
+            if (!text) {
+                showAlert('Введите текст ответа', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/test/answers', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        question_id: currentQuestionId,
+                        answer_text: text,
+                        creative_value: parseInt(creative),
+                        analytical_value: parseInt(analytical)
+                    })
+                });
+                
+                if (response.ok) {
+                    const newAnswer = await response.json();
+                    
+                    // Добавляем новый ответ в таблицу
+                    const table = document.getElementById('answersTable');
+                    const newRow = document.createElement('tr');
+                    newRow.id = `answer-${newAnswer.id}`;
+                    newRow.innerHTML = `
+                        <td>${newAnswer.id}</td>
+                        <td>${newAnswer.answer_text}</td>
+                        <td>${newAnswer.creative_value}</td>
+                        <td>${newAnswer.analytical_value}</td>
+                        <td class="action-buttons">
+                            <button class="btn-warning" onclick="startEditAnswer(${newAnswer.id}, '${newAnswer.answer_text}', ${newAnswer.creative_value}, ${newAnswer.analytical_value})">Редактировать</button>
+                            <button class="btn-danger" onclick="deleteAnswerOption(${newAnswer.id})">Удалить</button>
+                        </td>
+                    `;
+                    table.appendChild(newRow);
+                    
+                    // Очищаем поля ввода
+                    document.getElementById('newAnswerText').value = '';
+                    document.getElementById('newAnswerCreative').value = '0';
+                    document.getElementById('newAnswerAnalytical').value = '0';
+                    
+                    showAlert('Вариант ответа успешно создан', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Ошибка при создании варианта ответа', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при создании варианта ответа', 'error');
+            }
+        }
+        
+        // Функция для начала редактирования варианта ответа
+        function startEditAnswer(id, text, creative, analytical) {
+            document.getElementById('editAnswerId').value = id;
+            document.getElementById('editAnswerText').value = text;
+            document.getElementById('editAnswerCreative').value = creative;
+            document.getElementById('editAnswerAnalytical').value = analytical;
+            document.getElementById('editAnswerForm').style.display = 'block';
+            
+            // Прокручиваем к форме редактирования
+            document.getElementById('editAnswerForm').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Функция для отмены редактирования варианта ответа
+        function cancelEditAnswer() {
+            document.getElementById('editAnswerForm').style.display = 'none';
+            document.getElementById('editAnswerId').value = '';
+            document.getElementById('editAnswerText').value = '';
+            document.getElementById('editAnswerCreative').value = '0';
+            document.getElementById('editAnswerAnalytical').value = '0';
+        }
+        
+        // Функция для обновления варианта ответа
+        async function updateAnswerOption() {
+            const id = document.getElementById('editAnswerId').value;
+            const text = document.getElementById('editAnswerText').value.trim();
+            const creative = document.getElementById('editAnswerCreative').value;
+            const analytical = document.getElementById('editAnswerAnalytical').value;
+            
+            if (!text) {
+                showAlert('Введите текст ответа', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/test/answers/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        answer_text: text,
+                        creative_value: parseInt(creative),
+                        analytical_value: parseInt(analytical)
+                    })
+                });
+                
+                if (response.ok) {
+                    const updatedAnswer = await response.json();
+                    
+                    // Обновляем строку в таблице
+                    const row = document.getElementById(`answer-${id}`);
+                    row.innerHTML = `
+                        <td>${updatedAnswer.id}</td>
+                        <td>${updatedAnswer.answer_text}</td>
+                        <td>${updatedAnswer.creative_value}</td>
+                        <td>${updatedAnswer.analytical_value}</td>
+                        <td class="action-buttons">
+                            <button class="btn-warning" onclick="startEditAnswer(${updatedAnswer.id}, '${updatedAnswer.answer_text}', ${updatedAnswer.creative_value}, ${updatedAnswer.analytical_value})">Редактировать</button>
+                            <button class="btn-danger" onclick="deleteAnswerOption(${updatedAnswer.id})">Удалить</button>
+                        </td>
+                    `;
+                    
+                    // Скрываем форму редактирования
+                    cancelEditAnswer();
+                    
+                    showAlert('Вариант ответа успешно обновлен', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Ошибка при обновлении варианта ответа', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при обновлении варианта ответа', 'error');
+            }
+        }
+        
+        // Функция для удаления варианта ответа
+        async function deleteAnswerOption(id) {
+            if (!confirm('Вы уверены, что хотите удалить этот вариант ответа?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/test/answers/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    // Удаляем строку из таблицы
+                    const row = document.getElementById(`answer-${id}`);
+                    row.remove();
+                    
+                    showAlert('Вариант ответа успешно удален', 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Ошибка при удалении варианта ответа', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showAlert('Ошибка при удалении варианта ответа', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

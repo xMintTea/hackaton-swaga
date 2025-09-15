@@ -76,7 +76,7 @@ class Course(Base):
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
     
     topics = relationship("Topic", back_populates="course", order_by="Topic.order")
-    students = relationship("Student", back_populates="current_course")  # Обновлено
+    students = relationship("Student", back_populates="current_course") 
 
 class Topic(Base):
     __tablename__ = "topics"
@@ -92,3 +92,22 @@ class Topic(Base):
     course = relationship("Course", back_populates="topics")
 
 
+class TestQuestion(Base):
+    __tablename__ = "test_questions"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    text = Column(Text, nullable=False)  # Текст вопроса
+    order = Column(Integer, default=0)   # Порядок вопроса (для сортировки)
+
+class TestAnswerOption(Base):
+    __tablename__ = "test_answer_options"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    question_id = Column(Integer, ForeignKey("test_questions.id"))
+    answer_text = Column(String, nullable=False)  # Текст ответа
+    creative_value = Column(Integer, default=0)   # Баллы за творчество
+    analytical_value = Column(Integer, default=0) # Баллы за аналитику
+    
+    question = relationship("TestQuestion", backref="answer_options")
+    
+    

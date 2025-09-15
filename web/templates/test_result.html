@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Результаты теста | Cyberskill</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
+    <!-- Анимации для секций -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        .result-page-container {
+            padding: 150px 0 100px;
+            min-height: 100vh;
+        }
+        
+        .back-button {
+            margin-bottom: 30px;
+            display: inline-block;
+        }
+        
+        .result-container {
+            background: var(--dark-secondary);
+            border: 1px solid var(--neon-pink);
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
+        }
+        
+        .score-container {
+            display: flex;
+            justify-content: space-around;
+            margin: 40px 0;
+        }
+        
+        .score-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid;
+            border-radius: 8px;
+            padding: 20px;
+            width: 45%;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .creative-score {
+            border-color: var(--neon-pink);
+        }
+        
+        .analytical-score {
+            border-color: var(--neon-blue);
+        }
+        
+        .score-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .score-value {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .creative-value {
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
+        }
+        
+        .analytical-value {
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+        
+        .recommendation {
+            margin: 40px 0;
+            padding: 20px;
+            background: rgba(0, 238, 255, 0.1);
+            border-left: 3px solid var(--neon-blue);
+            border-right: 3px solid var(--neon-blue);
+            border-radius: 8px;
+        }
+        
+        .recommendation-title {
+            font-size: 1.8rem;
+            color: var(--neon-blue);
+            margin-bottom: 15px;
+        }
+        
+        .recommended-course {
+            font-size: 2.2rem;
+            color: var(--neon-pink);
+            margin: 15px 0;
+            text-shadow: 0 0 10px var(--neon-pink);
+        }
+        
+        .course-description {
+            margin: 20px 0;
+            line-height: 1.6;
+        }
+        
+        .course-actions {
+            margin-top: 30px;
+        }
+        
+        .btn-primary {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple));
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 0 15px var(--neon-pink);
+            transform: translateY(-2px);
+        }
+        
+        .other-courses {
+            margin-top: 50px;
+        }
+        
+        .other-courses-title {
+            font-size: 1.5rem;
+            color: var(--neon-blue);
+            margin-bottom: 20px;
+        }
+        
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .course-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .course-card:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue);
+            transform: translateY(-5px);
+        }
+        
+        .course-card-title {
+            font-size: 1.2rem;
+            color: var(--neon-pink);
+            margin-bottom: 10px;
+        }
+        
+        .course-card-desc {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        .course-card-link {
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .course-card-link:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .score-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .score-card {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-rain" id="matrixRain"></div>
+    
+    <!-- Заполнитель для header -->
+    <div id="header-placeholder"></div>
+    
+    <div class="container result-page-container">
+        <a href="{{ url_for('index') }}" class="btn back-button">← Назад на главную</a>
+        <h1 class="page-title">Результаты тестирования</h1>
+        
+        <div class="result-container">
+            <h2>Ваш профиль обучения</h2>
+            <p>На основе ваших ответов мы определили ваши сильные стороны и рекомендованный курс</p>
+            
+            <div class="score-container">
+                <div class="score-card creative-score">
+                    <div class="score-title">Творческий потенциал</div>
+                    <div class="score-value creative-value">{{ creative_score }}/10</div>
+                    <p>Способность к креативному мышлению и созданию нового</p>
+                </div>
+                
+                <div class="score-card analytical-score">
+                    <div class="score-title">Аналитические способности</div>
+                    <div class="score-value analytical-value">{{ analytical_score }}/10</div>
+                    <p>Способность к логическому анализу и решению задач</p>
+                </div>
+            </div>
+            
+            <div class="recommendation">
+                <div class="recommendation-title">Рекомендованный курс для вас:</div>
+                <div class="recommended-course">{{ recommended_course.title }}</div>
+                <div class="course-description">
+                    {{ recommended_course.description }}
+                </div>
+                
+                <div class="course-actions">
+                    <a href="{{ url_for('course', course_id=recommended_course.id) }}" class="btn-primary">Начать обучение</a>
+                </div>
+            </div>
+            
+            <div class="other-courses">
+                <div class="other-courses-title">Другие курсы, которые могут вам подойти:</div>
+                <div class="courses-grid">
+                    {% for course in other_courses %}
+                    <div class="course-card">
+                        <div class="course-card-title">{{ course.title }}</div>
+                        <div class="course-card-desc">{{ course.description[:100] }}...</div>
+                        <a href="{{ url_for('course', course_id=course.id) }}" class="course-card-link">Подробнее →</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Заполнитель для footer -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Модальные окна -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeLoginModal">&times;</button>
+            <h2 class="modal-title">Вход в систему</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Пароль</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Войти</button>
+                
+                <div style="text-align: center; margin-top: 15px;">
+                    <button id="forgotPasswordBtn" class="btn-link">Забыли пароль?</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeRegisterModal">&times;</button>
+            <h2 class="modal-title">Регистрация</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerName">Имя</label>
+                    <input type="text" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Пароль</label>
+                    <input type="password" id="registerPassword" required>
+                </div>
+                <div .form-group>
+                    <label for="registerConfirmPassword">Подтверждение пароля</label>
+                    <input type="password" id="registerConfirmPassword" required>
+                </div>
+                
+                <!-- Секция для преподавателей/админов -->
+                <div id="adminSection" style="display: none;">
+                    <div class="form-group">
+                        <label for="secretCode">Секретный код</label>
+                        <input type="password" id="secretCode" placeholder="Введите секретный код">
+                    </div>
+                    <div class="form-group">
+                        <label for="userRole">Роль</label>
+                        <select id="userRole">
+                            <option value="student">Студент</option>
+                            <option value="teacher">Преподаватель</option>
+                            <option value="admin">Администратор</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn" style="width: 100%;">Зарегистрироваться</button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 15px;">
+                <button id="toggleAdminBtn" class="btn-link">Вы не ученик?</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно восстановления пароля -->
+    <div class="modal" id="forgotPasswordModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeForgotPasswordModal">&times;</button>
+            <h2 class="modal-title">Восстановление пароля</h2>
+            <form id="forgotPasswordForm">
+                <div class="form-group">
+                    <label for="forgotPasswordEmail">Email</label>
+                    <input type="email" id="forgotPasswordEmail" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Восстановить пароль</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', path='js/auth.js') }}"></script>
+    <script src="{{ url_for('static', path='js/templateLoader.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Загрузка шаблонов header и footer
+            if (typeof loadTemplates === 'function') {
+                loadTemplates();
+            }
+            
+            // Анимация появления элементов
+            setTimeout(() => {
+                document.querySelectorAll('.score-card, .recommendation, .course-card').forEach((el, index) => {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(20px)';
+                    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    
+                    setTimeout(() => {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    }, 100 + (index * 100));
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>

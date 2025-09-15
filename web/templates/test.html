@@ -19,12 +19,13 @@
             display: inline-block;
         }
         
-        .test-info {
+        .test-container {
             background: var(--dark-secondary);
             border: 1px solid var(--neon-pink);
             padding: 30px;
             margin: 30px 0;
             box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
+            border-radius: 8px;
         }
         
         .page-title {
@@ -34,12 +35,140 @@
             text-shadow: 0 0 10px var(--neon-pink);
         }
         
-        .dev-comment {
+        .question {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .question-text {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--neon-blue);
+        }
+        
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .answer-label {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .answer-label:hover {
             background: rgba(0, 238, 255, 0.1);
-            border-left: 3px solid var(--neon-blue);
-            padding: 15px;
+            border-color: var(--neon-blue);
+        }
+        
+        .answer-label input[type="radio"] {
+            margin-right: 10px;
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--neon-pink);
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .answer-label input[type="radio"]:checked::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 10px;
+            height: 10px;
+            background: var(--neon-pink);
+            border-radius: 50%;
+        }
+        
+        .submit-btn {
+            margin-top: 30px;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple));
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            box-shadow: 0 0 15px var(--neon-pink);
+            transform: translateY(-2px);
+        }
+        
+        .submit-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        
+        .progress-container {
+            margin-bottom: 30px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            text-align: right;
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px 0;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--neon-pink);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            color: #ff4757;
+            text-align: center;
             margin: 20px 0;
-            font-style: italic;
+            padding: 10px;
+            background: rgba(255, 71, 87, 0.1);
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -53,27 +182,12 @@
         <a href="{{ url_for('index') }}" class="btn back-button">← Назад на главную</a>
         <h1 class="page-title">Тестирование навыков</h1>
         
-        <div class="test-info">
-            <h2>Страница в разработке</h2>
-            <p>Здесь будет система тестирования для определения уровня знаний по различным направлениям программирования.</p>
-            
-            <div class="dev-comment">
-                <strong>Комментарий для бэкендера:</strong> необходимо реализовать систему вопросов с различными типами ответов,
-                алгоритм подсчета баллов, систему рекомендаций на основе результатов и интеграцию с лидербордом.
-            </div>
-            
-            <h3>Планируемый функционал:</h3>
-            <ul>
-                <li>Разделение тестов по категориям (Python, JavaScript, Java и др.)</li>
-                <li>Различные типы вопросов: одиночный выбор, множественный выбор, ввод кода</li>
-                <li>Система подсчета очков и определения уровня</li>
-                <li>Рекомендации по курсам на основе результатов</li>
-                <li>Добавление результатов в лидерборд</li>
-                <li>Система достижений и наград</li>
-            </ul>
-            
-            <div style="text-align: center; margin-top: 30px;">
-                <a href="{{ url_for('index') }}" class="btn btn-pink">Вернуться на главную</a>
+        <div class="test-container">
+            <div id="test-content">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Загрузка вопросов теста...</p>
+                </div>
             </div>
         </div>
     </div>
@@ -168,6 +282,196 @@
 
     <script src="{{ url_for('static', path='js/auth.js') }}"></script>
     <script src="{{ url_for('static', path='js/templateLoader.js') }}"></script>
-    <script src="{{ url_for('static', path='js/script.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Загрузка вопросов теста
+            fetch('/api/test/questions')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Ошибка загрузки вопросов');
+                    }
+                    return response.json();
+                })
+                .then(questions => {
+                    renderTestForm(questions);
+                })
+                .catch(error => {
+                    document.getElementById('test-content').innerHTML = `
+                        <div class="error-message">
+                            <p>Ошибка загрузки вопросов: ${error.message}</p>
+                            <button onclick="location.reload()" class="btn">Попробовать снова</button>
+                        </div>
+                    `;
+                });
+                
+            // Загрузка шаблонов header и footer
+            if (typeof loadTemplates === 'function') {
+                loadTemplates();
+            }
+        });
+        
+        function renderTestForm(questions) {
+            const testContent = document.getElementById('test-content');
+            let formHTML = `
+                <h2>Тест на определение направления обучения</h2>
+                <p>Ответьте на вопросы, чтобы мы могли определить наиболее подходящее для вас направление в IT.</p>
+                
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-text">Вопрос <span id="current-question">0</span> из <span id="total-questions">${questions.length}</span></div>
+                </div>
+                
+                <form id="test-form">
+            `;
+            
+            questions.forEach((question, index) => {
+                formHTML += `
+                    <div class="question" id="question-${question.id}" ${index > 0 ? 'style="display: none;"' : ''}>
+                        <div class="question-text">${index + 1}. ${question.text}</div>
+                        <div class="answers">
+                `;
+                
+                question.answer_options.forEach(answer => {
+                    formHTML += `
+                        <label class="answer-label">
+                            <input type="radio" name="question-${question.id}" value="${answer.id}" data-creative="${answer.creative_value}" data-analytical="${answer.analytical_value}">
+                            ${answer.answer_text}
+                        </label>
+                    `;
+                });
+                
+                formHTML += `</div></div>`;
+            });
+            
+            formHTML += `
+                    <button type="button" id="prev-btn" class="btn" style="display: none; margin-right: 10px;">Назад</button>
+                    <button type="button" id="next-btn" class="btn">Следующий вопрос</button>
+                    <button type="submit" id="submit-btn" class="submit-btn" style="display: none;">Завершить тест</button>
+                </form>
+            `;
+            
+            testContent.innerHTML = formHTML;
+            
+            // Инициализация навигации по тесту
+            initTestNavigation(questions);
+        }
+        
+        function initTestNavigation(questions) {
+            let currentQuestionIndex = 0;
+            const totalQuestions = questions.length;
+            const progressFill = document.getElementById('progress-fill');
+            const currentQuestionSpan = document.getElementById('current-question');
+            const totalQuestionsSpan = document.getElementById('total-questions');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const submitBtn = document.getElementById('submit-btn');
+            
+            totalQuestionsSpan.textContent = totalQuestions;
+            updateProgress();
+            
+            // Обработчик кнопки "Следующий вопрос"
+            nextBtn.addEventListener('click', function() {
+                const currentQuestionId = questions[currentQuestionIndex].id;
+                const selectedAnswer = document.querySelector(`input[name="question-${currentQuestionId}"]:checked`);
+                
+                if (!selectedAnswer) {
+                    alert('Пожалуйста, выберите ответ на текущий вопрос');
+                    return;
+                }
+                
+                // Скрыть текущий вопрос
+                document.getElementById(`question-${currentQuestionId}`).style.display = 'none';
+                
+                // Показать следующий вопрос
+                currentQuestionIndex++;
+                
+                if (currentQuestionIndex < totalQuestions) {
+                    const nextQuestionId = questions[currentQuestionIndex].id;
+                    document.getElementById(`question-${nextQuestionId}`).style.display = 'block';
+                    
+                    // Показать кнопку "Назад"
+                    prevBtn.style.display = 'inline-block';
+                    
+                    // Если это последний вопрос, изменить текст кнопки
+                    if (currentQuestionIndex === totalQuestions - 1) {
+                        nextBtn.style.display = 'none';
+                        submitBtn.style.display = 'inline-block';
+                    }
+                }
+                
+                updateProgress();
+            });
+            
+            // Обработчик кнопки "Назад"
+            prevBtn.addEventListener('click', function() {
+                // Скрыть текущий вопрос
+                const currentQuestionId = questions[currentQuestionIndex].id;
+                document.getElementById(`question-${currentQuestionId}`).style.display = 'none';
+                
+                // Показать предыдущий вопрос
+                currentQuestionIndex--;
+                const prevQuestionId = questions[currentQuestionIndex].id;
+                document.getElementById(`question-${prevQuestionId}`).style.display = 'block';
+                
+                // Скрыть кнопку "Назад", если это первый вопрос
+                if (currentQuestionIndex === 0) {
+                    prevBtn.style.display = 'none';
+                }
+                
+                // Показать кнопку "Следующий вопрос", если она была скрыта
+                nextBtn.style.display = 'inline-block';
+                submitBtn.style.display = 'none';
+                
+                updateProgress();
+            });
+            
+            // Обработчик отправки формы
+            document.getElementById('test-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Собрать все ответы
+                const answers = [];
+                questions.forEach(question => {
+                    const selectedAnswer = document.querySelector(`input[name="question-${question.id}"]:checked`);
+                    if (selectedAnswer) {
+                        answers.push({
+                            question_id: question.id,
+                            answer_id: parseInt(selectedAnswer.value)
+                        });
+                    }
+                });
+                
+                // Отправить ответы на сервер
+                fetch('/api/test/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ answers: answers })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Ошибка отправки ответов');
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    // Перенаправить на страницу с результатами
+                    window.location.href = `/test/result?creative_score=${result.creative_score}&analytical_score=${result.analytical_score}&recommended_course=${encodeURIComponent(result.recommended_course)}`;
+                })
+                .catch(error => {
+                    alert(`Ошибка: ${error.message}`);
+                });
+            });
+            
+            function updateProgress() {
+                const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+                progressFill.style.width = `${progress}%`;
+                currentQuestionSpan.textContent = currentQuestionIndex + 1;
+            }
+        }
+    </script>
 </body>
 </html>

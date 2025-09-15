@@ -1,18 +1,223 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Users List
+Список тем курса
 {% endblock %}
 
 {% block body %}
+<div class="matrix-rain" id="matrixRain"></div>
 
-<ul>
-    {% for topic in topics %}
-    <li><h2><a href="/topic/{{ topic.id }}">{{ topic.title }}</a></h2></li>
-    {% endfor %}
-</ul>
-
-<div>
-    <a href="{{ url_for('index') }}">Back to homepage</a>
+<div class="container course-page-container">
+    <a href="{{ url_for('index') }}" class="btn back-button">← Назад на главную</a>
+    <h1 class="page-title animate__animated animate__fadeIn">Темы курса</h1>
+    
+    <div class="topics-container">
+        <ul class="topics-list">
+            {% for topic in topics %}
+            <li class="topic-item animate__animated animate__fadeInUp">
+                <a href="/topic/{{ topic.id }}" class="topic-link">
+                    <div class="topic-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="var(--neon-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 17L12 22L22 17" stroke="var(--neon-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 12L12 17L22 12" stroke="var(--neon-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="topic-info">
+                        <h3>{{ topic.title }}</h3>
+                        <p>Изучите эту тему, чтобы продвинуться в курсе</p>
+                    </div>
+                    <div class="topic-arrow">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 18L15 12L9 6" stroke="var(--neon-pink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
 </div>
+
+<style>
+    :root {
+        --dark-bg: #0a0a16;
+        --dark-secondary: #16162d;
+        --neon-pink: #ff2a6d;
+        --neon-blue: #00e4ff;
+        --neon-purple: #8a2be2;
+        --neon-green: #05d9e8;
+    }
+    
+    body {
+        background-color: var(--dark-bg);
+        color: #fff;
+        font-family: 'Rajdhani', sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
+    
+    .course-page-container {
+        padding: 150px 0 100px;
+        min-height: 100vh;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .back-button {
+        margin-bottom: 30px;
+        display: inline-block;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--neon-blue);
+        color: var(--neon-blue);
+        padding: 10px 20px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        font-family: 'Rajdhani', sans-serif;
+        font-weight: 500;
+    }
+    
+    .back-button:hover {
+        background: rgba(0, 228, 255, 0.1);
+        box-shadow: 0 0 10px var(--neon-blue);
+        color: #fff;
+    }
+    
+    .page-title {
+        font-size: 2.5rem;
+        margin-bottom: 40px;
+        color: var(--neon-pink);
+        text-shadow: 0 0 10px var(--neon-pink);
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 700;
+    }
+    
+    .topics-container {
+        background: var(--dark-secondary);
+        border: 1px solid var(--neon-purple);
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
+    }
+    
+    .topics-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .topic-item {
+        margin-bottom: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .topic-item:last-child {
+        margin-bottom: 0;
+        border-bottom: none;
+    }
+    
+    .topic-link {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        text-decoration: none;
+        color: white;
+        transition: all 0.3s ease;
+        border-radius: 5px;
+        background: rgba(0, 0, 0, 0.2);
+    }
+    
+    .topic-link:hover {
+        background: rgba(0, 228, 255, 0.1);
+        transform: translateX(5px);
+        box-shadow: 0 0 15px rgba(0, 228, 255, 0.3);
+    }
+    
+    .topic-icon {
+        margin-right: 15px;
+        color: var(--neon-blue);
+    }
+    
+    .topic-info {
+        flex: 1;
+    }
+    
+    .topic-info h3 {
+        margin: 0 0 5px 0;
+        font-size: 1.3rem;
+        color: var(--neon-blue);
+        font-weight: 600;
+    }
+    
+    .topic-info p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .topic-arrow {
+        color: var(--neon-pink);
+    }
+    
+    /* Matrix rain effect */
+    .matrix-rain {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.2;
+    }
+</style>
+
+<script>
+    // Matrix rain effect
+    document.addEventListener('DOMContentLoaded', function() {
+        const matrixRain = document.getElementById('matrixRain');
+        const canvas = document.createElement('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        matrixRain.appendChild(canvas);
+        
+        const ctx = canvas.getContext('2d');
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&!*';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+        
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+        
+        function draw() {
+            ctx.fillStyle = 'rgba(10, 10, 22, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#0ff';
+            ctx.font = `${fontSize}px monospace`;
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                
+                drops[i]++;
+            }
+        }
+        
+        setInterval(draw, 33);
+        
+        // Загрузка шаблонов header и footer
+        if (typeof loadTemplates === 'function') {
+            loadTemplates();
+        }
+    });
+</script>
 {% endblock %}
