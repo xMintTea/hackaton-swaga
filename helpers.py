@@ -3,6 +3,16 @@ from auth import utils_jwt
 from config.settings import settings
 from datetime import timedelta
 
+
+from fastapi import Form, HTTPException, status, Depends
+from models import User, Student
+
+from sqlalchemy.orm import Session, joinedload
+
+from utils.functions import get_hash
+from db_helpher import get_db
+
+
 TOKEN_TYPE_FIELD = "type"
 ACCESS_TOKEN_TYPE = "access"
 REFRESH_TOKEN_TYPE = "refresh" #8RESRESH
@@ -39,3 +49,40 @@ def create_refresh_token(user: UserSchema) -> str:
     return create_jwt(token_type=REFRESH_TOKEN_TYPE,
                       token_data=jwt_payload,
                       expire_timedelta=timedelta(days=settings.auth_jwt.refresh_token_expire_days))
+    
+    
+
+def validate_auth_user(username: str = Form(), password: str = Form(), db: Session = Depends(get_db)):
+    unauthed_exc = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,\
+                                 detail="invalid login or password")
+
+    if not (user:= db.query(User).where(User.login == username).filter(User.password == get_hash(password)).first()):
+        raise unauthed_exc
+    
+    return user
+
+
+
+def get_leaderboard(db: Session = Depends(get_db)):
+    students = db.query(Student).options(joinedload(Student.user)).all()
+    
+    leaderboard_list = []
+    for student in students:
+        if student.user:
+            points = round(student.xp / 2.5)  # type: ignore
+            leaderboard_list.append((student.user.nickname, points))
+    
+    leaderboard_list.sort(key=lambda x: x[1], reverse=True)
+    
+    result = []
+    for position, (nickname, points) in enumerate(leaderboard_list, 1):
+        if position > 5:
+            break
+        
+        result.append({
+            "position": position,
+            "nickname": nickname,
+            "points": points
+        })
+    
+    return result
