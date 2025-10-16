@@ -1,6 +1,14 @@
-from sqlalchemy import Table, Column, Integer, String, DateTime, Enum, ForeignKey, Text, Boolean, func
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Text,
+    func
+)
 from sqlalchemy.orm import relationship
-from datetime import datetime
 
 from database import Base
 from static import Roles

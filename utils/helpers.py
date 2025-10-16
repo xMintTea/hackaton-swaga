@@ -1,4 +1,4 @@
-from schemas import User as UserSchema
+from schemas.users import User as UserSchema
 from auth import utils_jwt
 from config.settings import settings
 from datetime import timedelta
@@ -10,12 +10,13 @@ from models import User, Student
 from sqlalchemy.orm import Session, joinedload
 
 from utils.functions import get_hash
-from db_helpher import get_db
+from utils.db_helpher import get_db
 
 
 TOKEN_TYPE_FIELD = "type"
 ACCESS_TOKEN_TYPE = "access"
 REFRESH_TOKEN_TYPE = "refresh" #8RESRESH
+
 
 def create_jwt(
     token_type: str,

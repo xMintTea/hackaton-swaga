@@ -16,19 +16,16 @@ from models import (
     Title, 
     Achievement
     )
-from schemas import (
-    UserRegisterSchema,
-    AchievementResponse,
-    UserResponse
-)
-from validation import get_current_token_payload
-from db_helpher import get_db
+
+from schemas.users import UserRegisterSchema, UserResponse
+from schemas.achievements import AchievementResponse
+
+from utils.db_helpher import get_db
 from utils.functions import get_hash
-from auth.utils_jwt import decode_jwt
 
 
 
-router = APIRouter(prefix="/users")
+router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @router.get("/")
@@ -43,43 +40,6 @@ def users_page(
         request=request,
         name="users.html",
         context={"request": request, "users": users})
-
-
-@router.get("/alt")
-def users_page_alt(
-    db: Session = Depends(get_db)
-):
-    users = db.query(User).all()
-    
-    return users
-
-
-
-
-@router.get("/me")
-def  auth_user_check_self_info(
-    request: Request,
-    db: Session = Depends(get_db)
-):
-    token = request.cookies.get("access_token")
-    
-    if not token:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-    
-    payload = decode_jwt(token=token) #type: ignore
-    
-    user = db.query(User).filter(User.id == payload.get("sub")).first()
-    
-    iat = payload.get("iat")
-    exp = payload.get("exp")
-    
-    return {
-        "id": user.id, #type: ignore
-        "login": user.login, #type: ignore
-        "password": user.password, #type: ignore
-        "ait": iat,
-        "exp": exp
-    }
 
 
 
@@ -116,19 +76,6 @@ def user_profile(login: str, request: Request, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
-
-
-
-
-
-@router.get("/me/alt")
-def cookie_login(request: Request):
-    if token:= request.cookies.get("access_token"):
-        return get_current_token_payload(token)
-
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
 
 
 
@@ -199,8 +146,6 @@ def get_user_achievements(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     
     return user.achievements
-
-
 
 
 

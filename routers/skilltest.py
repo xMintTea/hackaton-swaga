@@ -14,7 +14,7 @@ from models import (
     TestAnswerOption,
     TestQuestion
     )
-from schemas import (
+from schemas.testing import (
     TestQuestionSchema,
     TestAnswerOptionSchema,
     TestSubmissionSchema,
@@ -24,10 +24,13 @@ from schemas import (
     TestQuestionUpdate,
     TestAnswerUpdate
 )
-from db_helpher import get_db
 
 
-router = APIRouter(prefix="/test")
+
+from utils.db_helpher import get_db
+
+
+router = APIRouter(prefix="/test", tags=["Test"])
 
 @router.get("/questions", response_model=List[TestQuestionSchema])
 def get_test_questions(db: Session = Depends(get_db)):

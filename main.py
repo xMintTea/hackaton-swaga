@@ -2,12 +2,7 @@ from fastapi import (
     FastAPI,
 )   
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBearer
-from sqlalchemy.orm import Session, joinedload
 from database import engine
-from typing import List
-from sqlalchemy.exc import IntegrityError
-from templates import templates
 from fastapi.staticfiles import StaticFiles
 
 from routers import achievements
@@ -22,9 +17,8 @@ from routers import topics
 from routers import users
 
 from database import Base
-
-
 from utils.functions import get_origins
+
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="web/static"), name="static")

@@ -8,23 +8,16 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 
 
-from models import (
-    User, 
-    Student,
-    Course
-    )
-from schemas import (
-    StudentRegisterSchema,
-    SetCourseRequest,
-    StudentResponse,
-    LevelUpdate,
-    CurrencyUpdate,
-    XPUpdate
-)
+from models import User, Student,Course
 
-from db_helpher import get_db
+from schemas.students import StudentRegisterSchema, StudentResponse
+from schemas.courses import SetCourseRequest
 
-router = APIRouter(prefix="/students")
+from schemas.gamification import LevelUpdate, CurrencyUpdate, XPUpdate
+
+from utils.db_helpher import get_db
+
+router = APIRouter(prefix="/students", tags=["Students"])
 
 @router.get("/alt")
 def students_page_alt(

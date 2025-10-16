@@ -8,21 +8,23 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from models import User
-from schemas import (
+from schemas.users import (
     UserLoginSchema,
     UserRegisterSchema,
-    User as UserSchema,
-    Response as ResponseSchema,
-    Token
+    User as UserSchema
 )
-from helpers import create_access_token, create_refresh_token
+
+from schemas.other import Response as ResponseSchema, Token
+
+
+from utils.helpers import create_access_token, create_refresh_token
 from validation import get_current_auth_user_for_refresh
-from db_helpher import get_db
+from utils.db_helpher import get_db
 from utils.functions import get_hash
-from helpers import validate_auth_user
+from utils.helpers import validate_auth_user
 
 
-router = APIRouter(prefix="/auth")
+router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/login/", response_model=Token)
 def auth_user(response: Response, user: UserSchema = Depends(validate_auth_user)):

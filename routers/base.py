@@ -6,8 +6,8 @@ from fastapi import (
 from sqlalchemy.orm import Session
 
 from templates import templates
-from db_helpher import get_db
-from helpers import get_leaderboard
+from utils.db_helpher import get_db
+from utils.helpers import get_leaderboard
 
 
 

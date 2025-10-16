@@ -1,33 +1,20 @@
-from fastapi import APIRouter
-
-router = APIRouter(prefix="/achievements")
-
-
 from fastapi import (
     HTTPException,
     Depends,
-    Request
+    Request,
+    APIRouter
 )   
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBearer
-from sqlalchemy.orm import Session, joinedload
-from database import engine
-from typing import List
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 from templates import templates
-from fastapi.staticfiles import StaticFiles
+
+from models import Achievement
+from schemas.achievements import AchievementResponse, AchievementCreate
+
+from utils.db_helpher import get_db
 
 
-from models import (
-    Achievement,
-    )
-from schemas import (
-    AchievementResponse,
-    AchievementCreate
-)
 
-from db_helpher import get_db
-
+router = APIRouter(prefix="/achievements", tags=["Achievements"])
 
 
 @router.put("/{achievement_id}", response_model=AchievementResponse)
@@ -80,7 +67,6 @@ def create_achievement(
     db.refresh(db_achievement)
     
     return db_achievement
-
 
 
 

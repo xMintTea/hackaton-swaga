@@ -9,18 +9,13 @@ from sqlalchemy.orm import Session
 from templates import templates
 
 
-from models import (
-    Course,
-    Topic
-    )
-from schemas import (
-    TopicResponse,
-    TopicCreate
-)
-from db_helpher import get_db
+from models import Course, Topic
+
+from schemas.topics import TopicResponse, TopicCreate
+from utils.db_helpher import get_db
 
 
-router = APIRouter(prefix="/topics")
+router = APIRouter(prefix="/topics", tags=["Topics"])
 
 
 # Эндпоинты для топиков

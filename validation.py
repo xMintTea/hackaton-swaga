@@ -1,4 +1,4 @@
-from helpers import create_access_token, create_refresh_token, TOKEN_TYPE_FIELD, ACCESS_TOKEN_TYPE, REFRESH_TOKEN_TYPE
+from utils.helpers import TOKEN_TYPE_FIELD, ACCESS_TOKEN_TYPE, REFRESH_TOKEN_TYPE
 from fastapi import HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt import InvalidTokenError
@@ -6,11 +6,11 @@ from sqlalchemy.orm import Session
 
 
 from auth import utils_jwt
-from schemas import User as UserSchema
+from schemas.users import User as UserSchema
 from models import User
-from db_helpher import get_db
+from utils.db_helpher import get_db
 
-oath2_scheme = OAuth2PasswordBearer(tokenUrl="/login/",)
+oath2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login/",)
 
 
 def validate_token_type(

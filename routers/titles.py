@@ -10,15 +10,13 @@ from typing import List
 
 
 from models import Title
-from schemas import (
-    TitleResponse,
-    TitleCreate
-)
 
-from db_helpher import get_db
+from schemas.titles import TitleCreate, TitleResponse
+
+from utils.db_helpher import get_db
 
 
-router = APIRouter(prefix="/titles")
+router = APIRouter(prefix="/titles", tags=["Titles"])
 
 # Эндпоинты для Title
 @router.post("/", response_model=TitleResponse)

@@ -6,26 +6,21 @@ from fastapi import (
 )   
 from sqlalchemy.orm import Session, joinedload
 from typing import List
+
+
 from templates import templates
+from models import Course, Topic
+from schemas.courses import CourseResponse, CourseCreate
+from schemas.topics import TopicResponse
 
-
-from models import (
-    Course,
-    Topic
-)
-from schemas import (
-    CourseResponse,
-    TopicResponse,
-    CourseCreate
-)
-
-from db_helpher import get_db
+from utils.db_helpher import get_db
 
 
 
-router = APIRouter(prefix="/courses")
+router = APIRouter(prefix="/courses", tags=["Courses"])
 
-# Эндпоинты для курсов
+
+
 @router.post("/", response_model=CourseResponse)
 def create_course(course: CourseCreate, db: Session = Depends(get_db)):
     db_course = Course(
@@ -42,6 +37,7 @@ def create_course(course: CourseCreate, db: Session = Depends(get_db)):
 def get_courses(request: Request, db: Session = Depends(get_db)):
     courses = db.query(Course).options(joinedload(Course.topics)).all()
     
+    # TODO: УБРАТЬ ЭТО
     additional = []
     icons = ["🐍","⚡","☕","🤖","🌐", "🔐"]
     price = [1000, 2500, 3200, 4242, 2222, 2222]
