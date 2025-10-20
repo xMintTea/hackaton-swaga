@@ -16,8 +16,9 @@ class CourseResponse(BaseModel):
     updated_at: datetime
     topics: List[TopicResponse] = []
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 
 

@@ -12,6 +12,7 @@ class AchievementResponse(BaseModel):
     name: str
     description: str
     
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 

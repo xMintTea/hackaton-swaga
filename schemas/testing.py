@@ -45,8 +45,9 @@ class TestAnswerOptionSchema(BaseModel):
     creative_value: int
     analytical_value: int
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 class TestQuestionSchema(BaseModel):
     id: int
@@ -54,5 +55,6 @@ class TestQuestionSchema(BaseModel):
     order: int
     answer_options: List[TestAnswerOptionSchema]
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
