@@ -9,42 +9,12 @@ from templates import templates
 
 from models import Achievement
 from schemas.achievements import AchievementResponse, AchievementCreate
-
 from utils.db_helpher import get_db
 
 
 
 router = APIRouter(prefix="/achievements", tags=["Achievements"])
 
-
-@router.put("/{achievement_id}", response_model=AchievementResponse)
-def update_achievement(achievement_id: int, achievement: AchievementCreate, db: Session = Depends(get_db)):
-    db_achievement = db.query(Achievement).filter(Achievement.id == achievement_id).first()
-    if not db_achievement:
-        raise HTTPException(status_code=404, detail="Achievement not found")
-    
-    # Проверяем, существует ли другая ачивка с таким именем
-    existing_achievement = db.query(Achievement).filter(Achievement.name == achievement.name, Achievement.id != achievement_id).first()
-    if existing_achievement:
-        raise HTTPException(status_code=400, detail="Achievement with this name already exists")
-    
-    db_achievement.name = achievement.name # type: ignore
-    db_achievement.description = achievement.description # type: ignore
-    
-    db.commit()
-    db.refresh(db_achievement)
-    return db_achievement
-    
-    
-@router.delete("/{achievement_id}")
-def delete_achievement(achievement_id: int, db: Session = Depends(get_db)):
-    achievement = db.query(Achievement).filter(Achievement.id == achievement_id).first()
-    if not achievement:
-        raise HTTPException(status_code=404, detail="Achievement not found")
-    
-    db.delete(achievement)
-    db.commit()
-    return {"message": "Achievement deleted successfully"}
 
 
 @router.post("/", response_model=AchievementResponse)
@@ -81,3 +51,34 @@ def get_all_achievements(request: Request,db: Session = Depends(get_db)):
         name="achievements.html",
         context={"request": request, "achievements": achievements})
 
+
+
+
+@router.put("/{achievement_id}", response_model=AchievementResponse)
+def update_achievement(achievement_id: int, achievement: AchievementCreate, db: Session = Depends(get_db)):
+    db_achievement = db.query(Achievement).filter(Achievement.id == achievement_id).first()
+    if not db_achievement:
+        raise HTTPException(status_code=404, detail="Achievement not found")
+    
+    # Проверяем, существует ли другая ачивка с таким именем
+    existing_achievement = db.query(Achievement).filter(Achievement.name == achievement.name, Achievement.id != achievement_id).first()
+    if existing_achievement:
+        raise HTTPException(status_code=400, detail="Achievement with this name already exists")
+    
+    db_achievement.name = achievement.name # type: ignore
+    db_achievement.description = achievement.description # type: ignore
+    
+    db.commit()
+    db.refresh(db_achievement)
+    return db_achievement
+    
+    
+@router.delete("/{achievement_id}")
+def delete_achievement(achievement_id: int, db: Session = Depends(get_db)):
+    achievement = db.query(Achievement).filter(Achievement.id == achievement_id).first()
+    if not achievement:
+        raise HTTPException(status_code=404, detail="Achievement not found")
+    
+    db.delete(achievement)
+    db.commit()
+    return {"message": "Achievement deleted successfully"}
