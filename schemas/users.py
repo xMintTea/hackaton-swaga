@@ -1,14 +1,22 @@
-from pydantic import BaseModel, Field
-from datetime import datetime
-from typing import Optional, List
+from pydantic import BaseModel, Field, EmailStr
+from typing import Annotated
 
 from static import Roles
 
 class UserBase(BaseModel):
-    nickname: str
-    login: str
-    password: str
-    email: str
+    nickname: Annotated[str,
+                        Field(...,
+                              min_length=2,
+                              max_length=20)]
+    login:  Annotated[str,
+                        Field(...,
+                              min_length=2,
+                              max_length=20)]
+    password:  Annotated[str,
+                        Field(...,
+                              min_length=2,
+                              max_length=20)]
+    email: EmailStr
     role: Roles = Roles.USER
 
 

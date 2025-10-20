@@ -1,11 +1,19 @@
 from pydantic import BaseModel, Field
-from datetime import datetime
-from typing import Optional, List
-
+from typing import Annotated
 
 class AchievementCreate(BaseModel):
-    name: str
-    description: str
+    name: Annotated[
+        str,
+        Field(...,title="Название ачивки",
+              min_length=1,
+              max_length=17)
+    ]
+    description: Annotated[
+        str,
+        Field(...,title="Описание ачивки",
+              min_length=1,
+              max_length=32)
+    ]
 
 class AchievementResponse(BaseModel):
     id: int

@@ -1,10 +1,11 @@
 from pydantic import BaseModel, Field
-from datetime import datetime
-from typing import Optional, List
-
+from typing import Annotated
 
 class TitleCreate(BaseModel):
-    name: str
+    name: Annotated[
+        str,
+        Field(...,min_length=1, max_length=124, title="Название титула")
+    ]
 
 class TitleResponse(BaseModel):
     id: int

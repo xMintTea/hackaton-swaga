@@ -1,12 +1,18 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Annotated
 
 from schemas.topics import TopicResponse
 
 class CourseCreate(BaseModel):
-    title: str
-    description: Optional[str] = None
+    title: Annotated[
+        str,
+        Field(...,
+              min_length=4,
+              max_length=16) #TODO: ЭТО СЛИШКОМ МАЛО, НУЖНО БУДЕТ ПОРЕШАТЬ НА ФРОНТЕ ПРОБЛЕМУ И УДЕЛНИТЬ ЗДЕСЬ
+    ]
+    description: Annotated[str,
+                        Field(max_length=39)]
 
 class CourseResponse(BaseModel):
     id: int
