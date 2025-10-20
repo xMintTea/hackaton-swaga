@@ -71,6 +71,7 @@ class UserProfile(Base):
     __tablename__ = "user_profiles"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), unique=True)
+    about_me = Column(String, nullable=True)
     
     user = relationship("User", back_populates="profile")
 
@@ -118,4 +119,9 @@ class TestAnswerOption(Base):
     
     question = relationship("TestQuestion", backref="answer_options")
     
+    
+class SocialConnection(Base):
+    __tablename__ = "users_social_connections"
+    
+    id = Column(Integer, primary_key=True, index=True)
     

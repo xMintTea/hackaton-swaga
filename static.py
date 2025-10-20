@@ -6,3 +6,11 @@ class Roles(Enum):
     STUDENT = "student"
     TEACHER = "teacher"
     ADMIN = "admin"
+
+
+class Social(Enum):
+    YOUTUBE = "youtube"
+    VK = "vk"
+    TELEGRAM = "telegram"
+    GITHUB = "github"
+    OTHER = "other"
