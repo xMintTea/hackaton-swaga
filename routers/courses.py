@@ -44,18 +44,18 @@ def get_courses(request: Request, db: Session = Depends(get_db)):
     level = ["Базовый", "Базовый", "Базовый", "Продвинутый", "Продвинутый","Продвинутый"]
     
     for course in courses:
-        additional.routerend({ #type: ignore
+        additional.append({ #type: ignore
                 "id" : course.id,
                 "title" : course.title,
                 "desc" :course.description,
-                "icon" : icons[course.id-1], #type: ignore
-                "price" : price[course.id-1], #type: ignore
-                "lvl" : level[course.id-1], #type: ignore
+                # "icon" : icons[course.id-1], #type: ignore
+                # "price" : price[course.id-1], #type: ignore
+                # "lvl" : level[course.id-1], #type: ignore
                 "topic_count" : len(course.topics)*3
             }
         )
         
-    additional = list(sorted(additional, key=lambda x: x.get("lvl")))
+    # additional = list(sorted(additional, key=lambda x: x.get("lvl")))
         
     return templates.TemplateResponse(
         request=request,

@@ -88,7 +88,7 @@ def set_user_title(user_id: int, title_id: int, db: Session = Depends(get_db)):
     
     title = db.query(Title).filter(Title.id == title_id).first()
     if not title:
-        raise HTTPException(status_code=404, detail="Title not found")
+        title_id = None #type: ignore reason: its nullable
     
     user.title_id = title_id  # type: ignore
     db.commit()

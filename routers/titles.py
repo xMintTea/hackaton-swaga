@@ -1,5 +1,3 @@
-
-
 from fastapi import (
     HTTPException,
     Depends,
@@ -10,15 +8,13 @@ from typing import List
 
 
 from models import Title
-
 from schemas.titles import TitleCreate, TitleResponse
-
 from utils.db_helpher import get_db
 
 
 router = APIRouter(prefix="/titles", tags=["Titles"])
 
-# Эндпоинты для Title
+
 @router.post("/", response_model=TitleResponse)
 def create_title(title: TitleCreate, db: Session = Depends(get_db)):
     # Проверяем, существует ли титул с таким именем
@@ -32,6 +28,7 @@ def create_title(title: TitleCreate, db: Session = Depends(get_db)):
     db.refresh(db_title)
     return db_title
 
+
 @router.get("/", response_model=List[TitleResponse])
 def get_all_titles(db: Session = Depends(get_db)):
     """Получить все титулы"""
@@ -44,6 +41,7 @@ def get_title(title_id: int, db: Session = Depends(get_db)):
     if not title:
         raise HTTPException(status_code=404, detail="Title not found")
     return title
+
 
 @router.put("/{title_id}", response_model=TitleResponse)
 def update_title(title_id: int, title: TitleCreate, db: Session = Depends(get_db)):
@@ -60,6 +58,7 @@ def update_title(title_id: int, title: TitleCreate, db: Session = Depends(get_db
     db.commit()
     db.refresh(db_title)
     return db_title
+
 
 @router.delete("/{title_id}")
 def delete_title(title_id: int, db: Session = Depends(get_db)):
