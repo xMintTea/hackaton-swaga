@@ -17,10 +17,11 @@ router = APIRouter()
 @router.get("/", name="index")
 def index_page(
     request: Request,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    leaders = Depends(get_leaderboard)
 ):
     
-    leaders = get_leaderboard(db)
+
     return templates.TemplateResponse(
         request=request,
         name="index.html",

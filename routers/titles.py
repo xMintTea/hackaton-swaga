@@ -35,6 +35,7 @@ def get_all_titles(db: Session = Depends(get_db)):
     titles = db.query(Title).all()
     return titles
 
+
 @router.get("/{title_id}", response_model=TitleResponse)
 def get_title(title_id: int, db: Session = Depends(get_db)):
     title = db.query(Title).filter(Title.id == title_id).first()

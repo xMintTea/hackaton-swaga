@@ -1,13 +1,13 @@
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Annotated
 
-class TitleCreate(BaseModel):
+class GoodsCreate(BaseModel):
     name: Annotated[
         str,
-        Field(...,min_length=1, max_length=124, title="Название титула")
+        Field(...,min_length=1, max_length=124, title="Название товара")
     ]
 
-class TitleResponse(BaseModel):
+class GoodsResponse(BaseModel):
     id: int
     name: str
     

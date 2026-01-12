@@ -1,5 +1,5 @@
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 from typing import Optional, List
 from typing import Annotated
@@ -45,9 +45,7 @@ class TestAnswerOptionSchema(BaseModel):
     creative_value: int
     analytical_value: int
 
-    model_config = {
-        "from_attributes": True
-    }
+    model_config = ConfigDict(from_attributes=True)
 
 class TestQuestionSchema(BaseModel):
     id: int
@@ -55,6 +53,4 @@ class TestQuestionSchema(BaseModel):
     order: int
     answer_options: List[TestAnswerOptionSchema]
 
-    model_config = {
-        "from_attributes": True
-    }
+    model_config = ConfigDict(from_attributes=True)

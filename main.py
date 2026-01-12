@@ -13,6 +13,8 @@ from routers import courses
 from routers import titles
 from routers import topics
 from routers import users
+from routers import avatars
+from routers import goods
 
 from database import Base
 from utils.functions import get_origins
@@ -42,3 +44,5 @@ app.include_router(courses.router)
 app.include_router(titles.router)
 app.include_router(topics.router)
 app.include_router(users.router)
+app.include_router(avatars.router)
+app.include_router(goods.router)

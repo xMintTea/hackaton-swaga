@@ -5,16 +5,16 @@ from fastapi import (
     Request,
     APIRouter
 )
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload, Query
 from typing import List
 from templates import templates
 
 
 from models import (
     User, 
-    Student, 
     Title, 
-    Achievement
+    Achievement,
+    UserProfile
     )
 
 from schemas.users import UserRegisterSchema, UserResponse
@@ -27,35 +27,51 @@ from utils.functions import get_hash
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
+def get_users(db: Session = Depends(get_db)) -> Query:
+    users = db.query(User).options(
+        joinedload(User.profile).joinedload(UserProfile.available_frames),
+        joinedload(User.profile).joinedload(UserProfile.current_frame),
+        joinedload(User.profile).joinedload(UserProfile.available_titles),
+        joinedload(User.profile).joinedload(UserProfile.current_title),
+        joinedload(User.profile).joinedload(UserProfile.achievements),
+        joinedload(User.profile).joinedload(UserProfile.available_avatars),
+        joinedload(User.profile).joinedload(UserProfile.current_avatar),
+        joinedload(User.gamerec),
+        joinedload(User.courses)
+    )
+    
+    
+    return users
 
-@router.get("/")
+@router.get("/", response_model=List[UserResponse])
 def users_page(
     request: Request,
-    db: Session = Depends(get_db)
+    users: Query = Depends(get_users)
 ):
-    users = db.query(User).all()
-
+    
+    return users
     
     return templates.TemplateResponse(
         request=request,
         name="users.html",
-        context={"request": request, "users": users})
+        context={"request": request, "users": users.all()})
 
 
 
 
-@router.get("/{login}")
-def user_profile(login: str, request: Request, db: Session = Depends(get_db)):
+@router.get("/{login}", name="user_profile")
+def user_profile(login: str, request: Request, users: Query = Depends(get_users)):
     
     if token:= request.cookies.get("access_token"):
-        if user := db.query(User).filter(User.login == login).first():
+        if user := users.filter(User.login == login).first():
             
-            titile = user.title if user.title else "Нет титула"
+
+            titile = user.profile.current_title
             
-            lvl = user.student.lvl if user.student else 0
-            xp = user.student.xp if user.student else 0
-            currency = user.student.currency if user.student else 0
-            course = user.student.current_course if user.student else None
+            lvl = user.gamificationRecord.lvl if user.gamificationRecord else 0
+            xp = user.gamificationRecord.xp if user.gamificationRecord else 0
+            currency = user.gamificationRecord.currency if user.gamificationRecord else 0
+            course = user.courses.current_course if user.courses else None
             
             response = {
                 "nickname": user.nickname,
@@ -64,7 +80,7 @@ def user_profile(login: str, request: Request, db: Session = Depends(get_db)):
                 "lvl": lvl,
                 "xp" : xp,
                 "currency": currency,
-                "achievements" : user.achievements,
+                "achievements" : user.profile.achievements,
                 "course": course
             }
             
@@ -79,18 +95,37 @@ def user_profile(login: str, request: Request, db: Session = Depends(get_db)):
 
 
 
-# Эндпоинт для назначения титула пользователю
 @router.post("/{user_id}/set-title/{title_id}")
-def set_user_title(user_id: int, title_id: int, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == user_id).first()
+def set_user_title(user_id: int,
+                   title_id: int,
+                   users: Query = Depends(get_users),
+                   db: Session = Depends(get_db)):
+    user = users.filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    title = db.query(Title).filter(Title.id == title_id).first()
+
+    user.profile.current_title = title
+    db.commit()
+    db.refresh(user)
+    
+    return {"message": "Title set successfully", "user": user}
+
+@router.post("/{user_id}/grant-title/{title_id}")
+def grant_user_title(user_id: int,
+                   title_id: int,
+                   users: Query = Depends(get_users),
+                   db: Session = Depends(get_db)):
+    user = users.filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
     title = db.query(Title).filter(Title.id == title_id).first()
     if not title:
-        title_id = None #type: ignore reason: its nullable
+        return {"message": "No such title"}
     
-    user.title_id = title_id  # type: ignore
+    user.profile.available_titles.append(title)
     db.commit()
     db.refresh(user)
     
@@ -98,7 +133,6 @@ def set_user_title(user_id: int, title_id: int, db: Session = Depends(get_db)):
 
 
 
-# Эндпоинты для управления ачивками пользователей
 @router.post("/{user_id}/achievements/{achievement_id}")
 def add_achievement_to_user(user_id: int, achievement_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
@@ -110,14 +144,15 @@ def add_achievement_to_user(user_id: int, achievement_id: int, db: Session = Dep
         raise HTTPException(status_code=404, detail="Achievement not found")
     
     # Проверяем, есть ли уже эта ачивка у пользователя
-    if achievement in user.achievements:
+    if achievement in user.profile.achievements:
         raise HTTPException(status_code=400, detail="User already has this achievement")
     
-    user.achievements.routerend(achievement)
+    user.profile.achievements.append(achievement)
     db.commit()
     db.refresh(user)
     
     return {"message": "Achievement added to user successfully"}
+
 
 @router.delete("/{user_id}/achievements/{achievement_id}")
 def remove_achievement_from_user(user_id: int, achievement_id: int, db: Session = Depends(get_db)):
@@ -139,6 +174,7 @@ def remove_achievement_from_user(user_id: int, achievement_id: int, db: Session 
     
     return {"message": "Achievement removed from user successfully"}
 
+
 @router.get("/{user_id}/achievements", response_model=List[AchievementResponse])
 def get_user_achievements(user_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
@@ -148,8 +184,6 @@ def get_user_achievements(user_id: int, db: Session = Depends(get_db)):
     return user.achievements
 
 
-
-# Эндпоинты для управления пользователями
 @router.put("/{user_id}", response_model=UserResponse)
 def update_user(user_id: int, user_data: UserRegisterSchema, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.id == user_id).first()
@@ -177,16 +211,13 @@ def update_user(user_id: int, user_data: UserRegisterSchema, db: Session = Depen
     db.refresh(db_user)
     return db_user
 
+
 @router.delete("/{user_id}")
 def delete_user(user_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
-    # Удаляем связанные записи (студента, если есть)
-    student = db.query(Student).filter(Student.user_id == user_id).first()
-    if student:
-        db.delete(student)
     
     db.delete(user)
     db.commit()

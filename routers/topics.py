@@ -28,7 +28,7 @@ def create_topic(topic: TopicCreate, db: Session = Depends(get_db)):
     
     db_topic = Topic(
         course_id=topic.course_id,
-        title=topic.title,
+        name=topic.name,
         content=topic.content,
         order=topic.order
     )

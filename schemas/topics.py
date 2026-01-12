@@ -1,17 +1,16 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 from typing import Optional
 from typing import Annotated
 
 class TopicBase(BaseModel):
-    title: str
+    name: str
     content: Optional[str] = None
     order: int = Field(default=0, ge=0)
 
 
 class TopicCreate(TopicBase):
     course_id: int
-
 
 
 class TopicUpdate(BaseModel):
@@ -23,12 +22,8 @@ class TopicUpdate(BaseModel):
 class TopicResponse(BaseModel):
     id: int
     course_id: int
-    title: str
+    name: str
     content: Optional[str] = None
-    order: int 
-    created_at: datetime
-    updated_at: datetime
+    order: int
 
-    model_config = {
-        "from_attributes": True
-    }
+    model_config = ConfigDict(from_attributes=True)

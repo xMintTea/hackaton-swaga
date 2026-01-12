@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Annotated
 
 class AchievementCreate(BaseModel):
@@ -15,12 +15,11 @@ class AchievementCreate(BaseModel):
               max_length=32)
     ]
 
+
 class AchievementResponse(BaseModel):
     id: int
     name: str
     description: str
     
-    model_config = {
-        "from_attributes": True
-    }
+    model_config = ConfigDict(from_attributes=True)
 

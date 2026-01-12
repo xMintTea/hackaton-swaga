@@ -7,7 +7,7 @@ from fastapi import (
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from models import User
+from models import User, UserProfile, GamificationRecord
 from schemas.users import (
     UserLoginSchema,
     UserRegisterSchema,
@@ -15,6 +15,7 @@ from schemas.users import (
 )
 
 from schemas.other import Response as ResponseSchema, Token
+from static import Roles
 
 
 from utils.helpers import create_access_token, create_refresh_token
@@ -51,14 +52,21 @@ def auth_refresh_jwt(
 @router.post("/register/", response_model=ResponseSchema)
 def registerUser(user: UserRegisterSchema, db: Session = Depends(get_db)) -> dict:
 
+    user_profile = UserProfile()
+    game_record = GamificationRecord()
+
     db_user = User(
         login=user.login,
         nickname=user.nickname,
         password=get_hash(user.password),
-        email=user.email
-
+        email=user.email,
+        profile=user_profile,
+        role=Roles.USER,
+        gamerec=game_record
     )
     try:
+        db.add(user_profile)
+        db.add(game_record)
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
