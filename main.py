@@ -10,8 +10,6 @@ from routers import admin
 from routers import auth
 from routers import base
 from routers import courses
-from routers import skilltest
-from routers import students
 from routers import titles
 from routers import topics
 from routers import users
@@ -40,8 +38,7 @@ app.include_router(admin.router)
 app.include_router(auth.router)
 app.include_router(base.router)
 app.include_router(courses.router)
-app.include_router(skilltest.router)
-app.include_router(students.router)
+# app.include_router(skilltest.router)
 app.include_router(titles.router)
 app.include_router(topics.router)
 app.include_router(users.router)

@@ -5,7 +5,7 @@ from datetime import timedelta
 
 
 from fastapi import Form, HTTPException, status, Depends
-from models import User, Student
+from models import User
 
 from sqlalchemy.orm import Session, joinedload
 
@@ -62,16 +62,17 @@ def validate_auth_user(username: str = Form(), password: str = Form(), db: Sessi
     
     return user
 
+import random
 
-
+# TODO: Модели поменяли - это наеблнулось
 def get_leaderboard(db: Session = Depends(get_db)):
-    students = db.query(Student).options(joinedload(Student.user)).all()
+    users = db.query(User).all()
     
     leaderboard_list = []
-    for student in students:
-        if student.user:
-            points = round(student.xp / 2.5)  # type: ignore
-            leaderboard_list.append((student.user.nickname, points))
+    for user in users:
+        total_xp = user.gamerec.lvl * 100 + user.gamerec.xp
+        points = round(total_xp / 2.5) 
+        leaderboard_list.append((user.nickname, points))
     
     leaderboard_list.sort(key=lambda x: x[1], reverse=True)
     

@@ -7,8 +7,7 @@ from sqlalchemy.orm import Session, joinedload
 from templates import templates
 
 from models import (
-    User, 
-    Student, 
+    User,
     Title, 
     Achievement,
     Course,
@@ -85,7 +84,6 @@ def manage_users_page(request: Request, db: Session = Depends(get_db)):
     users = db.query(User).options(
         joinedload(User.title),
         joinedload(User.achievements),
-        joinedload(User.student).joinedload(Student.current_course)
     ).all()
     titles = db.query(Title).all()
     achievements = db.query(Achievement).all()
