@@ -9,7 +9,6 @@ from sqlalchemy.exc import IntegrityError
 
 from models import User, UserProfile, GamificationRecord
 from schemas.users import (
-    UserLoginSchema,
     UserRegisterSchema,
     User as UserSchema
 )
@@ -76,32 +75,3 @@ def registerUser(user: UserRegisterSchema, db: Session = Depends(get_db)) -> dic
         db.rollback()
         
         return {"data": "Пользователь с таким логином уже существует"}
-
-    
-
-
-
-@router.post("/login")
-def login(creds: UserLoginSchema, response: Response, db: Session = Depends(get_db)):
-    query = db.query(User).filter(
-        User.login == creds.login,
-        User.password == get_hash(creds.password)
-    )
-
-    user = query.first()
-    if user is not None:
-        
-        access_token = create_access_token(user)
-        refresh_token = create_refresh_token(user)
-        
-        response.set_cookie("access_token", access_token)
-        response.set_cookie("refresh_token", refresh_token)
-    
-        
-        return Token(access_token=access_token,
-                     refresh_token=refresh_token,
-                     token_type="bearer")
-    
-    raise HTTPException(status_code=401, detail="Incorrect username or password")
-
-
