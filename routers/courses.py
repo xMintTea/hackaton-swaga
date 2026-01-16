@@ -25,7 +25,9 @@ router = APIRouter(prefix="/courses", tags=["Courses"])
 def create_course(course: CourseCreate, db: Session = Depends(get_db)):
     db_course = Course(
         name=course.name,
-        description=course.description
+        description=course.description,
+        price=course.price,
+        course_lvl=course.course_lvl
     )
     db.add(db_course)
     db.commit()
@@ -41,11 +43,11 @@ def get_courses(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse(
         request=request,
         name="courses.html",
-        context={"request": request})
+        context={"request": request, "courses":courses})
 
 
 
-@router.get("/{course_id}", response_model=CourseResponse)
+@router.get("/{course_id}", response_model=CourseResponse, name="course")
 def get_course(course_id: int,  request: Request, db: Session = Depends(get_db)):
     course = db.query(Course).options(joinedload(Course.topics)).filter(Course.id == course_id).first()
     if not course:

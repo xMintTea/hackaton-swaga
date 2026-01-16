@@ -4,13 +4,14 @@ from sqlalchemy import (
     String,
     ForeignKey,
     Enum,
-    Boolean
+    Boolean,
+    Float
 )
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 
 from database import Base
-from static import Roles
+from static import Roles, Social, CourseLvl
 
 
 class BaseModel(Base):
@@ -165,6 +166,8 @@ class Course(BaseModel):
     
     name = Column(String)
     description = Column(String)
+    price = Column(Float)
+    course_lvl = Column(Enum(CourseLvl))
     users = relationship(User, secondary="student_course", back_populates="courses")
 
     topics = relationship("Topic")
