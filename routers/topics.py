@@ -40,11 +40,16 @@ def create_topic(topic: TopicCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/{topic_id}", response_model=TopicResponse)
-def get_topic(topic_id: int, db: Session = Depends(get_db)):
+def get_topic(topic_id: int,request: Request, db: Session = Depends(get_db)):
     topic = db.query(Topic).filter(Topic.id == topic_id).first()
     if not topic:
         raise HTTPException(status_code=404, detail="Topic not found")
-    return topic
+
+
+    return templates.TemplateResponse(
+        request=request,
+        name="topic.html",
+        context={"request": request, "topic": topic})
 
 
 @router.put("/{topic_id}", response_model=TopicResponse)
