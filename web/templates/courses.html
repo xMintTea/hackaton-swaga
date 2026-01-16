@@ -274,114 +274,17 @@
             {% for course in courses %}
             <a href="{{ url_for('course', course_id=course.id) }}" style="text-decoration: none;">
             <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-course-id="1">
-                <div class="course-icon">{{ course.icon }}</div>
-                <h3 class="course-title">{{ course.title }}</h3>
-                <p class="course-description">{{ course.desc }}</p>
+                <div class="course-icon">{{ course.icon }}🔐</div>
+                <h3 class="course-title">{{ course.name }}</h3>
+                <p class="course-description">{{ course.description }}</p>
                 <div class="course-meta">
-                    <span>{{ course.topic_count }} модулей</span>
-                    <span class="course-level">{{ course.lvl }}</span>
+                    <span>{{ course.topics | length }} модулей</span>
+                    <span class="course-level">{{ course.course_lvl.value }}</span>
                 </div>
                 <div class="course-price">{{ course.price }} ₽</div>
             </div>
             </a>
             {% endfor %}
-<!--             
-            <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="100" data-course-id="2">
-                <div class="course-icon">⚡</div>
-                <h3 class="course-title">JavaScript Fundamentals</h3>
-                <p class="course-description">Освойте язык, который powers современный веб и позволяет создавать интерактивные приложения.</p>
-                <div class="course-meta">
-                    <span>10 модулей</span>
-                    <span class="course-level">Начальный</span>
-                </div>
-                <div class="course-price">2 200 ₽</div>
-            </div>
-            
-            <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="200" data-course-id="3">
-                <div class="course-icon">☕</div>
-                <h3 class="course-title">Java Essentials</h3>
-                <p class="course-description">Начните путь в enterprise разработке с одного из самых стабильных и надежных языков.</p>
-                <div class="course-meta">
-                    <span>14 модулей</span>
-                    <span class="course-level">Начальный</span>
-                </div>
-                <div class="course-price">2 800 ₽</div>
-            </div>
-            
-            <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="300" data-course-id="4">
-                <div class="course-icon">🤖</div>
-                <h3 class="course-title">AI with Python</h3>
-                <p class="course-description">Создавайте нейронные сети и алгоритмы машинного обучения для решения сложных задач.</p>
-                <div class="course-meta">
-                    <span>16 модулей</span>
-                    <span class="course-level">Продвинутый</span>
-                </div>
-                <div class="course-price">4 500 ₽</div>
-            </div>
-            
-            <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="400" data-course-id="5">
-                <div class="course-icon">🌐</div>
-                <h3 class="course-title">Advanced JS Frameworks</h3>
-                <p class="course-description">Изучите современные фреймворки для создания сложных веб-приложений.</p>
-                <div class="course-meta">
-                    <span>15 модулей</span>
-                    <span class="course-level">Продвинутый</span>
-                </div>
-                <div class="course-price">3 900 ₽</div>
-            </div>
-            
-            <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="500" data-course-id="6">
-                <div class="course-icon">🔐</div>
-                <h3 class="course-title">Java Security</h3>
-                <p class="course-description">  </p>
-                <div class="course-meta">
-                    <span>18 модулей</span>
-                    <span class="course-level">Продвинутый</span>
-                </div>
-                <div class="course-price">4 200 ₽</div>
-            </div>
-        </div>
-    </div> -->
-    
-
-
-    <!-- Модальное окно курса -->
-    <!-- <div class="course-modal" id="courseModal">
-        <div class="course-modal-content">
-            <button class="close-course-modal" id="closeCourseModal">&times;</button>
-            <div class="course-modal-icon" id="courseModalIcon"></div>
-            <h2 class="course-modal-title" id="courseModalTitle">Название курса</h2>
-            <p class="course-modal-description" id="courseModalDescription">Описание курса будет здесь...</p>
-            
-            <div class="course-modal-details">
-                <div class="course-modal-detail">
-                    <div class="detail-label">Уровень сложности</div>
-                    <div class="detail-value" id="courseModalLevel">Начальный</div>
-                </div>
-                <div class="course-modal-detail">
-                    <div class="detail-label">Количество модулей</div>
-                    <div class="detail-value" id="courseModalModules">10</div>
-                </div>
-                <div class="course-modal-detail">
-                    <div class="detail-label">Продолжительность</div>
-                    <div class="detail-value" id="courseModalDuration">6 недель</div>
-                </div>
-                <div class="course-modal-detail">
-                    <div class="detail-label">Доступ</div>
-                    <div class="detail-value" id="courseModalAccess">Постоянный</div>
-                </div>
-            </div>
-            
-            <div class="course-modal-price" id="courseModalPrice">2 500 ₽</div>
-            
-            <a href="https://xsolla.com/" target="_blank" class="buy-course-btn" id="buyCourseBtn">Приобрести курс</a>
-        </div>
-    </div> -->
-    
-    <!-- Заполнитель для footer -->
-    <div id="footer-placeholder"></div>
-
-    <!-- Модальные окна (те же, что и на index.html) -->
     <div class="modal" id="loginModal">
         <div class="modal-content">
             <button class="close-modal" id="closeLoginModal">&times;</button>
