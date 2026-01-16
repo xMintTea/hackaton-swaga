@@ -242,6 +242,7 @@ function initModals() {
         if (registerModal) registerModal.style.display = 'none';
         if (forgotPasswordModal) forgotPasswordModal.style.display = 'none';
     }
+
     
     // Открытие модальных окон
     if (loginBtn && loginModal) {
@@ -334,61 +335,7 @@ function initForms() {
     const registerModal = document.querySelector(SELECTORS.REGISTER_MODAL);
     const forgotPasswordModal = document.querySelector(SELECTORS.FORGOT_PASSWORD_MODAL);
     
-    // Обработка отправки формы входа
-if (loginForm) {
-    loginForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        // Получаем данные из формы
-        const login = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        
 
-            console.log(login + " " + password)
-
-        try {
-            // Отправляем запрос на сервер
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    login: login,
-                    password: password
-                })
-            });
-            
-            if (response.ok) {
-                // Успешная авторизация
-                const data = await response.json();
-                
-                // Сохраняем токены (например, в localStorage)
-                localStorage.setItem('access_token', data.access_token);
-                localStorage.setItem('refresh_token', data.refresh_token);
-                
-                // Показываем уведомление об успехе
-                showNotification('Успех', 'Вы успешно вошли в систему', 'success');
-                
-                // Закрываем модальное окно
-                if (loginModal) loginModal.style.display = 'none';
-                
-                // Обновляем интерфейс (например, показываем кнопку выхода)
-                if (typeof auth !== 'undefined' && typeof auth.updateUI === 'function') {
-                    auth.updateUI();
-                }
-            } else {
-                // Обработка ошибок авторизации
-                const errorData = await response.json();
-                showNotification('Ошибка', errorData.detail || 'Неверный логин или пароль', 'error');
-            }
-        } catch (error) {
-            console.error('Ошибка при входе:', error);
-            showNotification('Ошибка', 'Произошла ошибка при подключении к серверу', 'error');
-        }
-    });
-}
-    
     // Обработка отправки формы регистрации
     if (registerForm) {
         registerForm.addEventListener('submit', function(e) {
