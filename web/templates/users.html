@@ -1,18 +1,197 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberskill | Пользователи</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+</head>
+<body>
+    <div class="matrix-rain" id="matrixRain"></div>
+    
+    <!-- Заполнитель для header -->
+    <div id="header-placeholder"></div>
+    
+    <!-- Добавлена обертка с классом container для выравнивания -->
+    <div class="container">
+        <section class="users-section">
+            <div class="section-title">
+                <h2>Сообщество киберпионеров</h2>
+                <p>Присоединяйся к лучшим из лучших в мире программирования</p>
+            </div>
+            
+            <div class="users-stats animate-on-scroll" data-animation="fadeInUp">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <h3>{{ users|length }}</h3>
+                        <p>Всего пользователей</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🚀</div>
+                    <div class="stat-info">
+                        <h3>{{ (users|selectattr('is_online', 'equalto', True)|list)|length if users else 0 }}</h3>
+                        <p>Активных сейчас</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-info">
+                        <h3>{{ (users|selectattr('role', 'equalto', 'teacher')|list)|length if users else 0 }}</h3>
+                        <p>Преподавателей</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="users-search animate-on-scroll" data-animation="fadeInUp" data-delay="100">
+                <input type="text" id="userSearch" placeholder="Поиск пользователей...">
+                <div class="search-icon">🔍</div>
+            </div>
+            
+            <div class="users-grid" id="usersGrid">
+                {% for user in users %}
+                <div class="user-card animate-on-scroll" data-animation="fadeInUp" data-delay="{{ loop.index * 50 }}">
+                    <div class="user-avatar">
+                        <div class="avatar-placeholder">
+                            {{ user.nickname[0] | upper if user.nickname else 'U' }}
+                        </div>
+                        {% if user.is_online %}
+                        <div class="online-indicator"></div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="user-info">
+                        <h3 class="user-name">{{ user.nickname or user.login }}</h3>
+                        
+                        {% if user.role and user.role != 'student' %}
+                        <div class="user-badge user-{{ user.role }}">
+                            {% if user.role == 'teacher' %}
+                            👨‍🏫 Преподаватель
+                            {% elif user.role == 'admin' %}
+                            ⚡ Администратор
+                            {% elif user.role == 'moderator' %}
+                            🛡️ Модератор
+                            {% else %}
+                            {{ user.role }}
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="user-stats">
+                            <div class="stat">
+                                <span class="stat-value">{{ user.courses|length if user.courses else 0 }}</span>
+                                <span class="stat-label">курсов</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">{{ user.gamificationRecord.points if user.gamificationRecord else 0 }}</span>
+                                <span class="stat-label">очков</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">{{ user.role or 'Студент' }}</span>
+                                <span class="stat-label">роль</span>
+                            </div>
+                        </div>
+                        
+                        {% if user.profile and user.profile.achievements %}
+                        <div class="user-skills">
+                            {% for achievement in user.profile.achievements[:3] %}
+                            <span class="skill-tag">{{ achievement.name[:10] }}{% if achievement.name|length > 10 %}...{% endif %}</span>
+                            {% endfor %}
+                            {% if user.profile.achievements|length > 3 %}
+                            <span class="skill-tag">+{{ user.profile.achievements|length - 3 }}</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="user-actions">
+                        <a href="{{ url_for('user_profile', login=user.login) }}" class="btn btn-small">
+                            Профиль
+                        </a>
+                        {% if user.is_online %}
+                        <span class="online-status">Online</span>
+                        {% else %}
+                        <span class="offline-status">
+                            Offline
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            {% if users|length == 0 %}
+            <div class="no-users animate-on-scroll" data-animation="fadeInUp">
+                <div class="no-users-icon">👥</div>
+                <h3>Пользователей пока нет</h3>
+                <p>Будь первым, кто присоединится к нашему сообществу!</p>
+                <a href="#register" class="btn btn-pink" onclick="showRegisterModal()">Зарегистрироваться</a>
+            </div>
+            {% endif %}
+            
+            <div class="users-pagination animate-on-scroll" data-animation="fadeInUp">
+                <a href="{{ url_for('index') }}" class="btn">
+                    ← На главную
+                </a>
+                <div class="pagination-info">
+                    Всего пользователей: {{ users|length }}
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Заполнитель для footer -->
+    <div id="footer-placeholder"></div>
 
-{% block title %}
-Users List
-{% endblock %}
+    <script>
+        // Поиск пользователей
+        document.getElementById('userSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const userCards = document.querySelectorAll('.user-card');
+            
+            userCards.forEach(card => {
+                const userName = card.querySelector('.user-name').textContent.toLowerCase();
+                if (userName.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
 
-{% block body %}
-<h1>Users:</h1>
-<ul>
-    {% for user in users %}
-    <li>{{ user.nickname }}</li>
-    {% endfor %}
-</ul>
+        // Анимации при скролле
+        document.addEventListener('DOMContentLoaded', function() {
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const animation = entry.target.getAttribute('data-animation');
+                        const delay = entry.target.getAttribute('data-delay') || 0;
+                        
+                        setTimeout(() => {
+                            entry.target.classList.add('animate__animated', `animate__${animation}`);
+                        }, parseInt(delay));
+                        
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            animatedElements.forEach(el => observer.observe(el));
+        });
 
-<div>
-    <a href="{{ url_for('index') }}">Back to homepage</a>
-</div>
-{% endblock %}
+        // Показать модальное окно регистрации
+        function showRegisterModal() {
+            const modal = document.getElementById('registerModal');
+            if (modal) modal.style.display = 'flex';
+        }
+    </script>
+
+    <script src="{{ url_for('static', path='js/script.js') }}"></script>
+    <script src="{{ url_for('static', path='js/templateLoader.js') }}"></script>
+</body>
+</html>
