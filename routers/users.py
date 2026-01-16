@@ -105,12 +105,16 @@ def set_user_title(user_id: int,
         raise HTTPException(status_code=404, detail="User not found")
     
     title = db.query(Title).filter(Title.id == title_id).first()
+    
+    if title not in user.profile.available_titles:
+        raise HTTPException(status_code=404, detail="User doesn't have that title")
 
     user.profile.current_title = title
     db.commit()
     db.refresh(user)
     
     return {"message": "Title set successfully", "user": user}
+
 
 @router.post("/{user_id}/grant-title/{title_id}")
 def grant_user_title(user_id: int,
@@ -122,6 +126,7 @@ def grant_user_title(user_id: int,
         raise HTTPException(status_code=404, detail="User not found")
     
     title = db.query(Title).filter(Title.id == title_id).first()
+    
     if not title:
         return {"message": "No such title"}
     
@@ -129,8 +134,7 @@ def grant_user_title(user_id: int,
     db.commit()
     db.refresh(user)
     
-    return {"message": "Title set successfully", "user": user}
-
+    return {"message": "Title granted successfully", "user": user}
 
 
 @router.post("/{user_id}/achievements/{achievement_id}")
@@ -143,7 +147,7 @@ def add_achievement_to_user(user_id: int, achievement_id: int, db: Session = Dep
     if not achievement:
         raise HTTPException(status_code=404, detail="Achievement not found")
     
-    # Проверяем, есть ли уже эта ачивка у пользователя
+
     if achievement in user.profile.achievements:
         raise HTTPException(status_code=400, detail="User already has this achievement")
     
