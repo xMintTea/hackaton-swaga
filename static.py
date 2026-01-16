@@ -13,3 +13,8 @@ class Social(Enum):
     TELEGRAM = "telegram"
     GITHUB = "github"
     OTHER = "other"
+    
+    
+class CourseLvl(Enum):
+    BEGGINER = "Начальный"
+    PRO = "Продвинутый"
