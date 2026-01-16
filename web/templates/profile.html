@@ -32,7 +32,9 @@
             
             <div class="profile-info">
                 <h1 class="username" id="username">{{ user.nickname }}</h1>
+                {% if user.title %}
                 <span class="user-title" id="userTitle">{{ user.title.name }}</span>
+                {% endif %}
                 
                 <div class="level-progress">
                     <div class="level-info">
@@ -40,7 +42,7 @@
                         <span class="level-number" id="userLevel">{{ user.lvl }}</span>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill" style="width: {{ user.xp }}%;"></div>
+                        <div class="progress-fill" id="progressFill" style="width: {{ user.xp }}%"></div>
                     </div>
                     <div class="xp-info">
                         <span id="currentXP">{{ user.xp }}</span>

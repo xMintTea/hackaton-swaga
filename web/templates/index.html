@@ -22,7 +22,7 @@
                 <p class="animate__animated animate__fadeIn animate__delay-1s">Освойте технологии будущего с нашими инновационными курсы по программированию, кибербезопасности, искусственному интеллекту и многому другому.</p>
                 <div class="hero-buttons animate__animated animate__fadeInUp animate__delay-2s">
                     <a href="{{ url_for('courses') }}" class="btn">Начать обучение</a>
-                    <a href="{{ url_for('test') }}" class="btn btn-pink">Пройти тест</a>
+                    <a href="#test" class="btn btn-pink">Пройти тест</a>
                 </div>
             </div>
         </div>
@@ -131,7 +131,7 @@
             <div class="test-container animate-on-scroll" data-animation="zoomIn">
                 <h2>"Хочешь проверить себя?"</h2>
                 <p>Прими вызов и пройди наш специальный тест, чтобы определить свой уровень и получить персональные рекомендации по обучению.</p>
-                <a href="{{ url_for('test') }}" class="btn btn-pink">Начать тест</a>
+                <a href="#test" class="btn btn-pink">Начать тест</a>
             </div>
         </div>
     </section>
@@ -284,7 +284,7 @@ if (registerForm) {
         
         try {
             // Отправляем запрос на сервер
-            const response = await fetch('/register/', {
+            const response = await fetch('/auth/register/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -314,6 +314,51 @@ if (registerForm) {
         }
     });
 }
+
+const loginForm = document.getElementById('loginForm');
+if (loginForm) {
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault()
+
+        const loginField = document.getElementById("loginEmail").value;
+        const passwordField = document.getElementById("loginPassword").value;
+
+
+        const formData = new FormData();
+        formData.append('username', loginField);
+        formData.append('password', passwordField);
+
+
+        try {            
+            const response = await fetch("/auth/login/", {
+                method: "POST",
+                body: formData
+
+            });
+
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Успешная регистрация
+                showNotification('Успех', data.data || 'Вход выполнен успешно', 'success');
+                
+                // Закрываем модальное окно
+                const registerModal = document.getElementById('registerModal');
+                if (registerModal) registerModal.style.display = 'none';
+                
+                // Очищаем форму
+                registerForm.reset();
+            } else {
+                // Обработка ошибок регистрации
+                showNotification('Ошибка', data.data || 'Ошибка при регистрации', 'error');
+            }
+
+
+        } catch {
+            console.error('Ошибка при входе:', error);
+            showNotification('Ошибка', 'Произошла ошибка при подключении к серверу', 'error');
+        }
+    })};
 
     </script>
 
