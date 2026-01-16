@@ -68,9 +68,9 @@ def user_profile(login: str, request: Request, users: Query = Depends(get_users)
 
             titile = user.profile.current_title
             
-            lvl = user.gamificationRecord.lvl if user.gamificationRecord else 0
-            xp = user.gamificationRecord.xp if user.gamificationRecord else 0
-            currency = user.gamificationRecord.currency if user.gamificationRecord else 0
+            lvl = user.gamerec.lvl if user.gamerec else 0
+            xp = user.gamerec.xp if user.gamerec else 0
+            currency = user.gamerec.currency if user.gamerec else 0
             course = user.courses.current_course if user.courses else None
             
             response = {
