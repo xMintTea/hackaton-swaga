@@ -1,3 +1,96 @@
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Проверяем, авторизован ли пользователь
+    if (typeof auth !== 'undefined' && auth.isLoggedIn()) {
+        // Загружаем данные профиля
+        loadProfileData();
+        
+        // Инициализируем обработчики событий
+        initEventHandlers();
+    } else {
+        // Если пользователь не авторизован, перенаправляем на главную
+        console.log('Пользователь не авторизован, перенаправление...');
+        // window.location.href = '/';
+    }
+});
+
+// Загрузка данных профиля
+async function loadProfileData() {
+    try {
+        // Проверяем, есть ли объект auth
+        if (typeof auth === 'undefined') {
+            console.error('Объект auth не определен');
+            return;
+        }
+        
+        const userInfo = auth.getUserInfo();
+        if (userInfo) {
+            updateProfileUI(userInfo);
+        } else {
+            console.error('Данные пользователя не найдены');
+            // Используем заглушку, если сервер не отвечает
+            const profileData = getStubProfileData();
+            updateProfileUI(profileData);
+        }
+    } catch (error) {
+        console.error('Ошибка загрузки данных профиля:', error);
+        // Используем заглушку при ошибке
+        const profileData = getStubProfileData();
+        updateProfileUI(profileData);
+    }
+}
+
+// Заглушка данных профиля
+function getStubProfileData() {
+    // Получаем данные из localStorage
+    const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    
+    return {
+        login: userData.login || 'Neo_Matrix',
+        nickname: userData.nickname || 'Neo_Matrix',
+        title: 'Новичок в киберпространстве',
+        level: 5,
+        xp: 650,
+        nextLevelXp: 1000,
+        currency: 1250,
+        description: 'Изучаю Python и кибербезопасность. Мечтаю стать профессиональным разработчиком.',
+        socialLinks: [
+            { type: 'youtube', url: 'youtube.com/user/neo_matrix' },
+            { type: 'github', url: 'github.com/neo_matrix' }
+        ],
+        courses: {
+            current: [
+                { name: 'Python Basics', progress: 65 }
+            ],
+            completed: []
+        },
+        achievements: [
+            { id: 1, name: 'Первые шаги', description: 'Зарегистрировался на платформе', icon: '⭐' },
+            { id: 2, name: 'Начало пути', description: 'Завершил первый модуль курса', icon: '📚' }
+        ],
+        inventory: {
+            avatars: [1],
+            frames: [1],
+            titles: [1]
+        },
+        shop: {
+            avatars: [
+                { id: 1, name: 'Базовый аватар', price: 0, owned: true },
+                { id: 2, name: 'Кибер-аватар', price: 500, owned: false },
+                { id: 3, name: 'Хакерский аватар', price: 750, owned: false }
+            ],
+            frames: [
+                { id: 1, name: 'Базовая рамка', price: 0, owned: true },
+                { id: 2, name: 'Золотая рамка', price: 1200, owned: false }
+            ],
+            titles: [
+                { id: 1, name: 'Новичок в киберпространстве', price: 0, owned: true },
+                { id: 2, name: 'Кибер-пионер', price: 800, owned: false }
+            ]
+        }
+    };
+}
+
 document.addEventListener('DOMContentLoaded', function() {
 
     // Загружаем данные профиля

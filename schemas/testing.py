@@ -29,19 +29,19 @@ class TestQuestionUpdate(BaseModel):
 
 class TestAnswerCreate(BaseModel):
     question_id: int
-    answer_text: str
+    text: str
     creative_value: int
     analytical_value: int
 
 class TestAnswerUpdate(BaseModel):
-    answer_text: str
+    text: str
     creative_value: int
     analytical_value: int
     
     
 class TestAnswerOptionSchema(BaseModel):
     id: int
-    answer_text: str
+    text: str
     creative_value: int
     analytical_value: int
 
@@ -51,6 +51,6 @@ class TestQuestionSchema(BaseModel):
     id: int
     text: str
     order: int
-    answer_options: List[TestAnswerOptionSchema]
+    answers: List[TestAnswerOptionSchema]
 
     model_config = ConfigDict(from_attributes=True)

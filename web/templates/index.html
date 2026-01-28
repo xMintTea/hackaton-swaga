@@ -131,7 +131,7 @@
             <div class="test-container animate-on-scroll" data-animation="zoomIn">
                 <h2>"Хочешь проверить себя?"</h2>
                 <p>Прими вызов и пройди наш специальный тест, чтобы определить свой уровень и получить персональные рекомендации по обучению.</p>
-                <a href="#test" class="btn btn-pink">Начать тест</a>
+                <a href="{{ url_for('test') }}" class="btn btn-pink">Начать тест</a>
             </div>
         </div>
     </section>
@@ -339,18 +339,31 @@ if (loginForm) {
             const data = await response.json();
             
             if (response.ok) {
-                // Успешная регистрация
+                // Успешный вход
                 showNotification('Успех', data.data || 'Вход выполнен успешно', 'success');
                 
                 // Закрываем модальное окно
-                const registerModal = document.getElementById('registerModal');
-                if (registerModal) registerModal.style.display = 'none';
+                const loginModal = document.getElementById('loginModal');
+                if (loginModal) loginModal.style.display = 'none';
                 
                 // Очищаем форму
-                registerForm.reset();
+                loginForm.reset();
+                
+                // Сохраняем данные пользователя (в реальном приложении это будет делать бэкенд)
+                // ПРИМЕЧАНИЕ: Здесь нужно будет заменить на реальную логику получения данных пользователя
+                // после того как ты прикрутишь аутентификацию
+                
+                // Временное решение - сохраняем в localStorage
+                localStorage.setItem('currentUser', JSON.stringify({
+                    nickname: loginField,
+                    avatar: '/static/img/avatars/avatar1.jpg'
+                }));
+                
+                // Обновляем отображение в хедере
+                updateHeaderUserInfo();
             } else {
-                // Обработка ошибок регистрации
-                showNotification('Ошибка', data.data || 'Ошибка при регистрации', 'error');
+                // Обработка ошибок входа
+                showNotification('Ошибка', data.data || 'Ошибка при входе', 'error');
             }
 
 
@@ -359,6 +372,60 @@ if (loginForm) {
             showNotification('Ошибка', 'Произошла ошибка при подключении к серверу', 'error');
         }
     })};
+
+// Функция для обновления информации о пользователе в хедере
+function updateHeaderUserInfo() {
+    const userData = JSON.parse(localStorage.getItem('currentUser'));
+    
+    if (userData) {
+        // Находим контейнер с кнопками входа/регистрации (предположительная структура)
+        const authContainer = document.querySelector('.auth-buttons') || 
+                              document.querySelector('.header-auth') ||
+                              document.getElementById('auth-buttons');
+        
+        if (authContainer) {
+            // Заменяем кнопки на аватар и ник пользователя
+            authContainer.innerHTML = `
+                <div class="user-profile" style="display: flex; align-items: center; gap: 10px;">
+                    
+                    <img src="${userData.avatar}" alt="${userData.nickname}" 
+                         style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #00ffff;">
+                    <a href="/users/${userData.nickname}">
+                    <span style="color: #fff; font-family: 'Rajdhani', sans-serif; font-weight: 500;">
+                        ${userData.nickname}
+                    </span>
+                    </a>
+                    <button id="logoutBtn" style="background: none; border: none; color: #ff0066; cursor: pointer; 
+                            margin-left: 10px; font-family: 'Rajdhani', sans-serif;">
+                        Выйти
+                    </button>
+
+                </div>
+            `;
+            
+            // Добавляем обработчик для кнопки выхода
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                localStorage.removeItem('currentUser');
+                location.reload(); // Перезагружаем страницу для обновления интерфейса
+            });
+        }
+    }
+}
+
+// Проверяем авторизацию при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    // Ждем немного, чтобы хедер успел загрузиться через templateLoader
+    setTimeout(updateHeaderUserInfo, 500);
+    
+    // Также можно добавить периодическую проверку, если хедер загружается асинхронно
+    const checkHeaderInterval = setInterval(() => {
+        const headerPlaceholder = document.getElementById('header-placeholder');
+        if (headerPlaceholder && headerPlaceholder.innerHTML.trim() !== '') {
+            updateHeaderUserInfo();
+            clearInterval(checkHeaderInterval);
+        }
+    }, 100);
+});
 
     </script>
 

@@ -15,6 +15,7 @@ from routers import topics
 from routers import users
 from routers import avatars
 from routers import goods
+from routers import skilltest
 
 from database import Base
 from utils.functions import get_origins
@@ -40,7 +41,7 @@ app.include_router(admin.router)
 app.include_router(auth.router)
 app.include_router(base.router)
 app.include_router(courses.router)
-# app.include_router(skilltest.router)
+app.include_router(skilltest.router)
 app.include_router(titles.router)
 app.include_router(topics.router)
 app.include_router(users.router)

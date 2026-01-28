@@ -285,7 +285,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Загрузка вопросов теста
-            fetch('/api/test/questions')
+            fetch('/test/questions')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Ошибка загрузки вопросов');
@@ -333,7 +333,7 @@
                         <div class="answers">
                 `;
                 
-                question.answer_options.forEach(answer => {
+                question.answers.forEach(answer => {
                     formHTML += `
                         <label class="answer-label">
                             <input type="radio" name="question-${question.id}" value="${answer.id}" data-creative="${answer.creative_value}" data-analytical="${answer.analytical_value}">

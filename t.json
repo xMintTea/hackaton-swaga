@@ -1,0 +1,22 @@
+{
+	"brewingType": "brewingRecipe",
+	"recipe": {
+		"ingredients": [
+			{
+				"solution": {
+                    "starter" : "minecraft:coal",
+                    "idgredietns" : [
+                        "minecraft:blaze_powder",
+                        "minecraft:light_blue_dye"
+                    ],
+                    "should_be_in_order" : true 
+                }
+			}
+		],
+		"results": [
+			{
+				"item": "minecraft:diamond"
+			}
+		]
+	}
+}
