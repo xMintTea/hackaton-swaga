@@ -3,7 +3,8 @@ from fastapi import (
     Depends,
     status,
     Request,
-    APIRouter
+    APIRouter,
+    Body
 )
 from sqlalchemy.orm import Session, joinedload, Query
 from typing import List
@@ -14,7 +15,8 @@ from models import (
     User, 
     Title, 
     Achievement,
-    UserProfile
+    UserProfile,
+    Avatar
     )
 
 from schemas.users import UserRegisterSchema, UserResponse
@@ -37,7 +39,8 @@ def get_users(db: Session = Depends(get_db)) -> Query:
         joinedload(User.profile).joinedload(UserProfile.available_avatars),
         joinedload(User.profile).joinedload(UserProfile.current_avatar),
         joinedload(User.gamerec),
-        joinedload(User.courses)
+        joinedload(User.courses),
+        joinedload(User.completed_topics)
     )
     
     
@@ -49,7 +52,7 @@ def users_page(
     users: Query = Depends(get_users)
 ):
     
-    return users
+    #return users
     
     return templates.TemplateResponse(
         request=request,
@@ -61,38 +64,40 @@ def users_page(
 
 @router.get("/{login}", name="user_profile")
 def user_profile(login: str, request: Request, users: Query = Depends(get_users)):
-    
-    if token:= request.cookies.get("access_token"):
-        if user := users.filter(User.login == login).first():
-            
-
-            titile = user.profile.current_title
-            
-            lvl = user.gamerec.lvl if user.gamerec else 0
-            xp = user.gamerec.xp if user.gamerec else 0
-            currency = user.gamerec.currency if user.gamerec else 0
-            course = user.courses.current_course if user.courses else None
-            
-            response = {
-                "nickname": user.nickname,
-                "title" : titile,
-                "role" : user.role,
-                "lvl": lvl,
-                "xp" : xp,
-                "currency": currency,
-                "achievements" : user.profile.achievements,
-                "course": course
-            }
-            
-            return templates.TemplateResponse(
-        request=request,
-        name="profile.html",
-        context={"request": request, "user": response})
+    if user := users.filter(User.login == login).first():
+        title = user.profile.current_title
+        lvl = user.gamerec.lvl if user.gamerec else 0
+        xp = user.gamerec.xp if user.gamerec else 0
+        currency = user.gamerec.currency if user.gamerec else 0
         
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-
+        # Получаем текущий аватар
+        current_avatar = user.profile.current_avatar
+        avatar_url = current_avatar.image_url[4:] if current_avatar else "/static/img/avatars/avatar1.jpg"
+        
+        print(avatar_url)
+        
+        # Получаем доступные аватары пользователя
+        available_avatars = user.profile.available_avatars
+        
+        response = {
+            "id": user.id,  # Добавляем ID пользователя
+            "nickname": user.nickname,
+            "title": title,
+            "role": user.role,
+            "lvl": lvl,
+            "xp": xp,
+            "currency": currency,
+            "achievements": user.profile.achievements,
+            "avatar_url": avatar_url,
+            "available_avatars": available_avatars
+        }
+        
+        return templates.TemplateResponse(
+            request=request,
+            name="profile.html",
+            context={"request": request, "user": response})
+    
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
 
 
 @router.post("/{user_id}/set-title/{title_id}")
@@ -226,3 +231,50 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     db.delete(user)
     db.commit()
     return {"message": "User deleted successfully"}
+
+
+
+@router.get("/{user_id}/avatars")
+def get_user_avatars(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).options(
+        joinedload(User.profile).joinedload(UserProfile.available_avatars),
+        joinedload(User.profile).joinedload(UserProfile.current_avatar)
+    ).filter(User.id == user_id).first()
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {
+        "current_avatar": user.profile.current_avatar,
+        "available_avatars": user.profile.available_avatars
+    }
+
+# Новый эндпоинт для изменения аватара
+@router.post("/{user_id}/avatar")
+def change_user_avatar(
+    user_id: int,
+    avatar_id: int = Body(..., embed=True),
+    db: Session = Depends(get_db)
+):
+    user = db.query(User).options(
+        joinedload(User.profile)
+    ).filter(User.id == user_id).first()
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Проверяем, есть ли аватар в доступных у пользователя
+    avatar = db.query(Avatar).filter(Avatar.id == avatar_id).first()
+    if not avatar:
+        raise HTTPException(status_code=404, detail="Avatar not found")
+    
+    # Проверяем, доступен ли аватар пользователю (публичный или куплен)
+    if not avatar.is_public and avatar not in user.profile.available_avatars:
+        raise HTTPException(status_code=403, detail="Avatar not available for this user")
+    
+    # Устанавливаем новый аватар
+    user.profile.current_avatar = avatar
+    db.commit()
+    db.refresh(user)
+    
+    return {"message": "Avatar changed successfully", "avatar_url": avatar.image_url}
