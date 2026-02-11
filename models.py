@@ -5,7 +5,8 @@ from sqlalchemy import (
     ForeignKey,
     Enum,
     Boolean,
-    Float
+    Float,
+    DateTime
 )
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
@@ -27,6 +28,7 @@ class StudentCourse(BaseModel):
     __tablename__  = "student_course"
     student_id = Column("student_id", Integer, ForeignKey("users.id"))
     course_id = Column("course_id", Integer, ForeignKey("courses.id"))
+    date = Column("date", DateTime)
 
 class StudentTopics(BaseModel):
     __tablename__ = "student_topic"
@@ -53,7 +55,22 @@ class UserAvailableAvatars(BaseModel):
 class UserPurchases(BaseModel):
     __tablename__ = "user_purchases"
     user_id = Column("user_id", Integer, ForeignKey("users_profiles.id"))
-    item_id = Column("item_id", Integer, ForeignKey("goods.id")) 
+    item_id = Column("item_id", Integer, ForeignKey("goods.id"))
+    datetime = Column("date", DateTime)
+    
+
+class CoursePurchases(BaseModel):
+    __tablename__ = "course_purchases"
+    user_id = Column("user_id", Integer, ForeignKey("users_profiles.id"))
+    course_id = Column("course_id", Integer, ForeignKey("courses.id"))
+    
+    
+class ProfileSocials(BaseModel):
+    __tablename__ = "profile_socials"
+    
+    profile_id = Column("profile_id", Integer, ForeignKey("users_profiles.id"))
+    social_type = Column("social_type", Enum(Social))
+    value = Column("value", String)
 
 
 class UserProfile(BaseModel):
