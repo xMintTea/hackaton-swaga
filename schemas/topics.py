@@ -27,3 +27,9 @@ class TopicResponse(BaseModel):
     order: int
 
     model_config = ConfigDict(from_attributes=True)
+    
+    
+    
+class SaveTCompetendTopic(BaseModel):
+    topic_id: int
+    user_id: int

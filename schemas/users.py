@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from typing import Annotated, Optional, List
 
 from static import Roles
+from schemas.topics import TopicBase
 
 class UserBase(BaseModel):
     nickname: Annotated[str,
@@ -107,5 +108,6 @@ class UserResponse(BaseModel):
     profile: Optional[UserProfileResponse] = None
     gamificationRecord: Optional[GamificationRecordResponse] = None
     courses: List[CourseResponse] = []
+    completed_topics: List[TopicBase] = []
     
     model_config = ConfigDict(from_attributes=True)
