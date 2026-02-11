@@ -200,7 +200,7 @@ def delete_answer_option(answer_id: int, db: Session = Depends(get_db)):
     return {"message": "Answer option deleted successfully"}
 
 
-@router.get("/test/result")
+@router.get("/result")
 def test_result_page(
     request: Request,
     creative_score: int,
@@ -235,8 +235,8 @@ def test_result_page(
         recommended_course = db.query(Course).filter(Course.id == 1).first()  
     
     
-    recommended_course = db.query(Course).filter(Course.id == 3).first()   # Формируем список других курсов (исключая рекомендованный)
-    other_courses = [c for c in all_courses if c.id != recommended_course.id] 
+    recommended_course = db.query(Course).filter(Course.id == 1).first()   # Формируем список других курсов (исключая рекомендованный)
+    other_courses = [c for c in all_courses if c.id != recommended_course.id] #type: ignore
     
     # Ограничиваем количество отображаемых курсов до 3
     other_courses = other_courses[:3]

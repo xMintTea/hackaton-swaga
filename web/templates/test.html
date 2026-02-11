@@ -282,196 +282,223 @@
 
     <script src="{{ url_for('static', path='js/auth.js') }}"></script>
     <script src="{{ url_for('static', path='js/templateLoader.js') }}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Загрузка вопросов теста
-            fetch('/test/questions')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Ошибка загрузки вопросов');
-                    }
-                    return response.json();
-                })
-                .then(questions => {
-                    renderTestForm(questions);
-                })
-                .catch(error => {
-                    document.getElementById('test-content').innerHTML = `
-                        <div class="error-message">
-                            <p>Ошибка загрузки вопросов: ${error.message}</p>
-                            <button onclick="location.reload()" class="btn">Попробовать снова</button>
-                        </div>
-                    `;
-                });
-                
-            // Загрузка шаблонов header и footer
-            if (typeof loadTemplates === 'function') {
-                loadTemplates();
-            }
-        });
-        
-        function renderTestForm(questions) {
-            const testContent = document.getElementById('test-content');
-            let formHTML = `
-                <h2>Тест на определение направления обучения</h2>
-                <p>Ответьте на вопросы, чтобы мы могли определить наиболее подходящее для вас направление в IT.</p>
-                
-                <div class="progress-container">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Загрузка вопросов теста
+        fetch('/test/questions')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки вопросов');
+                }
+                return response.json();
+            })
+            .then(questions => {
+                renderTestForm(questions);
+            })
+            .catch(error => {
+                document.getElementById('test-content').innerHTML = `
+                    <div class="error-message">
+                        <p>Ошибка загрузки вопросов: ${error.message}</p>
+                        <button onclick="location.reload()" class="btn">Попробовать снова</button>
                     </div>
-                    <div class="progress-text">Вопрос <span id="current-question">0</span> из <span id="total-questions">${questions.length}</span></div>
-                </div>
-                
-                <form id="test-form">
-            `;
-            
-            questions.forEach((question, index) => {
-                formHTML += `
-                    <div class="question" id="question-${question.id}" ${index > 0 ? 'style="display: none;"' : ''}>
-                        <div class="question-text">${index + 1}. ${question.text}</div>
-                        <div class="answers">
                 `;
-                
-                question.answers.forEach(answer => {
-                    formHTML += `
-                        <label class="answer-label">
-                            <input type="radio" name="question-${question.id}" value="${answer.id}" data-creative="${answer.creative_value}" data-analytical="${answer.analytical_value}">
-                            ${answer.answer_text}
-                        </label>
-                    `;
-                });
-                
-                formHTML += `</div></div>`;
             });
             
+        // Загрузка шаблонов header и footer
+        if (typeof loadTemplates === 'function') {
+            loadTemplates();
+        }
+    });
+    
+    function renderTestForm(questions) {
+        const testContent = document.getElementById('test-content');
+        
+        if (!questions || questions.length === 0) {
+            testContent.innerHTML = `
+                <div class="error-message">
+                    <p>В тесте нет вопросов. Обратитесь к администратору.</p>
+                    <a href="{{ url_for('index') }}" class="btn">Вернуться на главную</a>
+                </div>
+            `;
+            return;
+        }
+        
+        let formHTML = `
+            <h2>Тест на определение направления обучения</h2>
+            <p>Ответьте на вопросы, чтобы мы могли определить наиболее подходящее для вас направление в IT.</p>
+            
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: ${(1/questions.length)*100}%"></div>
+                </div>
+                <div class="progress-text">Вопрос <span id="current-question">1</span> из <span id="total-questions">${questions.length}</span></div>
+            </div>
+            
+            <form id="test-form">
+        `;
+        
+        questions.forEach((question, index) => {
             formHTML += `
+                <div class="question" id="question-${question.id}" ${index > 0 ? 'style="display: none;"' : ''}>
+                    <div class="question-text">${index + 1}. ${question.text}</div>
+                    <div class="answers">
+            `;
+            
+            question.answers.forEach(answer => {
+                formHTML += `
+                    <label class="answer-label">
+                        <input type="radio" name="question-${question.id}" value="${answer.id}" data-creative="${answer.creative_value}" data-analytical="${answer.analytical_value}">
+                        ${answer.text}
+                    </label>
+                `;
+            });
+            
+            formHTML += `</div></div>`;
+        });
+        
+        formHTML += `
+                <div class="navigation-buttons">
                     <button type="button" id="prev-btn" class="btn" style="display: none; margin-right: 10px;">Назад</button>
                     <button type="button" id="next-btn" class="btn">Следующий вопрос</button>
                     <button type="submit" id="submit-btn" class="submit-btn" style="display: none;">Завершить тест</button>
-                </form>
-            `;
-            
-            testContent.innerHTML = formHTML;
-            
-            // Инициализация навигации по тесту
-            initTestNavigation(questions);
-        }
+                </div>
+            </form>
+        `;
         
-        function initTestNavigation(questions) {
-            let currentQuestionIndex = 0;
-            const totalQuestions = questions.length;
-            const progressFill = document.getElementById('progress-fill');
-            const currentQuestionSpan = document.getElementById('current-question');
-            const totalQuestionsSpan = document.getElementById('total-questions');
-            const prevBtn = document.getElementById('prev-btn');
-            const nextBtn = document.getElementById('next-btn');
-            const submitBtn = document.getElementById('submit-btn');
+        testContent.innerHTML = formHTML;
+        
+        // Инициализация навигации по тесту
+        initTestNavigation(questions);
+    }
+    
+    function initTestNavigation(questions) {
+        let currentQuestionIndex = 0;
+        const totalQuestions = questions.length;
+        const progressFill = document.getElementById('progress-fill');
+        const currentQuestionSpan = document.getElementById('current-question');
+        const totalQuestionsSpan = document.getElementById('total-questions');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        
+        totalQuestionsSpan.textContent = totalQuestions;
+        updateProgress();
+        
+        // Обработчик кнопки "Следующий вопрос"
+        nextBtn.addEventListener('click', function() {
+            const currentQuestionId = questions[currentQuestionIndex].id;
+            const selectedAnswer = document.querySelector(`input[name="question-${currentQuestionId}"]:checked`);
             
-            totalQuestionsSpan.textContent = totalQuestions;
-            updateProgress();
-            
-            // Обработчик кнопки "Следующий вопрос"
-            nextBtn.addEventListener('click', function() {
-                const currentQuestionId = questions[currentQuestionIndex].id;
-                const selectedAnswer = document.querySelector(`input[name="question-${currentQuestionId}"]:checked`);
-                
-                if (!selectedAnswer) {
-                    alert('Пожалуйста, выберите ответ на текущий вопрос');
-                    return;
-                }
-                
-                // Скрыть текущий вопрос
-                document.getElementById(`question-${currentQuestionId}`).style.display = 'none';
-                
-                // Показать следующий вопрос
-                currentQuestionIndex++;
-                
-                if (currentQuestionIndex < totalQuestions) {
-                    const nextQuestionId = questions[currentQuestionIndex].id;
-                    document.getElementById(`question-${nextQuestionId}`).style.display = 'block';
-                    
-                    // Показать кнопку "Назад"
-                    prevBtn.style.display = 'inline-block';
-                    
-                    // Если это последний вопрос, изменить текст кнопки
-                    if (currentQuestionIndex === totalQuestions - 1) {
-                        nextBtn.style.display = 'none';
-                        submitBtn.style.display = 'inline-block';
-                    }
-                }
-                
-                updateProgress();
-            });
-            
-            // Обработчик кнопки "Назад"
-            prevBtn.addEventListener('click', function() {
-                // Скрыть текущий вопрос
-                const currentQuestionId = questions[currentQuestionIndex].id;
-                document.getElementById(`question-${currentQuestionId}`).style.display = 'none';
-                
-                // Показать предыдущий вопрос
-                currentQuestionIndex--;
-                const prevQuestionId = questions[currentQuestionIndex].id;
-                document.getElementById(`question-${prevQuestionId}`).style.display = 'block';
-                
-                // Скрыть кнопку "Назад", если это первый вопрос
-                if (currentQuestionIndex === 0) {
-                    prevBtn.style.display = 'none';
-                }
-                
-                // Показать кнопку "Следующий вопрос", если она была скрыта
-                nextBtn.style.display = 'inline-block';
-                submitBtn.style.display = 'none';
-                
-                updateProgress();
-            });
-            
-            // Обработчик отправки формы
-            document.getElementById('test-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Собрать все ответы
-                const answers = [];
-                questions.forEach(question => {
-                    const selectedAnswer = document.querySelector(`input[name="question-${question.id}"]:checked`);
-                    if (selectedAnswer) {
-                        answers.push({
-                            question_id: question.id,
-                            answer_id: parseInt(selectedAnswer.value)
-                        });
-                    }
-                });
-                
-                // Отправить ответы на сервер
-                fetch('/api/test/submit', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ answers: answers })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Ошибка отправки ответов');
-                    }
-                    return response.json();
-                })
-                .then(result => {
-                    // Перенаправить на страницу с результатами
-                    window.location.href = `/test/result?creative_score=${result.creative_score}&analytical_score=${result.analytical_score}&recommended_course=${encodeURIComponent(result.recommended_course)}`;
-                })
-                .catch(error => {
-                    alert(`Ошибка: ${error.message}`);
-                });
-            });
-            
-            function updateProgress() {
-                const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
-                progressFill.style.width = `${progress}%`;
-                currentQuestionSpan.textContent = currentQuestionIndex + 1;
+            if (!selectedAnswer) {
+                alert('Пожалуйста, выберите ответ на текущий вопрос');
+                return;
             }
+            
+            // Скрыть текущий вопрос
+            document.getElementById(`question-${currentQuestionId}`).style.display = 'none';
+            
+            // Показать следующий вопрос
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < totalQuestions) {
+                const nextQuestionId = questions[currentQuestionIndex].id;
+                document.getElementById(`question-${nextQuestionId}`).style.display = 'block';
+                
+                // Показать кнопку "Назад"
+                prevBtn.style.display = 'inline-block';
+                
+                // Если это последний вопрос, изменить кнопку
+                if (currentQuestionIndex === totalQuestions - 1) {
+                    nextBtn.style.display = 'none';
+                    submitBtn.style.display = 'inline-block';
+                }
+            }
+            
+            updateProgress();
+        });
+        
+        // Обработчик кнопки "Назад"
+        prevBtn.addEventListener('click', function() {
+            // Скрыть текущий вопрос
+            const currentQuestionId = questions[currentQuestionIndex].id;
+            document.getElementById(`question-${currentQuestionId}`).style.display = 'none';
+            
+            // Показать предыдущий вопрос
+            currentQuestionIndex--;
+            const prevQuestionId = questions[currentQuestionIndex].id;
+            document.getElementById(`question-${prevQuestionId}`).style.display = 'block';
+            
+            // Скрыть кнопку "Назад", если это первый вопрос
+            if (currentQuestionIndex === 0) {
+                prevBtn.style.display = 'none';
+            }
+            
+            // Всегда показывать кнопку "Следующий вопрос" при возврате назад
+            nextBtn.style.display = 'inline-block';
+            submitBtn.style.display = 'none';
+            
+            updateProgress();
+        });
+        
+        // Обработчик отправки формы
+        document.getElementById('test-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Проверяем, что все вопросы отвечены
+            let allAnswered = true;
+            questions.forEach(question => {
+                const selectedAnswer = document.querySelector(`input[name="question-${question.id}"]:checked`);
+                if (!selectedAnswer) {
+                    allAnswered = false;
+                }
+            });
+            
+            if (!allAnswered) {
+                alert('Пожалуйста, ответьте на все вопросы');
+                return;
+            }
+            
+            // Собрать все ответы
+            const answers = [];
+            questions.forEach(question => {
+                const selectedAnswer = document.querySelector(`input[name="question-${question.id}"]:checked`);
+                if (selectedAnswer) {
+                    answers.push({
+                        question_id: question.id,
+                        answer_id: parseInt(selectedAnswer.value)
+                    });
+                }
+            });
+            
+            // Отправить ответы на сервер
+            fetch('/test/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ answers: answers })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка отправки ответов');
+                }
+                return response.json();
+            })
+            .then(result => {
+                // Перенаправить на страницу с результатами
+                window.location.href = `/test/result?creative_score=${result.creative_score}&analytical_score=${result.analytical_score}&recommended_course=${encodeURIComponent(result.recommended_course)}`;
+            })
+            .catch(error => {
+                alert(`Ошибка: ${error.message}`);
+            });
+        });
+        
+        function updateProgress() {
+            const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+            progressFill.style.width = `${progress}%`;
+            currentQuestionSpan.textContent = currentQuestionIndex + 1;
         }
-    </script>
+    }
+</script>
 </body>
 </html>
