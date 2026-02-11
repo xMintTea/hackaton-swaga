@@ -4,7 +4,7 @@ from fastapi import (
     Request,
     APIRouter
 )   
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, Query
 from templates import templates
 
 from models import Achievement
@@ -39,13 +39,15 @@ def create_achievement(
     return db_achievement
 
 
-
 @router.get("/")
-def get_all_achievements(request: Request,db: Session = Depends(get_db)):
-    """Получить все ачивки"""
-    achievements = db.query(Achievement).all()
-    
-        
+def get_achievements(db: Session = Depends(get_db)):
+    return db.query(Achievement).all()
+
+
+@router.get("/view")
+def achievements_view(request: Request, achievements: Query = Depends(get_achievements) ):
+    """Страница со всеми ачивками"""
+
     return templates.TemplateResponse(
         request=request,
         name="achievements.html",
