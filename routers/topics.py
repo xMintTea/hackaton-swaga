@@ -3,16 +3,18 @@ from fastapi import (
     Depends,
     status,
     Request,
-    APIRouter
+    APIRouter,
 )
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, Query
 from templates import templates
 
 
-from models import Course, Topic
+from models import Course, Topic, User
 
-from schemas.topics import TopicResponse, TopicCreate
+from schemas.topics import TopicResponse, TopicCreate, SaveTCompetendTopic
 from utils.db_helpher import get_db
+from routers.users import get_users
+from validation import get_current_token_payload, get_current_auth_user
 
 
 router = APIRouter(prefix="/topics", tags=["Topics"])
@@ -40,16 +42,25 @@ def create_topic(topic: TopicCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/{topic_id}", response_model=TopicResponse)
-def get_topic(topic_id: int,request: Request, db: Session = Depends(get_db)):
+def get_topic(topic_id: int,request: Request, db: Session = Depends(get_db), users: Query = Depends(get_users)):
     topic = db.query(Topic).filter(Topic.id == topic_id).first()
     if not topic:
         raise HTTPException(status_code=404, detail="Topic not found")
 
+    is_completed = False
+
+    if token := request.cookies.get("access_token"):
+        payload = get_current_token_payload(token)
+        user: User = get_current_auth_user(payload, users)
+        
+        if topic in user.completed_topics:
+            is_completed = True
+    
 
     return templates.TemplateResponse(
         request=request,
         name="topic.html",
-        context={"request": request, "topic": topic})
+        context={"request": request, "topic": topic, "is_completed": is_completed})
 
 
 @router.put("/{topic_id}", response_model=TopicResponse)
@@ -107,3 +118,55 @@ def topic(topic_id: int, request: Request, db: Session = Depends(get_db)):
     
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
+
+@router.post("/complete_topic")
+def complete_topic(
+    topicToSave: SaveTCompetendTopic,
+    db : Session = Depends(get_db),
+    users: Query = Depends(get_users)
+    ):
+    user: User = users.where(User.id == topicToSave.user_id).first() #type: ignore
+    topic = db.query(Topic).where(Topic.id == topicToSave.topic_id).first()
+    
+    if not user:
+        raise Exception()
+    
+    if not topic:
+        raise Exception
+    
+    user.completed_topics.append(topic)
+    
+    db.commit()
+    db.refresh(user)
+    return 200
+    
+    
+@router.post("/complete_topic/{topic_id}")
+def complete_topic_by_id(
+    topic_id: int,
+    request: Request,
+    db : Session = Depends(get_db),
+    users: Query = Depends(get_users)
+    ):
+    
+    if token := request.cookies.get("access_token"):
+        payload = get_current_token_payload(token)
+        user: User = get_current_auth_user(payload, users)
+        
+        if not user:
+            raise Exception()
+    
+    
+    topic = db.query(Topic).where(Topic.id == topic_id).first()
+    
+
+    
+    if not topic:
+        raise Exception
+    
+    user.completed_topics.append(topic)
+    
+    db.commit()
+    db.refresh(user)
+    return 200
+    
