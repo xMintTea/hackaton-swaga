@@ -272,7 +272,12 @@
             <!-- Заглушки курсов - в будущем будут заменены данными из БД -->
 
             {% for course in courses %}
-            <a href="{{ url_for('course', course_id=course.id) }}" style="text-decoration: none;">
+
+            {% if course in available_courses %}
+            <a href="{{ url_for('course', course_id=course.id)}}" style="text-decoration: none;">
+            {% else %}
+            <a href="{{ url_for('buy_course', course_id=course.id)}}" style="text-decoration: none;">
+            {% endif %}
             <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-course-id="1">
                 <div class="course-icon">{{ course.icon }}🔐</div>
                 <h3 class="course-title">{{ course.name }}</h3>
@@ -281,7 +286,11 @@
                     <span>{{ course.topics | length }} модулей</span>
                     <span class="course-level">{{ course.course_lvl.value }}</span>
                 </div>
+                {% if course in available_courses %}
+                <div class="course-price">Куплен</div>
+                {% else %}
                 <div class="course-price">{{ course.price }} ₽</div>
+                {% endif %}
             </div>
             </a>
             {% endfor %}
