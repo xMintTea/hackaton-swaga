@@ -1,153 +1,167 @@
-function initForms() {
-    console.log('Инициализация форм...');
+// script4.js - Исправленная версия
+const SELECTORS = {
+    LOGIN_BUTTON: '#loginBtn',
+    REGISTER_BUTTON: '#registerBtn',
+    FORGOT_PASSWORD_BUTTON: '#forgotPasswordBtn',
+    LOGIN_FORM: '#loginForm',
+    REGISTER_FORM: '#registerForm',
+    FORGOT_PASSWORD_FORM: '#forgotPasswordForm',
+    LOGIN_MODAL: '#loginModal',
+    REGISTER_MODAL: '#registerModal',
+    FORGOT_PASSWORD_MODAL: '#forgotPasswordModal'
+};
+
+console.log("Инициализация модальных окон...");
+
+function initModals() {
+    console.log('Инициализация модальных окон...');
     
-    const loginForm = document.querySelector(SELECTORS.LOGIN_FORM);
-    const registerForm = document.querySelector(SELECTORS.REGISTER_FORM);
-    const forgotPasswordForm = document.querySelector(SELECTORS.FORGOT_PASSWORD_FORM);
+    // Находим кнопки открытия модальных окон
+    const loginBtn = document.querySelector(SELECTORS.LOGIN_BUTTON);
+    const registerBtn = document.querySelector(SELECTORS.REGISTER_BUTTON);
+    const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+    
+    // Находим модальные окна
     const loginModal = document.querySelector(SELECTORS.LOGIN_MODAL);
     const registerModal = document.querySelector(SELECTORS.REGISTER_MODAL);
     const forgotPasswordModal = document.querySelector(SELECTORS.FORGOT_PASSWORD_MODAL);
-
-    // Обработка отправки формы входа
-    if (loginForm) {
-        loginForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const loginField = document.getElementById("loginEmail").value;
-            const passwordField = document.getElementById("loginPassword").value;
-
-            const formData = new FormData();
-            formData.append('username', loginField);
-            formData.append('password', passwordField);
-
-            try {            
-                const response = await fetch("/auth/login/", {
-                    method: "POST",
-                    body: formData
-                });
-
-                const data = await response.json();
-                
-                if (response.ok) {
-                    // Успешный вход
-                    showNotification('Успех', data.data || 'Вход выполнен успешно', 'success');
-                    
-                    // Закрываем модальное окно
-                    if (loginModal) loginModal.style.display = 'none';
-                    
-                    // Очищаем форму
-                    loginForm.reset();
-                    
-                    // Сохраняем данные пользователя
-                    const userData = {
-                        login: loginField,
-                        nickname: loginField,
-                        avatar: '/static/img/avatars/avatar1.jpg',
-                        token: data.access_token || null
-                    };
-                    
-                    // Сохраняем в localStorage через объект auth
-                    if (typeof auth !== 'undefined') {
-                        auth.login(userData);
-                    } else {
-                        // Fallback
-                        localStorage.setItem('currentUser', JSON.stringify(userData));
-                        // Перезагружаем страницу для обновления интерфейса
-                        setTimeout(() => location.reload(), 1000);
-                    }
-                } else {
-                    showNotification('Ошибка', data.data || 'Ошибка при входе', 'error');
-                }
-            } catch (error) {
-                console.error('Ошибка при входе:', error);
-                showNotification('Ошибка', 'Произошла ошибка при подключении к серверу', 'error');
-            }
-        });
-    }
     
-    // Обработка отправки формы регистрации
-    if (registerForm) {
-        registerForm.addEventListener('submit', async function(e) {
+    // Находим кнопки закрытия
+    const closeLoginModal = document.getElementById('closeLoginModal');
+    const closeRegisterModal = document.getElementById('closeRegisterModal');
+    const closeForgotPasswordModal = document.getElementById('closeForgotPasswordModal');
+    
+    // Отладочная информация
+    console.log('Найдены элементы:', {
+        loginBtn: !!loginBtn,
+        registerBtn: !!registerBtn,
+        loginModal: !!loginModal,
+        registerModal: !!registerModal
+    });
+    
+    // Обработчик для кнопки "Вы не ученик?" (переключение секции админа)
+    const toggleAdminBtn = document.getElementById('toggleAdminBtn');
+    if (toggleAdminBtn) {
+        toggleAdminBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            
-            // Получаем данные из формы
-            const login = document.getElementById('registerLogin').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            
-            // Проверяем, открыта ли админская секция
             const adminSection = document.getElementById('adminSection');
-            const isAdminSectionVisible = adminSection && adminSection.style.display !== 'none';
-            
-            let requestBody = {
-                login: login,
-                nickname: login,
-                email: email,
-                password: password
-            };
-            
-            // Добавляем данные для админов, если секция видима
-            if (isAdminSectionVisible) {
-                const secretCode = document.getElementById('secretCode').value;
-                const userRole = document.getElementById('userRole').value;
-                
-                requestBody.secretCode = secretCode;
-                requestBody.role = userRole;
-            }
-            
-            try {
-                // Отправляем запрос на сервер
-                const response = await fetch('/auth/register/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    showNotification('Успех', data.data || 'Регистрация прошла успешно', 'success');
-                    
-                    // Закрываем модальное окно
-                    if (registerModal) registerModal.style.display = 'none';
-                    
-                    // Очищаем форму
-                    registerForm.reset();
-                    
-                    // Автоматически логиним пользователя после регистрации
-                    const userData = {
-                        login: login,
-                        nickname: login,
-                        avatar: '/static/img/avatars/avatar1.jpg'
-                    };
-                    
-                    // Сохраняем в localStorage через объект auth
-                    if (typeof auth !== 'undefined') {
-                        auth.login(userData);
-                    } else {
-                        // Fallback
-                        localStorage.setItem('currentUser', JSON.stringify(userData));
-                        // Перезагружаем страницу для обновления интерфейса
-                        setTimeout(() => location.reload(), 1000);
-                    }
-                } else {
-                    showNotification('Ошибка', data.data || 'Ошибка при регистрации', 'error');
-                }
-            } catch (error) {
-                console.error('Ошибка при регистрации:', error);
-                showNotification('Ошибка', 'Произошла ошибка при подключении к серверу', 'error');
+            if (adminSection) {
+                adminSection.style.display = adminSection.style.display === 'none' ? 'block' : 'none';
             }
         });
     }
     
-    // Обработка отправки формы восстановления пароля
+    // Открытие модальных окон
+    if (loginBtn && loginModal) {
+        loginBtn.addEventListener('click', function() {
+            console.log('Открытие окна входа');
+            loginModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Блокируем скролл
+        });
+    } else {
+        console.warn('Не найдена кнопка входа или модальное окно');
+    }
+    
+    if (registerBtn && registerModal) {
+        registerBtn.addEventListener('click', function() {
+            console.log('Открытие окна регистрации');
+            registerModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Блокируем скролл
+        });
+    } else {
+        console.warn('Не найдена кнопка регистрации или модальное окно');
+    }
+    
+    if (forgotPasswordBtn && forgotPasswordModal) {
+        forgotPasswordBtn.addEventListener('click', function() {
+            forgotPasswordModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
+    }
+    
+    // Закрытие модальных окон
+    if (closeLoginModal && loginModal) {
+        closeLoginModal.addEventListener('click', function() {
+            loginModal.style.display = 'none';
+            document.body.style.overflow = ''; // Восстанавливаем скролл
+        });
+    }
+    
+    if (closeRegisterModal && registerModal) {
+        closeRegisterModal.addEventListener('click', function() {
+            registerModal.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+    }
+    
+    if (closeForgotPasswordModal && forgotPasswordModal) {
+        closeForgotPasswordModal.addEventListener('click', function() {
+            forgotPasswordModal.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+    }
+    
+    // Закрытие при клике вне модального окна
+    window.addEventListener('click', function(event) {
+        if (event.target === loginModal) {
+            loginModal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        if (event.target === registerModal) {
+            registerModal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        if (event.target === forgotPasswordModal) {
+            forgotPasswordModal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    });
+    
+    // Обработчики форм
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+    
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Отправка формы входа');
+            // Здесь будет обработка входа
+            loginModal.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+    }
+    
+    if (registerForm) {
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Отправка формы регистрации');
+            // Здесь будет обработка регистрации
+            registerModal.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+    }
+    
     if (forgotPasswordForm) {
         forgotPasswordForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            showNotification('Восстановление пароля', 'Запрос на восстановление пароля отправлен! Проверьте вашу электронную почту.', 'success');
-            if (forgotPasswordModal) forgotPasswordModal.style.display = 'none';
+            console.log('Восстановление пароля');
+            // Здесь будет восстановление пароля
+            forgotPasswordModal.style.display = 'none';
+            document.body.style.overflow = '';
         });
     }
 }
+
+// Делаем функцию глобально доступной
+window.initModals = initModals;
+
+// Инициализация при загрузке DOM
+document.addEventListener('DOMContentLoaded', function() {
+    // Проверяем, загружен ли уже header
+    const headerLoaded = document.querySelector(SELECTORS.LOGIN_BUTTON);
+    if (headerLoaded) {
+        initModals();
+    }
+    // Если нет, templateLoader.js вызовет initScripts() после загрузки шаблонов
+});
