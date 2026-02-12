@@ -6,7 +6,7 @@ from fastapi import (
     status,
     Form,
     Request
-)
+)   
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer
 from sqlalchemy.orm import Session, joinedload
@@ -409,11 +409,30 @@ def create_course(course: CourseCreate, db: Session = Depends(get_db)):
 def get_courses(request: Request, db: Session = Depends(get_db)):
     courses = db.query(Course).options(joinedload(Course.topics)).all()
     
+    additional = []
+    icons = ["🐍","⚡","☕","🤖","🌐", "🔐"]
+    price = [1000, 2500, 3200, 4242, 2222, 2222]
+    level = ["Базовый", "Базовый", "Базовый", "Продвинутый", "Продвинутый","Продвинутый"]
+    
+    for course in courses:
+        additional.append({
+                "id" : course.id,
+                "title" : course.title,
+                "desc" :course.description,
+                "icon" : icons[course.id-1],
+                "price" : price[course.id-1],
+                "lvl" : level[course.id-1],
+                "topic_count" : len(course.topics)*3
+            }
+        )
+        
+    additional = list(sorted(additional, key=lambda x: x.get("lvl")))
+        
     return templates.TemplateResponse(
         request=request,
         name="courses.html",
-        context={"request": request, "courses": courses})
-    
+        context={"request": request, "courses": additional, "additional": additional})
+
 
 @app.get("/help", name="help")
 def get_help(request: Request):
@@ -478,7 +497,7 @@ def get_course(course_id: int,  request: Request, db: Session = Depends(get_db))
     
     return templates.TemplateResponse(
         request=request,
-        name="courses.html",
+        name="cours.html",
         context={"request": request, "course": response})
     
 
@@ -584,7 +603,6 @@ def set_student_course(
     db.refresh(student)
     
     return {"message": "Course set successfully", "student": student}
-
 
 
 
@@ -1275,27 +1293,28 @@ def test_result_page(
     # Детерминированная логика выбора курса на основе баллов
     if creative_score >= 7 and analytical_score >= 7:
         # Универсальный талант - курс полного цикла
-        recommended_course = next((c for c in all_courses if "Full Stack" in c.title or "Полный цикл" in c.title), all_courses[0])
+        recommended_course = db.query(Course).filter(Course.id == 4).first()  
     elif creative_score >= 7:
         # Творческий тип - фронтенд или дизайн
-        recommended_course = next((c for c in all_courses if "Frontend" in c.title or "Дизайн" in c.title or "Веб" in c.title), all_courses[0])
+        recommended_course = db.query(Course).filter(Course.id == 5).first()  
     elif analytical_score >= 7:
         # Аналитический тип - бэкенд или данные
-        recommended_course = next((c for c in all_courses if "Backend" in c.title or "Анализ" in c.title or "Данные" in c.title), all_courses[0])
+         recommended_course = db.query(Course).filter(Course.id == 3).first()  
     elif creative_score >= 5 and analytical_score >= 5:
         # Сбалансированный профиль - универсальный курс
-        recommended_course = next((c for c in all_courses if "Основы" in c.title or "Базовый" in c.title), all_courses[0])
+        recommended_course = db.query(Course).filter(Course.id == 2).first()  
     elif creative_score > analytical_score:
         # Склонность к творчеству
-        recommended_course = next((c for c in all_courses if "Дизайн" in c.title or "Интерфейс" in c.title), all_courses[0])
+        recommended_course = db.query(Course).filter(Course.id == 2).first()  
     elif analytical_score > creative_score:
         # Склонность к аналитике
-        recommended_course = next((c for c in all_courses if "Алгоритм" in c.title or "Структур" in c.title), all_courses[0])
+        recommended_course = db.query(Course).filter(Course.id == 6).first()  
     else:
         # Нейтральный результат - базовый курс
-        recommended_course = all_courses[0]
+        recommended_course = db.query(Course).filter(Course.id == 1).first()  
     
-    # Формируем список других курсов (исключая рекомендованный)
+    
+    recommended_course = db.query(Course).filter(Course.id == 3).first()   # Формируем список других курсов (исключая рекомендованный)
     other_courses = [c for c in all_courses if c.id != recommended_course.id] # type: ignore
     
     # Ограничиваем количество отображаемых курсов до 3

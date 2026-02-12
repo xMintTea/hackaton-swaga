@@ -113,8 +113,8 @@
         .course-level {
             padding: 5px 10px;
             border-radius: 15px;
-            background: var(--neon-blue);
-            color: var(--dark-primary);
+            background: var(--dark-primary) ;
+            color: var(--neon-blue);
             font-weight: 600;
         }
         
@@ -266,26 +266,26 @@
     <div class="container courses-page-container">
         <a href="{{ url_for('index') }}" class="btn back-button">← Назад на главную</a>
         <h1 class="page-title">Все курсы Cyberskill</h1>
-        
-        <div class="course-warning">
-            <h3>⚠️ Важная информация</h3>
-            <p>Вы можете приобрести только один курс за раз. Нельзя взять другой курс, пока не пройден текущий.</p>
-            <p>При отказе от курса потребуется приобрести его заново для доступа.</p>
-        </div>
+
         
         <div class="courses-grid" id="coursesGrid">
             <!-- Заглушки курсов - в будущем будут заменены данными из БД -->
+
+            {% for course in courses %}
+            <a href="{{ url_for('course', course_id=course.id) }}" style="text-decoration: none;">
             <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-course-id="1">
-                <div class="course-icon">🐍</div>
-                <h3 class="course-title">Python Basics</h3>
-                <p class="course-description">Изучите основы самого популярного языка для анализа данных и искусственного интеллекта.</p>
+                <div class="course-icon">{{ course.icon }}</div>
+                <h3 class="course-title">{{ course.title }}</h3>
+                <p class="course-description">{{ course.desc }}</p>
                 <div class="course-meta">
-                    <span>12 модулей</span>
-                    <span class="course-level">Начальный</span>
+                    <span>{{ course.topic_count }} модулей</span>
+                    <span class="course-level">{{ course.lvl }}</span>
                 </div>
-                <div class="course-price">2 500 ₽</div>
+                <div class="course-price">{{ course.price }} ₽</div>
             </div>
-            
+            </a>
+            {% endfor %}
+<!--             
             <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="100" data-course-id="2">
                 <div class="course-icon">⚡</div>
                 <h3 class="course-title">JavaScript Fundamentals</h3>
@@ -333,7 +333,7 @@
             <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="500" data-course-id="6">
                 <div class="course-icon">🔐</div>
                 <h3 class="course-title">Java Security</h3>
-                <p class="course-description">Освойте методы защиты enterprise приложений от современных киберугроз.</p>
+                <p class="course-description">  </p>
                 <div class="course-meta">
                     <span>18 модулей</span>
                     <span class="course-level">Продвинутый</span>
@@ -341,13 +341,15 @@
                 <div class="course-price">4 200 ₽</div>
             </div>
         </div>
-    </div>
+    </div> -->
     
+
+
     <!-- Модальное окно курса -->
-    <div class="course-modal" id="courseModal">
+    <!-- <div class="course-modal" id="courseModal">
         <div class="course-modal-content">
             <button class="close-course-modal" id="closeCourseModal">&times;</button>
-            <div class="course-modal-icon" id="courseModalIcon">🐍</div>
+            <div class="course-modal-icon" id="courseModalIcon"></div>
             <h2 class="course-modal-title" id="courseModalTitle">Название курса</h2>
             <p class="course-modal-description" id="courseModalDescription">Описание курса будет здесь...</p>
             
@@ -374,7 +376,7 @@
             
             <a href="https://xsolla.com/" target="_blank" class="buy-course-btn" id="buyCourseBtn">Приобрести курс</a>
         </div>
-    </div>
+    </div> -->
     
     <!-- Заполнитель для footer -->
     <div id="footer-placeholder"></div>
