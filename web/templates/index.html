@@ -183,7 +183,7 @@
                     <label for="loginPassword">Пароль</label>
                     <input type="password" id="loginPassword" required>
                 </div>
-                <button type="submit" class="btn" style="width: 100%;">Войти</button>
+                <button type="submit" class="btn" id="loginBtn" style="width: 100%;">Войти</button>
                 
                 <div style="text-align: center; margin-top: 15px;">
                     <button id="forgotPasswordBtn" class="btn-link">Забыли пароль?</button>
@@ -254,7 +254,100 @@
     <script src="{{ url_for('static', path='js/script.js') }}"></script>
     <script src="{{ url_for('static', path='js/templateLoader.js') }}"></script>
 
+    <script>
+        const login_btn = document.getElementById("loginBtn")
+        const login = document.getElementById("loginEmail")
+        const password = document.getElementById("loginPassword")
 
+        login_btn.addEventListener("click", async () => {
+            const formData = new FormData();
+            formData.append('username', login.value);
+            formData.append('password', password.value);
+            
+            try {
+                const response = await fetch('/auth/login/', {
+                    method: 'POST',
+                    body: new URLSearchParams(formData),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                });
+                
+                if (response.ok) {
+                    const tokenData = await response.json();
+                    // Сохраняем токен
+                    localStorage.setItem('access_token', tokenData.access_token);
+                    alert('Login successful!');
+                    loadUserInfo();
+                } else {
+                    alert('Login failed!');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        })
+    </script>
+
+
+<script>
+// Декодирование JWT
+function parseJwt(token) {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => 
+            '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        ).join(''));
+        return JSON.parse(jsonPayload);
+    } catch (e) {
+        return null;
+    }
+}
+
+// Основная функция
+function updateAuthUI() {
+    const token = localStorage.getItem('access_token');
+    if (!token) return;
+
+    const payload = parseJwt(token);
+    if (!payload || !payload.login) return;
+
+    const login = payload.login;
+
+    // Ждём, пока загрузится header
+    const checkHeader = setInterval(() => {
+        const header = document.querySelector('header'); // или другой контейнер
+        if (!header) return;
+
+        clearInterval(checkHeader);
+
+        // Находим кнопки входа/регистрации по тексту (можно заменить на свои селекторы)
+        const buttons = Array.from(header.querySelectorAll('button, a'));
+        const loginBtn = buttons.find(btn => btn.textContent.includes('Вход'));
+        const registerBtn = buttons.find(btn => btn.textContent.includes('Регистрация'));
+
+        if (loginBtn && registerBtn) {
+            // Скрываем кнопки
+            loginBtn.style.display = 'none';
+            registerBtn.style.display = 'none';
+
+            // Создаём ссылку на профиль
+            const profileLink = document.createElement('a');
+            profileLink.href = `/users/${login}`;
+            profileLink.className = 'profile-link'; // стилизуй как хочешь
+            profileLink.innerHTML = `
+                <img src="/static/img/default-avatar.png" alt="avatar" style="width:32px;height:32px;border-radius:50%;vertical-align:middle;margin-right:5px;">
+                <span>${login}</span>
+            `;
+
+            // Вставляем после кнопок (или в нужное место)
+            loginBtn.parentNode.insertBefore(profileLink, loginBtn.nextSibling);
+        }
+    }, 100);
+}
+
+document.addEventListener('DOMContentLoaded', updateAuthUI);
+</script>
 
 </body>
 </html>
