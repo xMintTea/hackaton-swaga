@@ -51,69 +51,36 @@
             </div>
             
             <h3 class="course-category">Базовые курсы</h3>
+
             <div class="courses-grid">
+                {% for course in beginners_courses %}
                 <div class="course-card animate-on-scroll" data-animation="fadeInUp">
                     <div class="course-icon">🐍</div>
-                    <h3>Python Basics</h3>
-                    <p>Изучите основы самого популярного языка для анализа данных и искусственного интеллекта.</p>
+                    <h3>{{ course.name }}</h3>
+                    <p>{{ course.description }}</p>
                     <div class="course-meta">
-                        <span>12 модулей</span>
-                        <span class="course-level">Начальный</span>
+                        <span>{{ course.topics | count }}</span>
+                        <span class="course-level">{{ course.course_lvl.value }}</span>
                     </div>
                 </div>
+                {% endfor %}
                 
-                <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="100">
-                    <div class="course-icon">⚡</div>
-                    <h3>JavaScript Fundamentals</h3>
-                    <p>Освойте язык, который powers современный веб и позволяет создавать интерактивные приложения.</p>
-                    <div class="course-meta">
-                        <span>10 модулей</span>
-                        <span class="course-level">Начальный</span>
-                    </div>
-                </div>
-                
-                <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="200">
-                    <div class="course-icon">☕</div>
-                    <h3>Java Essentials</h3>
-                    <p>Начните путь в enterprise разработке с одного из самых стабильных и надежных языков.</p>
-                    <div class="course-meta">
-                        <span>14 модулей</span>
-                        <span class="course-level">Начальный</span>
-                    </div>
-                </div>
             </div>
             
             <h3 class="course-category">Продвинутые курсы</h3>
             <div class="courses-grid">
+                {% for course in pro_courses %}
                 <div class="course-card animate-on-scroll" data-animation="fadeInUp">
-                    <div class="course-icon">🤖</div>
-                    <h3>AI with Python</h3>
-                    <p>Создавайте нейронные сети и алгоритмы машинного обучения для решения сложных задач.</p>
+                    <div class="course-icon">🐍</div>
+                    <h3>{{ course.name }}</h3>
+                    <p>{{ course.description }}</p>
                     <div class="course-meta">
-                        <span>16 модулей</span>
-                        <span class="course-level">Продвинутый</span>
+                        <span>{{ course.topics | count }}</span>
+                        <span class="course-level">{{ course.course_lvl.value }}</span>
                     </div>
                 </div>
+                {% endfor %}
                 
-                <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="100">
-                    <div class="course-icon">🌐</div>
-                    <h3>Advanced JS Frameworks</h3>
-                    <p>Изучите современные фреймворки для создания сложных веб-приложений.</p>
-                    <div class="course-meta">
-                        <span>15 модулей</span>
-                        <span class="course-level">Продвинутый</span>
-                    </div>
-                </div>
-                
-                <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="200">
-                    <div class="course-icon">🔐</div>
-                    <h3>Java Security</h3>
-                    <p>Освойте методы защиты enterprise приложений от современных киберугроз.</p>
-                    <div class="course-meta">
-                        <span>18 модулей</span>
-                        <span class="course-level">Продвинутый</span>
-                    </div>
-                </div>
             </div>
 
             <div style="text-align: center; margin-top: 40px;">
@@ -209,6 +176,7 @@
                 <label for="registerPassword">Пароль</label>
                 <input type="password" id="registerPassword" required>
             </div>
+                <input type="checkbox" id="permission">Я согласен на обработку данных
             
             <!-- Секция для преподавателей/админов -->
             <div id="adminSection" style="display: none;">
@@ -226,7 +194,7 @@
                 </div>
             </div>
             
-            <button type="submit" class="btn" style="width: 100%;">Зарегистрироваться</button>
+            <button type="submit" class="btn" style="width: 100%;" id="reg_btn">Зарегистрироваться</button>
         </form>
         
         <div style="text-align: center; margin-top: 15px;">
@@ -289,6 +257,53 @@
     </script>
 
 
+    <script>
+        const reg_btn = document.getElementById("reg_btn")
+        const regLogin = document.getElementById("registerLogin")
+        const regPassword = document.getElementById("registerPassword")
+        const email = document.getElementById("registerEmail")
+        const permission = document.getElementById("permission")
+
+        reg_btn.addEventListener("click", async () => {
+            
+            if (!permission.checked) {
+                alert("Чтобы продолжить, разрешите обработку данных")
+                return;
+            }
+            
+
+        const requestBody = {
+            nickname: regLogin.value,
+            login: regLogin.value,
+            password: regPassword.value,
+            email: email.value
+        };
+
+            
+            try {
+                const response = await fetch('/auth/register/', {
+                    method: 'POST',
+                    body: JSON.stringify(requestBody),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                if (response.ok) {
+                    alert('Регистрация успешна!!');
+                    loadUserInfo();
+                } else {
+                    alert('Register failed!');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+            
+
+        })
+
+    </script>
+
 <script>
 // Декодирование JWT
 function parseJwt(token) {
@@ -308,6 +323,8 @@ function parseJwt(token) {
 function updateAuthUI() {
     const token = localStorage.getItem('access_token');
     if (!token) return;
+    
+    localStorage.clear()
 
     const payload = parseJwt(token);
     if (!payload || !payload.login) return;
@@ -336,7 +353,7 @@ function updateAuthUI() {
             profileLink.href = `/users/${login}`;
             profileLink.className = 'profile-link'; // стилизуй как хочешь
             profileLink.innerHTML = `
-                <img src="/static/img/default-avatar.png" alt="avatar" style="width:32px;height:32px;border-radius:50%;vertical-align:middle;margin-right:5px;">
+                <img src="/static/img/avatars/avatar1.jpg" alt="avatar" style="width:32px;height:32px;border-radius:50%;vertical-align:middle;margin-right:5px;">
                 <span>${login}</span>
             `;
 

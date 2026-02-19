@@ -8,6 +8,8 @@ from sqlalchemy.orm import Session
 from templates import templates
 from utils.db_helpher import get_db
 from utils.helpers import get_leaderboard
+from models import Course
+from static import CourseLvl
 
 
 
@@ -17,14 +19,19 @@ router = APIRouter()
 @router.get("/", name="index")
 def index_page(
     request: Request,
-    leaders = Depends(get_leaderboard)
+    leaders = Depends(get_leaderboard),
+    db: Session = Depends(get_db)
 ):
     
-
+    beginers_courses = db.query(Course).where(Course.course_lvl == CourseLvl.BEGGINER).limit(3)
+    pro_courses = db.query(Course).where(Course.course_lvl == CourseLvl.PRO).limit(3)
+    
+    
+    
     return templates.TemplateResponse(
         request=request,
         name="index.html",
-        context={"request": request, "leaders": leaders})
+        context={"request": request, "leaders": leaders, "beginners_courses" : beginers_courses, "pro_courses" : pro_courses})
  
 
 
