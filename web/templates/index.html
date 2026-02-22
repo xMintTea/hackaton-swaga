@@ -22,7 +22,7 @@
                 <p class="animate__animated animate__fadeIn animate__delay-1s">Освойте технологии будущего с нашими инновационными курсы по программированию, кибербезопасности, искусственному интеллекту и многому другому.</p>
                 <div class="hero-buttons animate__animated animate__fadeInUp animate__delay-2s">
                     <a href="{{ url_for('courses') }}" class="btn">Начать обучение</a>
-                    <a href="{{ url_for('test') }}" class="btn btn-pink">Пройти тест</a>
+                    <a href="#test" class="btn btn-pink">Пройти тест</a>
                 </div>
             </div>
         </div>
@@ -51,69 +51,36 @@
             </div>
             
             <h3 class="course-category">Базовые курсы</h3>
+
             <div class="courses-grid">
+                {% for course in beginners_courses %}
                 <div class="course-card animate-on-scroll" data-animation="fadeInUp">
                     <div class="course-icon">🐍</div>
-                    <h3>Python Basics</h3>
-                    <p>Изучите основы самого популярного языка для анализа данных и искусственного интеллекта.</p>
+                    <h3>{{ course.name }}</h3>
+                    <p>{{ course.description }}</p>
                     <div class="course-meta">
-                        <span>12 модулей</span>
-                        <span class="course-level">Начальный</span>
+                        <span>{{ course.topics | count }}</span>
+                        <span class="course-level">{{ course.course_lvl.value }}</span>
                     </div>
                 </div>
+                {% endfor %}
                 
-                <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="100">
-                    <div class="course-icon">⚡</div>
-                    <h3>JavaScript Fundamentals</h3>
-                    <p>Освойте язык, который powers современный веб и позволяет создавать интерактивные приложения.</p>
-                    <div class="course-meta">
-                        <span>10 модулей</span>
-                        <span class="course-level">Начальный</span>
-                    </div>
-                </div>
-                
-                <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="200">
-                    <div class="course-icon">☕</div>
-                    <h3>Java Essentials</h3>
-                    <p>Начните путь в enterprise разработке с одного из самых стабильных и надежных языков.</p>
-                    <div class="course-meta">
-                        <span>14 модулей</span>
-                        <span class="course-level">Начальный</span>
-                    </div>
-                </div>
             </div>
             
             <h3 class="course-category">Продвинутые курсы</h3>
             <div class="courses-grid">
+                {% for course in pro_courses %}
                 <div class="course-card animate-on-scroll" data-animation="fadeInUp">
-                    <div class="course-icon">🤖</div>
-                    <h3>AI with Python</h3>
-                    <p>Создавайте нейронные сети и алгоритмы машинного обучения для решения сложных задач.</p>
+                    <div class="course-icon">🐍</div>
+                    <h3>{{ course.name }}</h3>
+                    <p>{{ course.description }}</p>
                     <div class="course-meta">
-                        <span>16 модулей</span>
-                        <span class="course-level">Продвинутый</span>
+                        <span>{{ course.topics | count }}</span>
+                        <span class="course-level">{{ course.course_lvl.value }}</span>
                     </div>
                 </div>
+                {% endfor %}
                 
-                <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="100">
-                    <div class="course-icon">🌐</div>
-                    <h3>Advanced JS Frameworks</h3>
-                    <p>Изучите современные фреймворки для создания сложных веб-приложений.</p>
-                    <div class="course-meta">
-                        <span>15 модулей</span>
-                        <span class="course-level">Продвинутый</span>
-                    </div>
-                </div>
-                
-                <div class="course-card animate-on-scroll" data-animation="fadeInUp" data-delay="200">
-                    <div class="course-icon">🔐</div>
-                    <h3>Java Security</h3>
-                    <p>Освойте методы защиты enterprise приложений от современных киберугроз.</p>
-                    <div class="course-meta">
-                        <span>18 модулей</span>
-                        <span class="course-level">Продвинутый</span>
-                    </div>
-                </div>
             </div>
 
             <div style="text-align: center; margin-top: 40px;">
@@ -183,7 +150,7 @@
                     <label for="loginPassword">Пароль</label>
                     <input type="password" id="loginPassword" required>
                 </div>
-                <button type="submit" class="btn" style="width: 100%;">Войти</button>
+                <button type="submit" class="btn" id="loginBtn" style="width: 100%;">Войти</button>
                 
                 <div style="text-align: center; margin-top: 15px;">
                     <button id="forgotPasswordBtn" class="btn-link">Забыли пароль?</button>
@@ -209,6 +176,7 @@
                 <label for="registerPassword">Пароль</label>
                 <input type="password" id="registerPassword" required>
             </div>
+                <input type="checkbox" id="permission">Я согласен на обработку данных
             
             <!-- Секция для преподавателей/админов -->
             <div id="adminSection" style="display: none;">
@@ -226,7 +194,7 @@
                 </div>
             </div>
             
-            <button type="submit" class="btn" style="width: 100%;">Зарегистрироваться</button>
+            <button type="submit" class="btn" style="width: 100%;" id="reg_btn">Зарегистрироваться</button>
         </form>
         
         <div style="text-align: center; margin-top: 15px;">
@@ -250,75 +218,153 @@
         </div>
     </div>
 
+    
+    <script src="{{ url_for('static', path='js/script.js') }}"></script>
+    <script src="{{ url_for('static', path='js/templateLoader.js') }}"></script>
+
     <script>
-// Обработка отправки формы регистрации
-const registerForm = document.getElementById('registerForm');
-if (registerForm) {
-    registerForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        // Получаем данные из формы
-        const login = document.getElementById('registerLogin').value;
-        const email = document.getElementById('registerEmail').value;
-        const password = document.getElementById('registerPassword').value;
-        
-        // Проверяем, открыта ли админская секция
-        const adminSection = document.getElementById('adminSection');
-        const isAdminSectionVisible = adminSection.style.display !== 'none';
-        
-        let requestBody = {
-            login: login,
-            nickname: login, // Используем логин как никнейм, если нет отдельного поля
-            email: email,
-            password: password
-        };
-        
-        // Добавляем данные для админов, если секция видима
-        if (isAdminSectionVisible) {
-            const secretCode = document.getElementById('secretCode').value;
-            const userRole = document.getElementById('userRole').value;
+        const login_btn = document.getElementById("loginBtn")
+        const login = document.getElementById("loginEmail")
+        const password = document.getElementById("loginPassword")
+
+        login_btn.addEventListener("click", async () => {
+            const formData = new FormData();
+            formData.append('username', login.value);
+            formData.append('password', password.value);
             
-            requestBody.secretCode = secretCode;
-            requestBody.role = userRole;
-        }
-        
-        try {
-            // Отправляем запрос на сервер
-            const response = await fetch('/register/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestBody)
-            });
-            
-            const data = await response.json();
-            
-            if (response.ok) {
-                // Успешная регистрация
-                showNotification('Успех', data.data || 'Регистрация прошла успешно', 'success');
+            try {
+                const response = await fetch('/auth/login/', {
+                    method: 'POST',
+                    body: new URLSearchParams(formData),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                });
                 
-                // Закрываем модальное окно
-                const registerModal = document.getElementById('registerModal');
-                if (registerModal) registerModal.style.display = 'none';
-                
-                // Очищаем форму
-                registerForm.reset();
-            } else {
-                // Обработка ошибок регистрации
-                showNotification('Ошибка', data.data || 'Ошибка при регистрации', 'error');
+                if (response.ok) {
+                    const tokenData = await response.json();
+                    // Сохраняем токен
+                    localStorage.setItem('access_token', tokenData.access_token);
+                    alert('Login successful!');
+                    loadUserInfo();
+                } else {
+                    alert('Login failed!');
+                }
+            } catch (error) {
+                console.error('Error:', error);
             }
-        } catch (error) {
-            console.error('Ошибка при регистрации:', error);
-            showNotification('Ошибка', 'Произошла ошибка при подключении к серверу', 'error');
-        }
-    });
-}
+        })
+    </script>
+
+
+    <script>
+        const reg_btn = document.getElementById("reg_btn")
+        const regLogin = document.getElementById("registerLogin")
+        const regPassword = document.getElementById("registerPassword")
+        const email = document.getElementById("registerEmail")
+        const permission = document.getElementById("permission")
+
+        reg_btn.addEventListener("click", async () => {
+            
+            if (!permission.checked) {
+                alert("Чтобы продолжить, разрешите обработку данных")
+                return;
+            }
+            
+
+        const requestBody = {
+            nickname: regLogin.value,
+            login: regLogin.value,
+            password: regPassword.value,
+            email: email.value
+        };
+
+            
+            try {
+                const response = await fetch('/auth/register/', {
+                    method: 'POST',
+                    body: JSON.stringify(requestBody),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                if (response.ok) {
+                    alert('Регистрация успешна!!');
+                    loadUserInfo();
+                } else {
+                    alert('Register failed!');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+            
+
+        })
 
     </script>
 
+<script>
+// Декодирование JWT
+function parseJwt(token) {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => 
+            '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        ).join(''));
+        return JSON.parse(jsonPayload);
+    } catch (e) {
+        return null;
+    }
+}
+
+// Основная функция
+function updateAuthUI() {
+    const token = localStorage.getItem('access_token');
+    if (!token) return;
     
-<script src="{{ url_for('static', path='js/script.js') }}"></script>
-    <script src="{{ url_for('static', path='js/templateLoader.js') }}"></script>
+    localStorage.clear()
+
+    const payload = parseJwt(token);
+    if (!payload || !payload.login) return;
+
+    const login = payload.login;
+
+    // Ждём, пока загрузится header
+    const checkHeader = setInterval(() => {
+        const header = document.querySelector('header'); // или другой контейнер
+        if (!header) return;
+
+        clearInterval(checkHeader);
+
+        // Находим кнопки входа/регистрации по тексту (можно заменить на свои селекторы)
+        const buttons = Array.from(header.querySelectorAll('button, a'));
+        const loginBtn = buttons.find(btn => btn.textContent.includes('Вход'));
+        const registerBtn = buttons.find(btn => btn.textContent.includes('Регистрация'));
+
+        if (loginBtn && registerBtn) {
+            // Скрываем кнопки
+            loginBtn.style.display = 'none';
+            registerBtn.style.display = 'none';
+
+            // Создаём ссылку на профиль
+            const profileLink = document.createElement('a');
+            profileLink.href = `/users/${login}`;
+            profileLink.className = 'profile-link'; // стилизуй как хочешь
+            profileLink.innerHTML = `
+                <img src="/static/img/avatars/avatar1.jpg" alt="avatar" style="width:32px;height:32px;border-radius:50%;vertical-align:middle;margin-right:5px;">
+                <span>${login}</span>
+            `;
+
+            // Вставляем после кнопок (или в нужное место)
+            loginBtn.parentNode.insertBefore(profileLink, loginBtn.nextSibling);
+        }
+    }, 100);
+}
+
+document.addEventListener('DOMContentLoaded', updateAuthUI);
+</script>
+
 </body>
 </html>

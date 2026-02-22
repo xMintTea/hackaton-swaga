@@ -13,9 +13,9 @@
     
     <div class="topics-container">
         <ul class="topics-list">
-            {% for topic in topics %}
+            {% for topic in course.topics %}
             <li class="topic-item animate__animated animate__fadeInUp">
-                <a href="/topic/{{ topic.id }}" class="topic-link">
+                <a href="/topics/{{ topic.id }}" class="topic-link">
                     <div class="topic-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="var(--neon-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -24,7 +24,7 @@
                         </svg>
                     </div>
                     <div class="topic-info">
-                        <h3>{{ topic.title }}</h3>
+                        <h3>{{ topic.name }}</h3>
                         <p>Изучите эту тему, чтобы продвинуться в курсе</p>
                     </div>
                     <div class="topic-arrow">

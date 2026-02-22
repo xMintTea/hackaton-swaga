@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
 <body>
+    <body data-user-id="{{ user.id }}"></body>
     <div class="matrix-rain" id="matrixRain"></div>
     
     <!-- Заполнитель для header -->
@@ -22,7 +23,7 @@
         <div class="profile-header">
             <div class="avatar-container">
                 <div class="avatar-frame" id="avatarFrame">
-                    <img src="/static/img/avatars/avatar1.jpg" alt="Аватар" class="avatar" id="userAvatar">
+                    <img src="{{ user.avatar_url }}" alt="Аватар" class="avatar" id="userAvatar">
                 </div>
                 <div class="avatar-controls">
                     <button class="btn btn-small" id="changeAvatarBtn">Сменить аватар</button>
@@ -32,7 +33,9 @@
             
             <div class="profile-info">
                 <h1 class="username" id="username">{{ user.nickname }}</h1>
+                {% if user.title %}
                 <span class="user-title" id="userTitle">{{ user.title.name }}</span>
+                {% endif %}
                 
                 <div class="level-progress">
                     <div class="level-info">
@@ -40,7 +43,7 @@
                         <span class="level-number" id="userLevel">{{ user.lvl }}</span>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill" style="width: {{ user.xp }}%;"></div>
+                        <div class="progress-fill" id="progressFill" style="width: {{ user.xp }}%"></div>
                     </div>
                     <div class="xp-info">
                         <span id="currentXP">{{ user.xp }}</span>
@@ -426,10 +429,10 @@
     </div>
 
 
-
+    <script src="/static/js/script.js"></script>
     <script src="/static/js/auth.js"></script>
     <script src="/static/js/templateLoader.js"></script>
     <script src="/static/js/profile.js"></script>
-    <script src="/static/js/script.js"></script>
+
 </body>
 </html>

@@ -6,9 +6,9 @@
 
 {% block body %}
 <div class="matrix-rain" id="matrixRain"></div>
-
+<p style="visibility: hidden;" class="topic_id">{{ topic.id }}</p>
 <div class="container topic-page-container">
-    <a href="/course/{{ topic.course_id }}" class="btn back-button">← Назад к темам</a>
+    <a href="/courses/{{ topic.course_id }}" class="btn back-button">← Назад к темам</a>
     <h1 class="page-title animate__animated animate__fadeIn">{{ topic.title }}</h1>
     
     <div class="topic-content-container">
@@ -17,7 +17,16 @@
         </div>
         
         <div class="actions">
-            <button class="complete-btn">Завершить тему</button>
+            <button 
+                id="completeTopicBtn"
+                class="{% if is_completed %}completed-btn{% else %}complete-btn{% endif %}"
+                {% if is_completed %}disabled{% endif %}>
+                {% if is_completed %}
+                    ✓ Тема завершена
+                {% else %}
+                    Завершить тему
+                {% endif %}
+            </button>
         </div>
     </div>
 </div>
@@ -103,10 +112,10 @@
         border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
     
-    .complete-btn {
+    .complete-btn,
+    .completed-btn {
         padding: 12px 30px;
         font-size: 1.1rem;
-        background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple));
         border: none;
         border-radius: 5px;
         color: white;
@@ -118,9 +127,20 @@
         letter-spacing: 1px;
     }
     
+    .complete-btn {
+        background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple));
+    }
+    
     .complete-btn:hover {
         box-shadow: 0 0 15px var(--neon-pink);
         transform: translateY(-2px);
+    }
+    
+    .completed-btn {
+        background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));
+        cursor: default;
+        opacity: 0.9;
+        box-shadow: 0 0 10px var(--neon-green);
     }
     
     /* Matrix rain effect */
@@ -134,11 +154,29 @@
         pointer-events: none;
         opacity: 0.2;
     }
+
+    /* Всплывающее уведомление */
+    .notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: var(--dark-secondary);
+        color: var(--neon-green);
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: 1px solid var(--neon-green);
+        box-shadow: 0 0 10px var(--neon-green);
+        z-index: 1000;
+        font-family: 'Rajdhani', sans-serif;
+        font-weight: 500;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
 </style>
 
 <script>
-    // Matrix rain effect
     document.addEventListener('DOMContentLoaded', function() {
+        // ========== Matrix rain effect ==========
         const matrixRain = document.getElementById('matrixRain');
         const canvas = document.createElement('canvas');
         canvas.width = window.innerWidth;
@@ -173,57 +211,82 @@
                 drops[i]++;
             }
         }
-        
         setInterval(draw, 33);
-        
-        // Декоративная кнопка "Завершить тему"
-        document.querySelector('.complete-btn').addEventListener('click', function() {
-            const originalText = this.textContent;
-            this.innerHTML = 'Тема завершена!';
-            this.style.background = 'linear-gradient(45deg, var(--neon-green), var(--neon-blue))';
-            this.style.cursor = 'default';
-            this.disabled = true;
+
+        // ========== Логика кнопки завершения темы ==========
+        const topicId = document.querySelector('.topic_id').textContent.trim();
+        const btn = document.getElementById('completeTopicBtn');
+
+        // Если кнопка активна (тема не завершена) – навешиваем обработчик
+        if (btn && !btn.disabled) {
+            btn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                
+                // Блокируем повторные нажатия во время запроса
+                btn.disabled = true;
+                const originalText = btn.textContent;
+                btn.textContent = 'Отправка...';
+                
+                try {
+                    const response = await fetch(`/topics/complete_topic/${topicId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include'
+                    });
+                    
+                    if (response.ok) {
+                        // Успех – меняем кнопку на завершённую
+                        btn.classList.remove('complete-btn');
+                        btn.classList.add('completed-btn');
+                        btn.textContent = '✓ Тема завершена';
+                        btn.disabled = true;  // остаётся неактивной
+                        
+                        // Показываем уведомление
+                        showNotification('Прогресс сохранен!', 'var(--neon-green)');
+                    } else {
+                        // Ошибка сервера – возвращаем исходное состояние
+                        btn.classList.remove('completed-btn');
+                        btn.classList.add('complete-btn');
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                        
+                        const errorData = await response.json().catch(() => ({}));
+                        showNotification('Ошибка: ' + (errorData.error || 'Не удалось завершить тему'), 'var(--neon-pink)');
+                    }
+                } catch (error) {
+                    // Сетевая ошибка
+                    btn.classList.remove('completed-btn');
+                    btn.classList.add('complete-btn');
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    showNotification('Ошибка соединения', 'var(--neon-pink)');
+                }
+            });
+        }
+
+        // Вспомогательная функция для показа уведомлений
+        function showNotification(message, color) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            notification.style.color = color;
+            notification.style.borderColor = color;
+            notification.style.boxShadow = `0 0 10px ${color}`;
+            document.body.appendChild(notification);
             
-            // Создаем эффект "всплывающего сообщения"
-            const message = document.createElement('div');
-            message.textContent = 'Прогресс сохранен!';
-            message.style.position = 'fixed';
-            message.style.bottom = '20px';
-            message.style.right = '20px';
-            message.style.background = 'var(--dark-secondary)';
-            message.style.color = 'var(--neon-green)';
-            message.style.padding = '10px 20px';
-            message.style.borderRadius = '5px';
-            message.style.border = '1px solid var(--neon-green)';
-            message.style.boxShadow = '0 0 10px var(--neon-green)';
-            message.style.zIndex = '1000';
-            message.style.opacity = '0';
-            message.style.transition = 'opacity 0.3s';
-            message.style.fontFamily = "'Rajdhani', sans-serif";
-            message.style.fontWeight = '500';
+            // Плавно показываем
+            setTimeout(() => notification.style.opacity = '1', 10);
             
-            document.body.appendChild(message);
-            
-            // Показываем и скрываем сообщение
+            // Скрываем через 3 секунды
             setTimeout(() => {
-                message.style.opacity = '1';
-            }, 10);
-            
-            setTimeout(() => {
-                message.style.opacity = '0';
-                setTimeout(() => {
-                    document.body.removeChild(message);
-                    setTimeout(() => {
-                        this.innerHTML = originalText;
-                        this.style.background = 'linear-gradient(45deg, var(--neon-pink), var(--neon-purple))';
-                        this.style.cursor = 'pointer';
-                        this.disabled = false;
-                    }, 3000);
-                }, 300);
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 400);
             }, 3000);
-        });
-        
-        // Загрузка шаблонов header и footer
+        }
+
+        // Загрузка шаблонов header/footer (если используется)
         if (typeof loadTemplates === 'function') {
             loadTemplates();
         }

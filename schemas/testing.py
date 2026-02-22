@@ -1,0 +1,56 @@
+
+from pydantic import BaseModel, Field, ConfigDict
+from datetime import datetime
+from typing import Optional, List
+from typing import Annotated
+
+
+class UserAnswerSchema(BaseModel):
+    question_id: int
+    answer_id: int
+
+
+class TestSubmissionSchema(BaseModel):
+    answers: List[UserAnswerSchema]
+
+class TestRecommendationResponse(BaseModel):
+    creative_score: int
+    analytical_score: int
+    recommended_course: str
+    
+
+class TestQuestionCreate(BaseModel):
+    text: str
+    order: int
+
+class TestQuestionUpdate(BaseModel):
+    text: str
+    order: int
+
+class TestAnswerCreate(BaseModel):
+    question_id: int
+    text: str
+    creative_value: int
+    analytical_value: int
+
+class TestAnswerUpdate(BaseModel):
+    text: str
+    creative_value: int
+    analytical_value: int
+    
+    
+class TestAnswerOptionSchema(BaseModel):
+    id: int
+    text: str
+    creative_value: int
+    analytical_value: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+class TestQuestionSchema(BaseModel):
+    id: int
+    text: str
+    order: int
+    answers: List[TestAnswerOptionSchema]
+
+    model_config = ConfigDict(from_attributes=True)

@@ -1,16 +1,17 @@
-from helpers import create_access_token, create_refresh_token, TOKEN_TYPE_FIELD, ACCESS_TOKEN_TYPE, REFRESH_TOKEN_TYPE
+from utils.helpers import TOKEN_TYPE_FIELD, ACCESS_TOKEN_TYPE, REFRESH_TOKEN_TYPE
 from fastapi import HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt import InvalidTokenError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, Query
 
 
 from auth import utils_jwt
-from schemas import User as UserSchema
+from schemas.users import User as UserSchema
 from models import User
-from db_helpher import get_db
+from utils.db_helpher import get_db
+from routers.users import get_users
 
-oath2_scheme = OAuth2PasswordBearer(tokenUrl="/login/",)
+oath2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login/",)
 
 
 def validate_token_type(
@@ -40,10 +41,11 @@ def get_current_token_payload(
     return payload
     
 
-def get_user_by_token_sub(payload: dict, db: Session) -> UserSchema:
+def get_user_by_token_sub(payload: dict, users: Query) -> UserSchema:
     user_id: str | None = payload.get("sub")
 
-    if user:=db.query(User).where(User.id == user_id).first():
+    if user:=users.where(User.id == user_id).first():
+        
         return user
     
 
@@ -54,10 +56,10 @@ def get_user_by_token_sub(payload: dict, db: Session) -> UserSchema:
 def get_auth_user_from_token_of_type(token_type: str):
     def get_auth_user_from_token(
         payload: dict = Depends(get_current_token_payload),
-        db: Session = Depends(get_db)
+        users: Query = Depends(get_users)
     ) -> UserSchema:
         validate_token_type(payload,token_type)
-        return get_user_by_token_sub(payload, db)
+        return get_user_by_token_sub(payload, users)
     
     return get_auth_user_from_token
 

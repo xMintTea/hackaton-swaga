@@ -1,113 +1,266 @@
-from sqlalchemy import Table, Column, Integer, String, DateTime, Enum, ForeignKey, Text, Boolean, func
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    ForeignKey,
+    Enum,
+    Boolean,
+    Float,
+    DateTime
+)
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
-from datetime import datetime
 
 from database import Base
-from static import Roles
+from static import Roles, Social, CourseLvl
 
 
-
-class User(Base):
-    __tablename__ = "users"
-
-    id = Column(Integer, primary_key=True, index=True)
-    nickname = Column(String)
-    login = Column(String, unique=True, index=True)
-    password = Column(String)
-    email = Column(String, unique=True, index=True)
-    role = Column(Enum(Roles), default=Roles.USER)
-    title_id = Column(Integer, ForeignKey("titles.id"), nullable=True)
+class BaseModel(Base):
+    __abstract__ = True
+    __allow_unmapped__ = True
     
-    title = relationship("Title", back_populates="users")
-    student = relationship("Student", back_populates="user", uselist=False)
-    achievements = relationship("Achievement", secondary="user_achievements", back_populates="users")
-    profile = relationship("UserProfile", back_populates="user", uselist=False)
+    id = Column(Integer, primary_key=True)
 
-class Student(Base):
-    __tablename__ = "students"
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey('users.id'), unique=True)    
+
+
+
+class StudentCourse(BaseModel):
+    __tablename__  = "student_course"
+    student_id = Column("student_id", Integer, ForeignKey("users.id"))
+    course_id = Column("course_id", Integer, ForeignKey("courses.id"))
+    date = Column("date", DateTime)
+
+class StudentTopics(BaseModel):
+    __tablename__ = "student_topic"
+    student_id = Column("student_id", Integer, ForeignKey("users.id"))
+    topic_id = Column("topic_id", Integer, ForeignKey("topics.id"))
+
+class UserAvailableFrames(BaseModel):
+    __tablename__ = "user_available_frames"
+    user_profile_id = Column("user_id", Integer, ForeignKey("users_profiles.id"))
+    frame_id = Column("frame_id", Integer, ForeignKey("frames.id"))
+
+class UserAvailableTitles(BaseModel):
+    __tablename__ = "user_available_titles"
+    user_profile_id = Column("user_id", Integer, ForeignKey("users_profiles.id"))
+    title_id = Column("title_id", Integer, ForeignKey("titles.id"))
+
+
+class UserAvailableAvatars(BaseModel):
+    __tablename__ = "user_available_avatars"
+    user_profile_id = Column("user_profile_id", Integer, ForeignKey("users_profiles.id"))
+    avatar_id = Column("avatar_id", Integer, ForeignKey("avatars.id"))
+
+
+class UserPurchases(BaseModel):
+    __tablename__ = "user_purchases"
+    user_id = Column("user_id", Integer, ForeignKey("users_profiles.id"))
+    item_id = Column("item_id", Integer, ForeignKey("goods.id"))
+    datetime = Column("date", DateTime)
+    
+
+class CoursePurchases(BaseModel):
+    __tablename__ = "course_purchases"
+    user_id = Column("user_id", Integer, ForeignKey("users_profiles.id"))
+    course_id = Column("course_id", Integer, ForeignKey("courses.id"))
+    
+    
+class ProfileSocials(BaseModel):
+    __tablename__ = "profile_socials"
+    
+    profile_id = Column("profile_id", Integer, ForeignKey("users_profiles.id"))
+    social_type = Column("social_type", Enum(Social))
+    value = Column("value", String)
+
+
+class UserProfile(BaseModel):
+    __tablename__ = "users_profiles"
+    
+    user_id = Column(ForeignKey("users.id"))
+    user = relationship("User", back_populates="profile")
+    
+    about_me = Column(String)
+    
+
+    current_frame_id = Column(ForeignKey("frames.id"))
+    current_frame = relationship("Frame", foreign_keys=[current_frame_id], back_populates="users_with_active_frame")
+    available_frames = relationship("Frame", secondary="user_available_frames", back_populates="users_with_frame")
+
+    current_title_id = Column(ForeignKey("titles.id"))
+    current_title = relationship("Title", foreign_keys=[current_title_id], back_populates="users_with_active_title")
+    available_titles = relationship("Title", secondary="user_available_titles", back_populates="users_with_frame")
+    
+    current_avatar_id = Column(ForeignKey("avatars.id"))
+    current_avatar = relationship(
+        "Avatar", 
+        foreign_keys=[current_avatar_id],
+        back_populates="users_with_active_avatar"
+    )
+    
+    available_avatars = relationship(
+        "Avatar", 
+        secondary="user_available_avatars",
+        back_populates="users_with_avatar"
+    )
+    
+    achievements = relationship("Achievement")
+    
+    purchases = relationship("Goods", secondary="user_purchases", back_populates="users")
+    
+    
+
+    def __repr__(self):
+        return f"<UserProfile({self.id=},{self.current_frame_id=}, {self.available_frames=})>"
+
+
+class GamificationRecord(BaseModel):
+    __tablename__ = "game_records"
+    
+    user_id = Column(ForeignKey("users.id"))
+    user = relationship("User", back_populates="gamerec")
+    
     xp = Column(Integer, default=0)
     lvl = Column(Integer, default=1)
     currency = Column(Integer, default=0)
-    current_course_id = Column(Integer, ForeignKey('courses.id')) 
     
-    user = relationship("User", back_populates="student")
-    current_course = relationship("Course", back_populates="students") 
+    def __repr__(self):
+        return f"<GameRecord({self.id=}, {self.user_id=}, {self.xp=})>"
 
-class Achievement(Base):
+
+class User(BaseModel):
+    __tablename__ = "users"
+    
+    login = Column(String)
+    nickname = Column(String)
+    password = Column(String)
+    email = Column(String)
+    role = Column(Enum(Roles))
+
+    profile = relationship(UserProfile,back_populates="user", uselist=False) # 1 к 1
+    gamerec = relationship(GamificationRecord, back_populates="user", uselist=False) # 1 к 1
+    courses = relationship("Course", secondary="student_course", back_populates="users")
+
+    completed_topics = relationship("Topic", secondary="student_topic", back_populates="users_completed")
+
+    def __repr__(self):
+        return f"<User({self.id=}, {self.login=}, {self.profile=})>"
+
+
+class Frame(BaseModel):
+    __tablename__ = "frames"
+    
+    name = Column(String)
+    img_href = Column(String)
+    
+
+    users_with_frame = relationship(UserProfile, secondary="user_available_frames", back_populates="available_frames")
+    users_with_active_frame = relationship(UserProfile, foreign_keys="[UserProfile.current_frame_id]", back_populates="current_frame")
+
+    def __repr__(self):
+        return f"<Frame({self.id=}, {self.name=})>"
+
+
+class Achievement(BaseModel):
     __tablename__ = "achievements"
-    id = Column(Integer, primary_key=True, index=True)
+    
+    user_id = Column(ForeignKey("users_profiles.id"))
+    
     name = Column(String)
     description = Column(String)
-    
-    users = relationship("User", secondary="user_achievements", back_populates="achievements")
 
-class UserAchievement(Base):
-    __tablename__ = "user_achievements"
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    achievement_id = Column(Integer, ForeignKey('achievements.id'))
-    
-    user = relationship("User")
-    achievement = relationship("Achievement")
 
-class Title(Base):
+class Title(BaseModel):
     __tablename__ = "titles"
-    id = Column(Integer, primary_key=True, index=True)
+
+    users_with_active_title = relationship(UserProfile, foreign_keys="[UserProfile.current_title_id]", back_populates="current_title")
+    users_with_frame = relationship(UserProfile, secondary="user_available_titles", back_populates="available_titles")
+    
     name = Column(String)
-    
-    users = relationship("User", back_populates="title")
 
-class UserProfile(Base):
-    __tablename__ = "user_profiles"
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), unique=True)
-    
-    user = relationship("User", back_populates="profile")
 
-class Course(Base):
+class Course(BaseModel):
     __tablename__ = "courses"
     
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, nullable=False)
-    description = Column(Text)
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
-    
-    topics = relationship("Topic", back_populates="course", order_by="Topic.order")
-    students = relationship("Student", back_populates="current_course") 
+    name = Column(String)
+    description = Column(String)
+    price = Column(Float)
+    course_lvl = Column(Enum(CourseLvl))
+    users = relationship(User, secondary="student_course", back_populates="courses")
 
-class Topic(Base):
+    topics = relationship("Topic")
+
+
+    def __repr__(self):
+        return f"<Course({self.name=},{self.topics=})>"
+
+class Topic(BaseModel):
     __tablename__ = "topics"
     
-    id = Column(Integer, primary_key=True, index=True)
-    course_id = Column(Integer, ForeignKey("courses.id"), nullable=False)
-    title = Column(String, nullable=False)
-    content = Column(Text)
-    order = Column(Integer, default=0)
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    course_id = Column(ForeignKey("courses.id"))
     
-    course = relationship("Course", back_populates="topics")
+    
+    name = Column(String)
+    content = Column(String, nullable=True)
+    order = Column(Integer, default=0)
+    
+    users_completed = relationship(User, secondary="student_topic", back_populates="completed_topics")
 
 
-class TestQuestion(Base):
+    def __repr__(self):
+        return f"<Topic({self.name=},{self.users_completed=})>"
+
+
+class TestQuestion(BaseModel):
     __tablename__ = "test_questions"
     
-    id = Column(Integer, primary_key=True, index=True)
-    text = Column(Text, nullable=False)  # Текст вопроса
-    order = Column(Integer, default=0)   # Порядок вопроса (для сортировки)
+    text = Column(String)
+    order = Column(Integer)
+    
+    answers = relationship("TestAnswer")
 
-class TestAnswerOption(Base):
-    __tablename__ = "test_answer_options"
+    def __repr__(self):
+        return f"<TestQuestion({self.id=}, {self.answers=})>"
+
+
+class TestAnswer(BaseModel):
+    __tablename__ = "test_answers"
     
-    id = Column(Integer, primary_key=True, index=True)
-    question_id = Column(Integer, ForeignKey("test_questions.id"))
-    answer_text = Column(String, nullable=False)  # Текст ответа
-    creative_value = Column(Integer, default=0)   # Баллы за творчество
-    analytical_value = Column(Integer, default=0) # Баллы за аналитику
+    question_id = Column(ForeignKey("test_questions.id"))
+    text = Column(String)
+    analytical_value = Column(Integer)
+    creative_value = Column(Integer)
+
+
+    def __repr__(self):
+        return f"<TestAnswer({self.id=})>"
+
+
+class Avatar(BaseModel):
+    __tablename__ = "avatars"
     
-    question = relationship("TestQuestion", backref="answer_options")
+    name = Column(String)
+    image_url = Column(String)
+    is_public = Column(Boolean, default=True)
+    
+    users_with_active_avatar = relationship(
+        "UserProfile", 
+        foreign_keys="[UserProfile.current_avatar_id]",
+        back_populates="current_avatar"
+    )
+    
+    users_with_avatar = relationship(
+        "UserProfile", 
+        secondary="user_available_avatars",
+        back_populates="available_avatars"
+    )
+
+    def __repr__(self):
+        return f"<Avatar({self.id=}, {self.name=})>"
     
     
+class Goods(BaseModel):
+    __tablename__ = "goods"
+    
+    name = Column(String)
+    
+    users = relationship(UserProfile, secondary="user_purchases", back_populates="purchases")
